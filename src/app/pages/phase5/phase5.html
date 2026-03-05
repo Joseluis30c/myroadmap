@@ -1,0 +1,35 @@
+<div class="container">
+    <div class="badge-row">
+        @for (item of weeks; track item.id) {
+        <button 
+            class="badge badge-prev"
+            [class.active-week]="selectedWeekId === item.id"
+            (click)="loadWeek(item.id)">
+            {{item.name}}
+        </button>
+        }
+    </div>
+    <h1 class="title-header" [innerHTML]="titleWeek"></h1>
+    <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" [style.width.%]="progressPercentage"></div></div>
+        <div class="progress-text">{{ progressLabel }}</div>
+    </div>
+</div>
+<main class="content">
+    <div class="container">
+        @switch (selectedWeekId) {
+            @case (1) {
+                <app-week1></app-week1>
+            }
+            @case (2) {
+                <app-week2></app-week2>
+            }
+            @case (3) {
+                <app-week3></app-week3>
+            }
+            @default {
+                <app-home></app-home>
+            }
+        }
+    </div>
+</main>

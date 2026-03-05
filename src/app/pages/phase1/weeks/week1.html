@@ -1,0 +1,427 @@
+<div class="day-nav">
+    <a [routerLink]="[]" fragment="dia1" class="day-pill">📍 Día 1 – Request Lifecycle</a>
+    <a [routerLink]="[]" fragment="dia2" class="day-pill">📍 Día 2 – Middleware</a>
+    <a [routerLink]="[]" fragment="dia3" class="day-pill">📍 Día 3 – DI Profundo</a>
+    <a [routerLink]="[]" fragment="dia4" class="day-pill">📍 Día 4 – Configuración</a>
+    <a [routerLink]="[]" fragment="dia5" class="day-pill">📍 Día 5 – Logging + API</a>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">API estructurada</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">.NET 8 / ASP.NET Core</div></div>
+</div>
+
+<!-- DÍA 1 -->
+<div class="day-section" id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Ciclo de Vida de una Request</div>
+        <div class="day-subtitle">Cómo ASP.NET Core procesa cada petición HTTP de inicio a fin</div>
+        </div>
+        <span class="day-tag">⏱ ~4–5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Concepto clave:</strong> Cuando llega una HTTP request, ASP.NET Core la procesa a través de un pipeline lineal: Kestrel → Middleware pipeline → Routing → Controller/Endpoint → Middleware (respuesta) → Kestrel. Entender este flujo es la base de todo lo demás.
+    </div>
+
+    <div class="resources">
+
+    <div class="resource-card">
+        <div class="resource-icon doc">📖</div>
+        <div class="resource-body">
+            <div class="resource-type doc">📖 Documentación Oficial</div>
+            <h3>ASP.NET Core Request Processing</h3>
+            <p>Documentación oficial de Microsoft sobre cómo se maneja el ciclo de vida de una request, Kestrel y el pipeline de middlewares.</p>
+            <a href="https://learn.microsoft.com/es-es/aspnet/core/fundamentals/middleware/?view=aspnetcore-8.0" target="_blank">📘 Leer en Microsoft Docs →</a>
+        </div>
+    </div>
+
+    <div class="resource-card">
+        <div class="resource-icon doc">📖</div>
+        <div class="resource-body">
+            <div class="resource-type doc">📖 Documentación Oficial</div>
+            <h3>Request and Response operations in ASP.NET Core</h3>
+            <p>Explica HttpContext, HttpRequest, HttpResponse y cómo leer/escribir el body de la request.</p>
+            <a href="https://learn.microsoft.com/es-es/aspnet/core/fundamentals/use-http-context?view=aspnetcore-8.0" target="_blank">📘 Leer en Microsoft Docs →</a>
+        </div>
+    </div>
+
+    <div class="resource-card">
+        <div class="resource-icon vid">▶️</div>
+        <div class="resource-body">
+            <div class="resource-type vid">▶️ Video – YouTube</div>
+            <h3>ASP.NET Core Request Pipeline Explained</h3>
+            <p>Explica visualmente el pipeline de ASP.NET Core. Uno de los mejores canales .NET ~15 min.</p>
+            <a href="https://youtu.be/uFcyAdXL4mk?si=aNU8PhtVcI8CeUAu" target="_blank">▶️ Ver en YouTube →</a>
+        </div>
+    </div>
+
+    <div class="resource-card">
+        <div class="resource-icon vid">▶️</div>
+        <div class="resource-body">
+            <div class="resource-type vid">▶️ Video – YouTube</div>
+            <h3>ASP.NET Core Fundamentals – IWebHostBuilder & Kestrel</h3>
+            <p>Explica cómo arranca la aplicación, el rol de Kestrel y cómo fluye la request. Canal: Raw Coding.</p>
+            <a href="https://youtu.be/M6N6Ia5z6Ro?si=FD4I-ilazL7G8oD6" target="_blank">▶️ Ver en YouTube →</a>
+        </div>
+    </div>
+
+    <div class="resource-card">
+        <div class="resource-icon code">💻</div>
+        <div class="resource-body">
+            <div class="resource-type code">💻 Ejercicio Práctico</div>
+            <h3>Crear un endpoint y rastrear el ciclo completo</h3>
+            <p>Crea un minimal API que logee en consola cada etapa: entrada, procesamiento y salida.</p>
+            <div class="code-label">Program.cs básico para experimentar:</div>
+            <pre><code>{{codeExample1}}</code></pre>
+        </div>
+    </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div class="day-section" id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+            <div class="day-title">Middleware</div>
+            <div class="day-subtitle">Crear, ordenar y comprender el pipeline de middlewares</div>
+        </div>
+        <span class="day-tag">⏱ ~4–5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Concepto clave:</strong> Un middleware es un componente que intercepta la request/response. Se encadenan en orden y pueden pasar el control al siguiente (<code>await next()</code>) o cortocircuitar la cadena. El <strong>orden importa</strong>: Exception → HTTPS → Routing → Auth → Endpoints.
+    </div>
+
+    <div class="resources">
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+            <div class="resource-type doc">📖 Documentación Oficial</div>
+            <h3>ASP.NET Core Middleware – Guía Completa</h3>
+            <p>Explica cómo escribir middleware, el orden recomendado, middleware integrado y middleware personalizado con IMiddleware.</p>
+            <a href="https://learn.microsoft.com/es-es/aspnet/core/fundamentals/middleware/?view=aspnetcore-8.0" target="_blank">📘 Leer en Microsoft Docs →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+            <div class="resource-type doc">📖 Artículo Técnico</div>
+            <h3>Escribir middleware personalizado (Microsoft)</h3>
+            <p>Cómo crear clases middleware reutilizables con IMiddleware vs RequestDelegate, y cómo registrarlos.</p>
+            <a href="https://learn.microsoft.com/es-es/aspnet/core/fundamentals/middleware/write?view=aspnetcore-8.0" target="_blank">📘 Leer en Microsoft Docs →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon vid">▶️</div>
+            <div class="resource-body">
+            <div class="resource-type vid">▶️ Video – YouTube</div>
+            <h3>ASP.NET Core Middleware In Depth</h3>
+            <p>Explica Use, Run, Map y cómo crear middlewares personalizados. Muy visual y claro. ~20 min.</p>
+            <a href="https://youtu.be/tx1hsf_R-0o?si=Ky2JT52fTv7fvekj" target="_blank">▶️ Ver en YouTube →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon vid">▶️</div>
+            <div class="resource-body">
+            <div class="resource-type vid">▶️ Video – YouTube</div>
+            <h3>Custom Middleware in ASP.NET Core</h3>
+            <p>Tutorial que muestra cómo hacer un middleware de autenticación customizado paso a paso.</p>
+            <a href="https://youtu.be/cu4CUJAcJ-4?si=WkDeNzsOcWEbo9Yz" target="_blank">▶️ Ver en YouTube →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon code">💻</div>
+            <div class="resource-body">
+            <div class="resource-type code">💻 Ejercicio Práctico</div>
+            <h3>Middleware de timing de requests</h3>
+            <p>Crea un middleware que mida cuánto tarda cada request y lo registre en headers de respuesta.</p>
+            <pre><code>{{codeExample2}}</code></pre>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div class="day-section" id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+            <div class="day-title">Dependency Injection Profundo</div>
+            <div class="day-subtitle">Lifetimes, Scoped vs Singleton vs Transient, y patrones avanzados</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Concepto clave:</strong> DI en .NET tiene 3 lifetimes: <strong>Transient</strong> (nueva instancia cada vez), <strong>Scoped</strong> (una por request HTTP) y <strong>Singleton</strong> (una por toda la vida de la app). Mezclarlos mal provoca bugs sutiles y memory leaks (Captive Dependencies).
+    </div>
+
+    <div class="resources">
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+            <div class="resource-type doc">📖 Documentación Oficial</div>
+            <h3>Dependency Injection en ASP.NET Core</h3>
+            <p>Guía completa de Microsoft: lifetimes, registro de servicios, IServiceProvider, options pattern y más.</p>
+            <a href="https://learn.microsoft.com/es-es/dotnet/core/extensions/dependency-injection" target="_blank">📘 Leer en Microsoft Docs →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+            <div class="resource-type doc">📖 Artículo – Andrew Lock</div>
+            <h3>Understanding Scoped, Transient and Singleton DI</h3>
+            <p>Andrew Lock (andrewlock.net) es uno de los mejores recursos .NET. Este artículo profundiza en captive dependencies y cuándo usar cada lifetime.</p>
+            <a href="https://andrewlock.net/new-in-asp-net-core-3-service-provider-validation/" target="_blank">📘 Leer artículo →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon vid">▶️</div>
+            <div class="resource-body">
+            <div class="resource-type vid">▶️ Video – YouTube</div>
+            <h3>Dependency Injection Lifetimes – The RIGHT Way</h3>
+            <p>Explica visualmente los tres lifetimes, cuándo usar cada uno y los errores más comunes. ~25 min.</p>
+            <a href="https://youtu.be/AF224eUmWLc?si=kCFa2t5tCMlSGZi-" target="_blank">▶️ Ver en YouTube →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon vid">▶️</div>
+            <div class="resource-body">
+            <div class="resource-type vid">▶️ Video – YouTube</div>
+            <h3>Advanced DI in .NET: Factories, Named Services, Keyed DI (.NET 8)</h3>
+            <p>Temas avanzados: Keyed services (nuevo en .NET 8), Factory Pattern con DI, IServiceScopeFactory.</p>
+            <a href="https://www.youtube.com/watch?v=tKEF6xaeoig" target="_blank">▶️ Ver en YouTube →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon code">💻</div>
+            <div class="resource-body">
+            <div class="resource-type code">💻 Ejercicio Práctico</div>
+            <h3>Comparar lifetimes en tiempo real</h3>
+            <p>Registra el mismo servicio con distintos lifetimes e imprime el GUID para ver cuándo se crean nuevas instancias.</p>
+            <pre><code>{{codeExample3}}</code></pre>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+            <div class="resource-type doc">📖 Microsoft Docs</div>
+            <h3>Keyed Services en .NET 8 (Nuevo)</h3>
+            <p>Registrar y resolver múltiples implementaciones del mismo interface usando una clave string o enum. Muy útil para strategy pattern.</p>
+            <a href="https://learn.microsoft.com/es-es/dotnet/core/extensions/dependency-injection#keyed-services" target="_blank">📘 Leer en Microsoft Docs →</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div class="day-section" id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+            <div class="day-title">Configuración Avanzada</div>
+            <div class="day-subtitle">appsettings, environments, Options Pattern, secrets y variables de entorno</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Concepto clave:</strong> ASP.NET Core usa un sistema de configuración por capas: <code>appsettings.json</code> → <code>appsettings.{{'{'}}Env{{'}'}}.json</code> → Variables de entorno → Argumentos CLI → User Secrets. Cada capa puede sobrescribir la anterior. El <strong>Options Pattern</strong> (IOptions, IOptionsSnapshot, IOptionsMonitor) es la forma correcta de consumirla.
+    </div>
+
+    <div class="resources">
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+            <div class="resource-type doc">📖 Documentación Oficial</div>
+            <h3>Configuration in ASP.NET Core – Microsoft Docs</h3>
+            <p>Toda la documentación sobre proveedores de configuración, binding, jerarquía de fuentes y más.</p>
+            <a href="https://learn.microsoft.com/es-es/aspnet/core/fundamentals/configuration/?view=aspnetcore-8.0" target="_blank">📘 Leer en Microsoft Docs →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+            <div class="resource-type doc">📖 Documentación Oficial</div>
+            <h3>Options Pattern en .NET</h3>
+            <p>IOptions vs IOptionsSnapshot vs IOptionsMonitor: cuándo usar cada uno, validación de opciones, y data annotations.</p>
+            <a href="https://learn.microsoft.com/es-es/dotnet/core/extensions/options" target="_blank">📘 Leer en Microsoft Docs →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon vid">▶️</div>
+            <div class="resource-body">
+            <div class="resource-type vid">▶️ Video – YouTube</div>
+            <h3>ASP.NET Core Configuration – The Complete Guide</h3>
+            <p>Cubre appsettings, environments, Options Pattern, secrets y variables de entorno en un solo video. ~30 min.</p>
+            <a href="https://www.youtube.com/watch?v=5GlgHV_12-k" target="_blank">▶️ Ver en YouTube →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon vid">▶️</div>
+            <div class="resource-body">
+            <div class="resource-type vid">▶️ Video – YouTube</div>
+            <h3>User Secrets &amp; Environment Variables in .NET</h3>
+            <p>Manejo seguro de secrets en development y cómo pasar configuración en producción via variables de entorno.</p>
+            <a href="https://youtu.be/zZFw6RWrmBA?si=ggmQ5ptt712FtGjc" target="_blank">▶️ Ver en YouTube →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon code">💻</div>
+            <div class="resource-body">
+            <div class="resource-type code">💻 Ejercicio Práctico</div>
+            <h3>Implementar Options Pattern con validación</h3>
+            <p>Crea una clase de configuración fuertemente tipada con validación automática al inicio.</p>
+            <pre><code>{{codeExample4}}</code></pre>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+            <div class="resource-type doc">📖 Documentación Oficial</div>
+            <h3>User Secrets para Development</h3>
+            <p>Cómo almacenar secrets localmente sin subirlos al repositorio. Ideal para connection strings y API keys en dev.</p>
+            <a href="https://learn.microsoft.com/es-es/aspnet/core/security/app-secrets?view=aspnetcore-8.0" target="_blank">📘 Leer en Microsoft Docs →</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- DÍA 5 -->
+<div class="day-section" id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Logging Básico + API Entregable</div>
+        <div class="day-subtitle">ILogger, Serilog, structured logging y construir la API final</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Concepto clave:</strong> .NET tiene logging built-in con <code>ILogger&lt;T&gt;</code>. Serilog es el estándar de la industria para structured logging (logs como JSON). El <strong>structured logging</strong> (plantillas con &#123;Property&#125;) permite filtrar y buscar logs eficientemente en producción.
+    </div>
+
+    <div class="resources">
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+                <div class="resource-type doc">📖 Documentación Oficial</div>
+                <h3>Logging en .NET – Microsoft Docs</h3>
+                <p>ILogger, LogLevel, log categories, log filtering, proveedores de logging y structured logging.</p>
+                <a href="https://learn.microsoft.com/es-es/dotnet/core/extensions/logging?tabs=command-line" target="_blank">📘 Leer en Microsoft Docs →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+                <div class="resource-type doc">📖 Documentación Serilog</div>
+                <h3>Serilog – Getting Started</h3>
+                <p>Documentación oficial de Serilog: instalación, sinks (Console, File, Seq), enrichers y configuración via appsettings.</p>
+                <a href="https://serilog.net/" target="_blank">📘 Ir a Serilog.net →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon vid">▶️</div>
+            <div class="resource-body">
+                <div class="resource-type vid">▶️ Video – YouTube</div>
+                <h3>Logging in ASP.NET Core with Serilog</h3>
+                <p>Instalar Serilog, configurarlo en appsettings, structured logging y múltiples sinks. Práctico y directo. ~20 min.</p>
+                <a href="https://www.youtube.com/watch?v=hJ0QHRV3RPQ" target="_blank">▶️ Ver en YouTube →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon vid">▶️</div>
+            <div class="resource-body">
+                <div class="resource-type vid">▶️ Video – YouTube</div>
+                <h3>Structured Logging – Por qué importa</h3>
+                <p>Diferencia entre logging de texto plano y structured logging, y cómo consultar logs en producción.</p>
+                <a href="https://youtu.be/gLxcWcUwuts?si=LgJQWpDZUAubOCpS" target="_blank">▶️ Ver en YouTube →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon code">💻</div>
+            <div class="resource-body">
+                <div class="resource-type code">💻 Ejercicio – API Entregable Final</div>
+                <h3>Estructura de la API bien organizada</h3>
+                <p>Integra todo lo aprendido en la semana: middleware, DI, configuración y logging con Serilog.</p>
+                <pre><code>{{codeExample5}}</code></pre>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon pdf">📄</div>
+            <div class="resource-body">
+                <div class="resource-type pdf">📄 Repositorio GitHub</div>
+                <h3>Clean Architecture con ASP.NET Core (referencia)</h3>
+                <p>Repositorio de referencia de Jason Taylor con estructura profesional real: middleware, DI, logging todo integrado.</p>
+                <a href="https://github.com/jasontaylordev/CleanArchitecture" target="_blank">📄 Ver en GitHub →</a>
+            </div>
+        </div>
+
+        <div class="resource-card">
+            <div class="resource-icon doc">📖</div>
+            <div class="resource-body">
+                <div class="resource-type doc">📖 eBook Gratuito</div>
+                <h3>Architecting Modern Web Apps with ASP.NET Core (Microsoft)</h3>
+                <p>eBook oficial gratuito de Microsoft. Capítulos 2-4 son muy relevantes para esta semana. PDF descargable.</p>
+                <a href="https://aka.ms/webappebook" target="_blank">📘 Descargar PDF gratuito →</a>
+            </div>
+        </div>
+
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable Final – API Bien Estructurada</h2>
+    <p style="font-size:0.88rem; color: var(--text-muted); margin-bottom: 1rem;">Tu API debe cumplir todos estos puntos para considerar la semana completa:</p>
+    <ul>
+        <li>Middleware personalizado de timing y manejo de errores</li>
+        <li>Servicios registrados con el lifetime correcto (Scoped para repositorios, etc.)</li>
+        <li>Configuración tipada con Options Pattern y validación</li>
+        <li>appsettings separado por environment (Development / Production)</li>
+        <li>Serilog configurado desde appsettings.json con structured logging</li>
+        <li>Endpoints mínimamente estructurados (al menos CRUD de un recurso)</li>
+        <li>Código limpio: sin lógica de negocio en Program.cs</li>
+    </ul>
+</div>
