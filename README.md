@@ -6,6 +6,7 @@
 ![Frontend](https://img.shields.io/badge/Frontend-Web-orange)
 
 Aplicación web desarrollada con **Angular** que permite visualizar y organizar un **roadmap de aprendizaje o desarrollo**, mostrando de forma clara los pasos, tecnologías y objetivos que se desean alcanzar.
+
 ---
 # 📚 Tabla de Contenido
 
