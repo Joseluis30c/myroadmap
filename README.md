@@ -1,59 +1,168 @@
-# Myroadmap
+# 🗺️ MyRoadMap
+![Angular](https://img.shields.io/badge/Angular-21-red)
+![TypeScript](https://img.shields.io/badge/TypeScript-Language-blue)
+![Status](https://img.shields.io/badge/Status-Active-success)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Frontend](https://img.shields.io/badge/Frontend-Web-orange)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.0.
+Aplicación web desarrollada con **Angular** que permite visualizar y organizar un **roadmap de aprendizaje o desarrollo**, mostrando de forma clara los pasos, tecnologías y objetivos que se desean alcanzar.
+---
+# 📚 Tabla de Contenido
 
-## Development server
+- Descripción
+- Objetivo del proyecto
+- Tecnologías utilizadas
+- Funcionalidades
+- Estructura del proyecto
+- Cómo ejecutar el proyecto
+- Ejemplo de código
+- Mejoras futuras
+- Autor
+- Apoya el proyecto
 
-To start a local development server, run:
+---
+# 🧠 Descripcion
 
-```bash
-ng serve
+**MyRoadMap** es una aplicación web desarrollada con **Angular** que permite crear y visualizar un **roadmap de aprendizaje o desarrollo profesional**.
+
+El objetivo es mostrar de manera organizada los diferentes pasos o tecnologías que forman parte de un plan de aprendizaje o desarrollo, facilitando el seguimiento del progreso y la planificación de nuevas metas.
+
+Este tipo de herramientas es útil para:
+
+- Planificar el aprendizaje de nuevas tecnologías
+- Organizar objetivos profesionales
+- Visualizar el progreso de desarrollo
+- Compartir roadmaps con otros desarrolladores
+
+---
+# 🎯 Objetivo del proyecto
+
+El proyecto tiene como objetivo principal:
+
+- Crear una aplicación web moderna utilizando **Angular**
+- Permitir visualizar un **roadmap de aprendizaje**
+- Practicar arquitectura y estructura de proyectos frontend
+- Servir como ejemplo educativo para desarrolladores que trabajan con Angular
+
+También funciona como una herramienta para **organizar objetivos tecnológicos y profesionales**.
+
+---
+# 🧰 Tecnologias utilizadas
+
+Las principales tecnologías utilizadas en el proyecto son:
+
+- **Angular**
+- **TypeScript**
+- **HTML**
+- **CSS**
+- **Node.js**
+- **Angular CLI**
+
+Estas tecnologías permiten construir aplicaciones web modernas, rápidas y mantenibles.
+
+---
+# ⚙️ Funcionalidades
+
+El proyecto incluye las siguientes funcionalidades:
+
+✔ Visualización de un roadmap de aprendizaje  
+✔ Organización de tecnologías por etapas  
+✔ Interfaz web moderna desarrollada con Angular  
+✔ Arquitectura basada en componentes  
+✔ Fácil extensión para agregar nuevas secciones o tecnologías  
+
+---
+# 📁 Estructura del proyecto
+
+    myroadmap/
+    ├── src/
+    |  ├──app/
+    |  |  ├──components/
+    |  |  ├──pages/
+    |  |  ├──services/
+    ├── angular.json
+    ├── package.json
+    └── README.md
+------------------------------------------------------------------------
+
+# 🚀 Como ejecutar el proyecto
+
+### 1️⃣ Clonar el repositorio
+
+``` bash
+git clone https://github.com/Joseluis30c/myroadmap.git
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+### 2️⃣ Instalar dependencias
+``` bash
+ npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
+### 3️⃣ Ejecutar el proyecto
+``` bash
+ ng serve
 ```
 
-## Building
+### 4️⃣ Abrir en el navegador
+``` bash
+ http://localhost:4200
+```
+------------------------------------------------------------------------
 
-To build the project run:
+# 💡 Ejemplo de código
 
-```bash
-ng build
+Ejemplo simple de un componente en Angular:
+
+``` typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-roadmap',
+  template: `
+    <h1>My Roadmap</h1>
+    <ul>
+      <li *ngFor="let item of roadmap">
+        {{ item }}
+      </li>
+    </ul>
+  `
+})
+export class RoadmapComponent {
+
+  roadmap: string[] = [
+    'HTML & CSS',
+    'JavaScript',
+    'Angular',
+    'APIs',
+    'Bases de datos'
+  ];
+
+}
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+------------------------------------------------------------------------
 
-## Running unit tests
+# 🚀 Mejoras futuras
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Algunas mejoras que podrían agregarse al proyecto:
 
-```bash
-ng test
-```
+-   Diseño responsive mejorado
+-   Integración con APIs para obtener roadmaps dinámicos
+-   Persistencia de datos
+-   Sistema de usuarios
+------------------------------------------------------------------------
 
-## Running end-to-end tests
+# 👨‍💻 Autor
 
-For end-to-end (e2e) testing, run:
+**Jose Luis Chavesta Rivas**
 
-```bash
-ng e2e
-```
+GitHub\
+https://github.com/Joseluis30c
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+------------------------------------------------------------------------
 
-## Additional Resources
+# ⭐ Apoya el proyecto
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Si este proyecto te resulta útil o interesante:
+
+⭐ Dale una estrella al repositorio en GitHub.
