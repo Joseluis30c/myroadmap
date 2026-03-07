@@ -1,0 +1,53 @@
+<div class="nav-scroller py-1 mb-3 border-bottom">
+    <nav class="nav nav-underline justify-content-between"> 
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia1"><strong>Día 1</strong> – xUnit Fundamentos</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia2"><strong>Día 2</strong> – Moq & Mocking</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia3"><strong>Día 3</strong> – Testing de Servicios</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia4"><strong>Día 4</strong> – Testing de Controllers</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia5"><strong>Día 5</strong> – Cobertura & Entregable</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Objetivo</div><div class="value">60% cobertura</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">26+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Patrón clave</div><div class="value">xUnit + Moq</div></div>
+</div>
+
+<!-- DIAGRAMA ARQUITECTURA -->
+<div class="arch-diagram">
+    <h3>🗺 La Pirámide de Tests — Dónde vas a enfocarte esta semana</h3>
+    <div class="layers">
+        <div class="layer layer-pres">
+        <div>
+            <div class="layer-name">🌐 E2E / Integration Tests</div>
+            <div class="layer-rule">Lentos, costosos, pocas unidades. No son el foco de esta semana.</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">Semana 5</span><span class="layer-tag">WebApplicationFactory</span><span class="layer-tag">Testcontainers</span>
+        </div>
+        </div>
+        <div class="layer layer-app">
+        <div>
+            <div class="layer-name">⚙️ Integration Tests</div>
+            <div class="layer-rule">Prueban múltiples capas juntas. Verás lo básico al final de la semana.</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">Controllers + Services</span><span class="layer-tag">In-Memory DB</span>
+        </div>
+        </div>
+        <div class="layer layer-domain">
+        <div>
+            <div class="layer-name">⚡ Unit Tests — EL FOCO DE ESTA SEMANA</div>
+            <div class="layer-rule">Rápidos, aislados, sin dependencias reales. Prueban una sola unidad lógica.</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">xUnit</span><span class="layer-tag">Moq</span><span class="layer-tag">FluentAssertions</span><span class="layer-tag">Domain</span><span class="layer-tag">Services</span><span class="layer-tag">Controllers</span>
+        </div>
+        </div>
+        <div class="concept-box">
+            <strong>💡Regla 70-20-10:</strong> 70% Unit Tests, 20% Integration Tests, 10% E2E. Los unit tests son el grueso porque son rápidos, baratos y se ejecutan en cada commit.
+        </div>
+    </div>
+</div>

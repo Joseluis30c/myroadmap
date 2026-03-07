@@ -1,8 +1,580 @@
-<div class="day-nav">
-    <a [routerLink]="[]" fragment="dia1" class="day-pill">📍 Día 1 – FluentValidation base</a>
-    <a [routerLink]="[]" fragment="dia2" class="day-pill">📍 Día 2 – FV avanzado + Pipeline</a>
-    <a [routerLink]="[]" fragment="dia3" class="day-pill">📍 Día 3 – Manejo global de errores</a>
-    <a [routerLink]="[]" fragment="dia4" class="day-pill">📍 Día 4 – API Response Pattern</a>
-    <a [routerLink]="[]" fragment="dia5" class="day-pill">📍 Día 5 – REST Best Practices + API</a>
+<div class="nav-scroller py-1 mb-3 border-bottom">
+    <nav class="nav nav-underline justify-content-between"> 
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia1"><strong>Día 1</strong> – FluentValidation base</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia2"><strong>Día 2</strong> – FV avanzado + Pipeline</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia3"><strong>Día 3</strong> – Manejo global de errores</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia4"><strong>Día 4</strong> – API Response Pattern</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia5"><strong>Día 5</strong> – REST Best Practices + API</button>
+    </nav>
 </div>
-<h1>Proximamente..</h1>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Objetivo</div><div class="value">API robusta</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">26+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Patrón clave</div><div class="value">ProblemDetails RFC 9457</div></div>
+</div>
+
+<!-- DIAGRAMA ARQUITECTURA -->
+<div class="flow">
+    <h3>🗺 El flujo completo de una request con validaciones y errores</h3>
+    <div class="flow-steps">
+        <div class="fs fs-req"><div class="fs-name">📥 Request</div><div class="fs-sub">JSON entra al Controller</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-valid"><div class="fs-name">🔍 FluentValidation</div><div class="fs-sub">Valida el DTO / Command<br>400 si falla</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-biz"><div class="fs-name">⚙️ Application Layer</div><div class="fs-sub">Lógica de negocio<br>lanza DomainException</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-err"><div class="fs-name">🚨 Exception Handler</div><div class="fs-sub">Captura TODO<br>mapea a ProblemDetails</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-res"><div class="fs-name">📤 Response</div><div class="fs-sub">JSON estándar<br>RFC 9457</div></div>
+    </div>
+</div>
+
+<!-- RFC 9457 -->
+<div class="flow">
+    <h3>📋 ProblemDetails – RFC 9457 (el estándar que debes usar)</h3>
+    <p style="font-size:.83rem;margin-bottom:1rem;">Todos los errores de tu API deben responder con este formato. Es el estándar de la industria y .NET lo soporta nativamente desde .NET 7.</p>
+    <div class="pf-grid">
+        <div class="pf"><div class="pf-key">"type"</div><div class="pf-val">URI que identifica el tipo de error. Ej: "https://tools.ietf.org/html/rfc9110#section-15.5.5"</div></div>
+        <div class="pf"><div class="pf-key">"title"</div><div class="pf-val">Descripción corta legible. Ej: "Validation Error" o "Not Found"</div></div>
+        <div class="pf"><div class="pf-key">"status"</div><div class="pf-val">HTTP status code. Ej: 400, 404, 422, 500</div></div>
+        <div class="pf"><div class="pf-key">"detail"</div><div class="pf-val">Explicación específica del error en esta request concreta</div></div>
+        <div class="pf"><div class="pf-key">"instance"</div><div class="pf-val">URI de la request que causó el error. Ej: "/products/abc123"</div></div>
+        <div class="pf"><div class="pf-key">"errors"</div><div class="pf-val">Extensión custom: lista de errores de validación por campo</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">FluentValidation — Fundamentos</div>
+        <div class="day-subtitle">Instalación, validators básicos, reglas predefinidas y mensajes de error</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>¿Por qué FluentValidation y no DataAnnotations?</strong> DataAnnotations mezcla validación con el modelo (viola SRP), es difícil de testear y no soporta reglas complejas. FluentValidation tiene validadores separados, son unit-testables sin HTTP, soportan async, y tienen mensajes de error completamente personalizables.
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>❌ DataAnnotations (evitar)</h4>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>✅ FluentValidation (usar)</h4>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">FluentValidation — Documentación oficial completa</h3>
+                    <div class="mb-1 text-body-secondary">Toda la referencia: validators built-in, custom validators, mensajes, severity, condiciones (When/Unless), colecciones y más. Tu biblia esta semana.</div>
+                    <a class="link" href="https://docs.fluentvalidation.net/en/latest/" target="_blank">📘 Ir docs.fluentvalidation.net →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">FluentValidation — Integración con ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Cómo registrar validators automáticamente via DI, integración con el model binding de .NET y configuración del comportamiento al fallar la validación.</div>
+                    <a class="link" href="https://docs.fluentvalidation.net/en/latest/aspnet.html" target="_blank">📘 Ir docs.fluentvalidation.net →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">FluentValidation in ASP.NET Core — Full Guide</h3>
+                    <div class="mb-1 text-body-secondary">Desde cero: instalación, validators básicos, integración en .NET 8, errores de validación automáticos con ProblemDetails. El mejor video de arranque. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/RYJGfB6auuE?si=5YGMTBGJ-SCjOt7o" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">FluentValidation — Getting Started</h3>
+                    <div class="mb-1 text-body-secondary">Recorre los validators más usados con ejemplos reales: NotEmpty, Length, EmailAddress, Must, WithMessage y cómo testear validators unitariamente. ~25 min.</div>
+                    <a class="link" href="https://youtu.be/vaDDB7BpEgQ?si=3bArlvpr82bQb8Ym" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Ejercicio — Validator base con mensajes en español</strong> 
+                    <h3 class="mb-0">Tu primer validator completo para el Application Layer</h3>
+                    <div class="mb-1 text-body-secondary">Crea este validator en <code>Application/Products/Validators/</code>. Los validators viven en Application, no en la API.</div>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">FluentValidation Avanzado + Pipeline de Validación</div>
+        <div class="day-subtitle">Custom validators, validación async, When/Unless, RuleSets y Validation Behavior</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Validation Behavior (el patrón pro):</strong> En lugar de llamar al validator manualmente en cada endpoint, creas un <code>ValidationBehavior&lt;TRequest,TResponse&gt;</code> que intercepta todos los Commands/Queries automáticamente. Si falla, lanza una excepción antes de llegar al Application Service. Cero boilerplate.
+    </div>
+    <div class="tip">
+        <strong>💡 Tip:</strong> Los validators async son para validaciones que requieren consultar la BD, como verificar si un email ya existe. Úsalos con cuidado — agregan latencia. Para la mayoría de reglas, los validators síncronos son suficientes.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Custom Validators y Async Validation</h3>
+                    <div class="mb-1 text-body-secondary">Cómo crear validadores personalizados con <code>Must</code>, <code>MustAsync</code>, <code>Custom</code> e implementar <code>IAsyncValidator</code> para validaciones contra la base de datos.</div>
+                    <a class="link" href="https://docs.fluentvalidation.net/en/latest/custom-validators.html" target="_blank">📘 Ir docs.fluentvalidation.net →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Conditions — When, Unless, WhenAsync</h3>
+                    <div class="mb-1 text-body-secondary">Aplicar reglas de validación condicionalmente: "validar email solo si el usuario eligió notificaciones por correo". Muy útil para DTOs con campos opcionales.</div>
+                    <a class="link" href="https://docs.fluentvalidation.net/en/latest/conditions.html" target="_blank">📘 Ir docs.fluentvalidation.net →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Validation Pipeline Behavior con FluentValidation</h3>
+                    <div class="mb-1 text-body-secondary">Implementa un <code>IPipelineBehavior</code> que ejecuta FluentValidation automáticamente en todos tus Commands. Con CQRS pattern. El video más avanzado y práctico. ~35 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=X8zRvXbirMU" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">FluentValidation Advanced — RuleSets, Custom Validators</h3>
+                    <div class="mb-1 text-body-secondary">RuleSets para diferentes escenarios (Create vs Update), validadores reutilizables con <code>SetValidator</code>, y validación de colecciones con <code>ForEach</code>. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/-ix1hzWr2ws?si=IGZRPRCRJ2Bds83s" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — ValidationBehavior sin MediatR</strong> 
+                    <h3 class="mb-0">Pipeline de validación automática para todos los Commands</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Manejo Global de Excepciones</div>
+        <div class="day-subtitle">IExceptionHandler, ProblemDetails, mapeo de errores y middleware de excepciones</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El principio:</strong> Ningún <code>try/catch</code> en los Controllers. Los errores se propagan hacia arriba y un handler global los captura, los mapea a un formato estándar (<code>ProblemDetails</code>) y retorna la respuesta correcta. Los controllers quedan limpios.
+    </div>
+    <div class="tip">
+        <strong>⚠️ Anti-patrón frecuente:</strong> Tener try/catch en cada action del Controller que retorna <code>Ok()</code> o <code>BadRequest()</code> con mensajes inconsistentes. El resultado: 10 formatos de error diferentes en la misma API.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">IExceptionHandler en ASP.NET Core (.NET 8)</h3>
+                    <div class="mb-1 text-body-secondary">La forma moderna (.NET 8+) de manejar excepciones globalmente: <code>IExceptionHandler</code> permite encadenar múltiples handlers por tipo de excepción.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/fundamentals/error-handling?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">ProblemDetails en ASP.NET Core — RFC 9457</h3>
+                    <div class="mb-1 text-body-secondary">Cómo <code>IProblemDetailsService</code> y <code>AddProblemDetails()</code> generan respuestas de error estándar automáticamente. Incluye cómo extender el formato con campos custom.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/web-api/handle-errors?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Global Exception Handling in ASP.NET Core (.NET 8) — IExceptionHandler</h3>
+                    <div class="mb-1 text-body-secondary">Implementa el nuevo <code>IExceptionHandler</code> de .NET 8 con ProblemDetails. Muestra cómo encadenar múltiples handlers para diferentes tipos de excepción. ~25 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=4NfflZilTvk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Exception Handling Best Practices con ProblemDetails</h3>
+                    <div class="mb-1 text-body-secondary">Mapea DomainException, NotFoundException, ValidationException a códigos HTTP correctos con ProblemDetails. Integra con la Clean Architecture de la semana 2. ~30 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=gMwAhKddHYQ" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Sistema completo de exception handlers</strong> 
+                    <h3 class="mb-0">Tres handlers encadenados para los errores más comunes</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Milan Jovanović Blog</strong> 
+                    <h3 class="mb-0">Global Error Handling in ASP.NET Core 8</h3>
+                    <div class="mb-1 text-body-secondary">Artículo completo que compara el middleware de excepciones antiguo con el nuevo <code>IExceptionHandler</code> y explica cuándo usar cada enfoque.</div>
+                    <a class="link" href="https://www.milanjovanovic.tech/blog/global-error-handling-in-aspnetcore-8" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">API Response Pattern</div>
+        <div class="day-subtitle">Result pattern, respuestas consistentes, envelopes y cuándo NO usar wrapper</div>
+        </div>
+        <span class="day-tag">⏱ ~4–5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Result Pattern vs Excepciones:</strong> Usar excepciones para flujo de control normal (NotFoundException en un GET) es un anti-patrón. El <strong>Result Pattern</strong> modela explícitamente el éxito y el fracaso como valores de retorno: <code>Result&lt;Product&gt;</code> puede ser un éxito con el producto o un error con el motivo. Hace el código más predecible y testeable.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Result Pattern en .NET — La forma correcta de manejar errores</h3>
+                    <div class="mb-1 text-body-secondary">Implementa <code>Result&lt;T&gt;</code> y <code>Error</code> desde cero, por qué es mejor que excepciones para errores esperados, y cómo integrarlo con ProblemDetails. ~35 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=WCCkEe_Hy2Y" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Functional Error Handling con Result en C#</h3>
+                    <div class="mb-1 text-body-secondary">Implementación del Result Pattern con discriminated unions (OneOf), Railway Oriented Programming en C# y cuándo usar Result vs Exceptions. ~30 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=YbuSuSpzee4" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Andrew Lock</strong> 
+                    <h3 class="mb-0">Using the Result Pattern to avoid exceptions for control flow</h3>
+                    <div class="mb-1 text-body-secondary">Por qué las excepciones no son para flujo de negocio normal, cómo implementar Result con records de C# y cómo convertirlo a IActionResult en el Controller.</div>
+                    <a class="link" href="https://andrewlock.net/working-with-the-result-pattern-part-1-replacing-exceptions-as-control-flow/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Vladimir Khorikov</strong> 
+                    <h3 class="mb-0">Error handling: Exception vs Result — Guía definitiva</h3>
+                    <div class="mb-1 text-body-secondary">Explica con mucha profundidad cuándo usar cada estrategia: excepciones para errores inesperados y Result para errores de negocio esperados.</div>
+                    <a class="link" href="https://enterprisecraftsmanship.com/posts/advanced-error-handling-techniques/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Result Pattern completo</strong> 
+                    <h3 class="mb-0">Implementación de Result&lt;T&gt; + Error + extensión para Controllers</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">🗂</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">🗂 NuGet — ErrorOr</strong> 
+                    <h3 class="mb-0">ErrorOr — Result Pattern listo para usar</h3>
+                    <div class="mb-1 text-body-secondary">En lugar de implementar Result desde cero, puedes usar esta librería muy popular en la comunidad .NET. Tiene soporte nativo para múltiples errores, discriminated unions y se integra con ProblemDetails.</div>
+                    <a class="link" href="https://github.com/amantinband/error-or" target="_blank">🗂 Ver en GitHub →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Buenas Prácticas REST + API Entregable</div>
+        <div class="day-subtitle">HTTP status codes correctos, naming conventions, versioning básico e integrar todo</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>REST no es solo usar HTTP:</strong> Es usar HTTP <em>correctamente</em>. Los recursos son sustantivos (no verbos), los status codes tienen significado preciso, los headers comunican metadatos y el contenido de los errores sigue un estándar. Una API REST bien diseñada es autodocumentada.
+    </div>
+
+    <div class="flow">
+        <h3>📋 Códigos HTTP que más usarás y cuándo</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Código</th><th scope="col">Nombre</th><th scope="col">Cuándo usarlo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="table-success">200</td><td>OK</td><td>GET exitoso, PUT/PATCH exitoso con body de respuesta</td></tr>
+                <tr><td class="table-success">201</td><td>Created</td><td>POST que crea un recurso. Incluir header <code>Location</code></td></tr>
+                <tr><td class="table-success">204</td><td>No Content</td><td>DELETE exitoso, PUT/PATCH sin body de respuesta</td></tr>
+                <tr><td class="table-warning">400</td><td>Bad Request</td><td>Errores de validación de input (FluentValidation)</td></tr>
+                <tr><td class="table-warning">401</td><td>Unauthorized</td><td>Sin autenticación o token inválido</td></tr>
+                <tr><td class="table-warning">403</td><td>Forbidden</td><td>Autenticado pero sin permiso para ese recurso</td></tr>
+                <tr><td class="table-warning">404</td><td>Not Found</td><td>Recurso no encontrado. No para "lista vacía"</td></tr>
+                <tr><td class="table-warning">409</td><td>Conflict</td><td>Estado conflictivo: email duplicado, versión optimistic lock</td></tr>
+                <tr><td class="table-warning">422</td><td>Unprocessable Entity</td><td>Input válido sintácticamente pero inválido semánticamente</td></tr>
+                <tr><td class="table-danger">500</td><td>Internal Server Error</td><td>Error inesperado del servidor. Nunca exponer detalles en prod</td></tr>
+            </tbody>
+        </table>        
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">RESTful API Design Guidelines — Microsoft REST API Guidelines</h3>
+                    <div class="mb-1 text-body-secondary">Las guías REST oficiales de Microsoft: naming, versioning, paginación, errores, headers y más. El documento de referencia usado en equipos de Microsoft.</div>
+                    <a class="link" href="https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md" target="_blank">📘 Microsoft API Guidelines →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Web API design best practices — Azure Architecture Center</h3>
+                    <div class="mb-1 text-body-secondary">Recursos, verbos HTTP, idempotencia, paginación, versionado y manejo de errores en APIs REST. Muy completo y con ejemplos concretos.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/architecture/best-practices/api-design" target="_blank">📘 Azure Architecture Center →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">REST API Best Practices — Los errores que comete el 90%</h3>
+                    <div class="mb-1 text-body-secondary">Errores comunes en diseño REST: verbos en URLs, status codes incorrectos, envelope innecesario, y cómo corregirlos. Muy directo y práctico. ~20 min.</div>
+                    <a class="link" href="https://youtu.be/oPcAT2D-B5k?si=2snJWXQq-KeQNfGc" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">API Versioning in ASP.NET Core — Guía completa</h3>
+                    <div class="mb-1 text-body-secondary">URL versioning, query string, header versioning. Cómo configurar <code>Asp.Versioning</code> en .NET 8 y deprecar versiones anteriores correctamente. ~25 min.</div>
+                    <a class="link" href="https://youtu.be/8Asq7ymF1R8?si=a3BF4eTjlT3p8jhi" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Program.cs final: todo integrado</strong> 
+                    <h3 class="mb-0">Wiring completo de la Semana 3 en Program.cs</h3>
+                    <pre><code>{{codeExample7}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Controller limpio sin try/catch</strong> 
+                    <h3 class="mb-0">Así queda un Controller con todo el sistema integrado</h3>
+                    <pre><code>{{codeExample8}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — API con Validaciones y Manejo Global de Errores</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Construida sobre la Clean Architecture de la Semana 2, tu API debe ahora también cumplir:</p>
+    <ul>
+        <li>FluentValidation con validators en el Application Layer, auto-registrados por DI</li>
+        <li>Todos los errores en formato ProblemDetails — cero formatos de error custom ad-hoc</li>
+        <li>IExceptionHandler para ValidationException, NotFoundException y un handler global fallback</li>
+        <li>Result&lt;T&gt; implementado en el Application Layer para errores de negocio esperados</li>
+        <li>Controllers sin try/catch, con status codes HTTP correctos por cada operación</li>
+        <li>Al menos 5 unit tests de validators con TestValidate (sin necesidad de HTTP)</li>
+        <li>URLs REST correctas: /api/v1/products, /api/v1/products/{{'{'}}id{{'}'}}</li>
+        <li>API Versioning configurado aunque sea con v1 por ahora</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong >🔗 Conexión con Semanas 1 y 2:</strong> El middleware de la Semana 1 convive con <code>UseExceptionHandler()</code> — el handler de excepciones va antes en el pipeline. Los validators de FluentValidation viven en el <code>Application</code> project de tu Clean Architecture. El <code>Result&lt;T&gt;</code> vive en el <code>Domain</code>. El <code>IExceptionHandler</code> vive en la capa <code>Api</code>. Todo encaja en la estructura de la Semana 2.
+    </div>
+</div>

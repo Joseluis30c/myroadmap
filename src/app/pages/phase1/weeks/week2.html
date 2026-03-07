@@ -1,9 +1,11 @@
-<div class="day-nav">
-    <a [routerLink]="[]" fragment="dia1" class="day-pill">📍 Día 1 – Principios & Capas</a>
-    <a [routerLink]="[]" fragment="dia2" class="day-pill">📍 Día 2 – Domain Layer</a>
-    <a [routerLink]="[]" fragment="dia3" class="day-pill">📍 Día 3 – Application Layer</a>
-    <a [routerLink]="[]" fragment="dia4" class="day-pill">📍 Día 4 – Infrastructure Layer</a>
-    <a [routerLink]="[]" fragment="dia5" class="day-pill">📍 Día 5 – Repository Pattern + API</a>
+<div class="nav-scroller py-1 mb-3 border-bottom">
+    <nav class="nav nav-underline justify-content-between"> 
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia1"><strong>Día 1</strong> – Principios & Capas</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia2"><strong>Día 2</strong> – Domain Layer</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia3"><strong>Día 3</strong> – Application Layer</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia4"><strong>Día 4</strong> – Infrastructure Layer</button>
+        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia5"><strong>Día 5</strong> – Repository Pattern + API</button>
+    </nav>
 </div>
 
 <div class="intro-grid" style="margin-top:1.5rem;">
@@ -59,388 +61,475 @@
     </div>
 </div>
 
+<div class="divider"></div>
+
 <!-- DÍA 1 -->
-<div class="day-section" id="dia1">
-<div class="day-header">
-    <div class="day-number">1</div>
-    <div>
-    <div class="day-title">Principios de Clean Architecture</div>
-    <div class="day-subtitle">Dependency Rule, SOLID, por qué separar capas y qué problema resuelve</div>
-    </div>
-    <span class="day-tag">⏱ ~4–5h</span>
-</div>
-
-<div class="concept-box">
-    <strong>La regla fundamental:</strong> Las dependencias solo pueden apuntar hacia adentro. El Domain no sabe que existe Infrastructure. La Application no sabe que existe la API. Esto se logra con interfaces: el Domain define <code>IProductRepository</code>, y la Infrastructure lo implementa.
-</div>
-
-<div class="principles">
-    <div class="pc"><div class="pc-title">Single Responsibility</div><div class="pc-body">Cada clase/módulo tiene una sola razón para cambiar. Un controller no contiene lógica de negocio.</div></div>
-    <div class="pc"><div class="pc-title">Open/Closed</div><div class="pc-body">Abierto a extensión, cerrado a modificación. Agregar un nuevo repositorio sin tocar el caso de uso.</div></div>
-    <div class="pc"><div class="pc-title">Dependency Inversion</div><div class="pc-body">Los módulos de alto nivel no dependen de los de bajo nivel. Ambos dependen de abstracciones (interfaces).</div></div>
-    <div class="pc"><div class="pc-title">Interface Segregation</div><div class="pc-body">Interfaces pequeñas y específicas. <code>IReadRepository</code> separado de <code>IWriteRepository</code>.</div></div>
-</div>
-
-<div class="resources">
-    <div class="resource-card">
-    <div class="resource-icon doc">📖</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📖 Artículo Fundacional</div>
-        <h3>The Clean Architecture – Robert C. Martin (Uncle Bob)</h3>
-        <p>El artículo original donde Uncle Bob define Clean Architecture. Obligatorio leer para entender la filosofía detrás. Explica los círculos concéntricos y la Dependency Rule.</p>
-        <a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank">📘 Leer artículo original →</a>
-    </div>
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Principios de Clean Architecture</div>
+        <div class="day-subtitle">Dependency Rule, SOLID, por qué separar capas y qué problema resuelve</div>
+        </div>
+        <span class="day-tag">⏱ ~4–5h</span>
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>Clean Architecture with ASP.NET Core – Intro completa</h3>
-        <p>El mejor video de introducción a CA en .NET. Explica los 4 proyectos, qué va en cada capa y por qué con ejemplos reales. ~45 min.</p>
-        <a href="https://www.youtube.com/watch?v=YiVqwoFMieg" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
+    <div class="concept-box">
+        <strong>La regla fundamental:</strong> Las dependencias solo pueden apuntar hacia adentro. El Domain no sabe que existe Infrastructure. La Application no sabe que existe la API. Esto se logra con interfaces: el Domain define <code>IProductRepository</code>, y la Infrastructure lo implementa.
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>Clean Architecture – ¿Realmente vale la pena?</h3>
-        <p>Cuándo aplicar CA, cuándo es overkill y las críticas válidas. Perspectiva pragmática y balanceada. ~25 min.</p>
-        <a href="https://www.youtube.com/watch?v=lkmvnjypENw" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
+    <div class="principles">
+        <div class="pc"><div class="pc-title">Single Responsibility</div><div class="pc-body">Cada clase/módulo tiene una sola razón para cambiar. Un controller no contiene lógica de negocio.</div></div>
+        <div class="pc"><div class="pc-title">Open/Closed</div><div class="pc-body">Abierto a extensión, cerrado a modificación. Agregar un nuevo repositorio sin tocar el caso de uso.</div></div>
+        <div class="pc"><div class="pc-title">Dependency Inversion</div><div class="pc-body">Los módulos de alto nivel no dependen de los de bajo nivel. Ambos dependen de abstracciones (interfaces).</div></div>
+        <div class="pc"><div class="pc-title">Interface Segregation</div><div class="pc-body">Interfaces pequeñas y específicas. <code>IReadRepository</code> separado de <code>IWriteRepository</code>.</div></div>
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 eBook Gratuito – Microsoft</div>
-        <h3>Architecting Modern Web Apps – Capítulos de Clean Architecture</h3>
-        <p>Los capítulos 5 y 6 de este eBook oficial son los más densos sobre separación de capas, DDD y patrones arquitecturales en .NET.</p>
-        <a href="https://aka.ms/webappebook" target="_blank">📄 Descargar PDF gratuito →</a>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Artículo Fundacional</strong> 
+                    <h3 class="mb-0">The Clean Architecture – Robert C. Martin (Uncle Bob)</h3>
+                    <div class="mb-1 text-body-secondary">El artículo original donde Uncle Bob define Clean Architecture. Obligatorio leer para entender la filosofía detrás. Explica los círculos concéntricos y la Dependency Rule.</div>
+                    <a class="link" href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Clean Architecture with ASP.NET Core – Intro completa</h3>
+                    <div class="mb-1 text-body-secondary">El mejor video de introducción a CA en .NET. Explica los 4 proyectos, qué va en cada capa y por qué con ejemplos reales. ~45 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=YiVqwoFMieg" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Clean Architecture – ¿Realmente vale la pena?</h3>
+                    <div class="mb-1 text-body-secondary">Cuándo aplicar CA, cuándo es overkill y las críticas válidas. Perspectiva pragmática y balanceada. ~25 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=lkmvnjypENw" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 eBook Gratuito – Microsoft</strong> 
+                    <h3 class="mb-0">Architecting Modern Web Apps – Capítulos de Clean Architecture</h3>
+                    <div class="mb-1 text-body-secondary">Los capítulos 5 y 6 de este eBook oficial son los más densos sobre separación de capas, DDD y patrones arquitecturales en .NET.</div>
+                    <a class="link" href="https://aka.ms/webappebook" target="_blank">📘 Descargar PDF gratuito →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Overview of .NET Application Architecture Patterns</h3>
+                    <div class="mb-1 text-body-secondary">Resumen de patrones arquitecturales soportados: Layered, Clean Architecture, Hexagonal. Con ejemplos en .NET.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
-
-    <div class="resource-card">
-    <div class="resource-icon doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Documentación Oficial</div>
-        <h3>Overview of .NET Application Architecture Patterns</h3>
-        <p>Resumen de patrones arquitecturales soportados: Layered, Clean Architecture, Hexagonal. Con ejemplos en .NET.</p>
-        <a href="https://learn.microsoft.com/es-es/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures" target="_blank">📘 Microsoft Docs →</a>
-    </div>
-    </div>
-</div>
 </div>
 
 <div class="divider"></div>
 
 <!-- DÍA 2 -->
-<div class="day-section" id="dia2">
-<div class="day-header">
-    <div class="day-number">2</div>
-    <div class="day-info">
-    <div class="day-title">Domain Layer — El núcleo</div>
-    <div class="day-subtitle">Entities, Value Objects, interfaces de repositorios, Domain Events y reglas de negocio</div>
-    </div>
-    <span class="day-tag">⏱ ~5h</span>
-</div>
-
-<div class="concept-box">
-    <strong>Regla de oro del Domain:</strong> Este proyecto no referencia <em>ningún</em> NuGet externo (excepto abstracciones puras). No conoce Entity Framework, no conoce la base de datos, no conoce HTTP. Solo contiene la lógica de negocio pura en C#.
-</div>
-
-<div class="tip">
-    <strong>💡 Tip práctico:</strong> Si tu entidad Product tiene un precio que no puede ser negativo, esa validación va en el Domain, no en el Controller ni en un Validator de FluentValidation. La invariante de negocio vive donde vive el negocio.
-</div>
-
-<div class="resources">
-    <div class="resource-card">
-    <div class="resource-icon vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>Domain Layer – Entities, Value Objects y Aggregates </h3>
-        <p>Construye el Domain Layer desde cero: Entity base class, Value Objects, cómo proteger invariantes, y qué son los Aggregate Roots. ~35 min.</p>
-        <a class="rc-link" href="https://youtu.be/UEtmOW8uZZY?si=jid7SLJWMYSItOIL" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div class="day-info">
+        <div class="day-title">Domain Layer — El núcleo</div>
+        <div class="day-subtitle">Entities, Value Objects, interfaces de repositorios, Domain Events y reglas de negocio</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>Value Objects en .NET – La forma correcta</h3>
-        <p>Por qué usar Value Objects en lugar de primitivos (Primitive Obsession), cómo implementarlos con records en C# 9+ y cuándo usarlos. ~20 min.</p>
-        <a class="rc-link" href="https://www.youtube.com/watch?v=P5CRea21R2E" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
+    <div class="concept-box">
+        <strong>Regla de oro del Domain:</strong> Este proyecto no referencia <em>ningún</em> NuGet externo (excepto abstracciones puras). No conoce Entity Framework, no conoce la base de datos, no conoce HTTP. Solo contiene la lógica de negocio pura en C#.
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Documentación Oficial – .NET</div>
-        <h3>Design the Domain Model Layer (Microsoft)</h3>
-        <p>Guía oficial de Microsoft sobre Domain Model: Entity classes, Value Objects, Aggregate Roots y cómo implementarlos en C#.</p>
-        <a class="rc-link" href="https://learn.microsoft.com/es-es/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/microservice-domain-model" target="_blank">📘 Microsoft Docs →</a>
-    </div>
+    <div class="tip">
+        <strong>💡 Tip práctico:</strong> Si tu entidad Product tiene un precio que no puede ser negativo, esa validación va en el Domain, no en el Controller ni en un Validator de FluentValidation. La invariante de negocio vive donde vive el negocio.
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Artículo – Vladimir Khorikov</div>
-        <h3>Entities vs Value Objects vs DTOs (Enterprise Craftsmanship)</h3>
-        <p>Vladimir Khorikov (uno de los mejores bloggers de DDD) explica la diferencia entre entidades, value objects y cuándo usar cada uno con código C#.</p>
-        <a class="rc-link" href="https://enterprisecraftsmanship.com/posts/entity-vs-value-object-the-ultimate-list-of-differences/" target="_blank">📘 Leer artículo →</a>
-    </div>
-    </div>
-
-    <div class="resource-card">
-        <div class="resource-icon ic-code">💻</div>
-        <div class="resource-body">
-          <div class="resource-type code">💻 Código – Domain Layer base</div>
-          <h3>Estructura base del Domain Layer</h3>
-          <p>Crea estos archivos en tu proyecto Domain para establecer la base de tu arquitectura.</p>
-          <p>// Domain/Entities/Entity.cs — clase base</p>
-          <pre><code>{{ codeExample1 }}</code></pre>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Domain Layer – Entities, Value Objects y Aggregates</h3>
+                    <div class="mb-1 text-body-secondary">Construye el Domain Layer desde cero: Entity base class, Value Objects, cómo proteger invariantes, y qué son los Aggregate Roots. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/UEtmOW8uZZY?si=jid7SLJWMYSItOIL" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Value Objects en .NET – La forma correcta</h3>
+                    <div class="mb-1 text-body-secondary">Por qué usar Value Objects en lugar de primitivos (Primitive Obsession), cómo implementarlos con records en C# 9+ y cuándo usarlos. ~20 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=P5CRea21R2E" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial – .NET</strong> 
+                    <h3 class="mb-0">Design the Domain Model Layer</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial de Microsoft sobre Domain Model: Entity classes, Value Objects, Aggregate Roots y cómo implementarlos en C#.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/microservice-domain-model" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Artículo – Vladimir Khorikov</strong> 
+                    <h3 class="mb-0">Entities vs Value Objects vs DTOs (Enterprise Craftsmanship)</h3>
+                    <div class="mb-1 text-body-secondary">Vladimir Khorikov (uno de los mejores bloggers de DDD) explica la diferencia entre entidades, value objects y cuándo usar cada uno con código C#.</div>
+                    <a class="link" href="https://enterprisecraftsmanship.com/posts/entity-vs-value-object-the-ultimate-list-of-differences/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código – Domain Layer base</strong> 
+                    <h3 class="mb-0">Estructura base del Domain Layer</h3>
+                    <div class="mb-1 text-body-secondary">Crea estos archivos en tu proyecto Domain para establecer la base de tu arquitectura.<br>// Domain/Entities/Entity.cs — clase base</div>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo – Andrew Lock</strong> 
+                    <h3 class="mb-0">Avoiding Primitive Obsession in C#</h3>
+                    <div class="mb-1 text-body-secondary">Cómo evitar usar string/int para todo y crear tipos específicos del dominio que son más seguros y expresivos.</div>
+                    <a class="link" href="https://andrewlock.net/series/using-strongly-typed-entity-ids-to-avoid-primitive-obsession/" target="_blank">📘 Leer serie →</a>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="resource-card">
-    <div class="resource-icon ic-doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Artículo – Andrew Lock</div>
-        <h3>Avoiding Primitive Obsession in C#</h3>
-        <p>Cómo evitar usar string/int para todo y crear tipos específicos del dominio que son más seguros y expresivos.</p>
-        <a href="https://andrewlock.net/series/using-strongly-typed-entity-ids-to-avoid-primitive-obsession/" target="_blank">📘 Leer serie →</a>
-    </div>
-    </div>
-</div>
-</div>
 <div class="divider"></div>
 
 <!-- DÍA 3 -->
-<div class="day-section" id="dia3">
-<div class="day-header">
-    <div class="day-number">3</div>
-    <div>
-    <div class="day-title">Application Layer</div>
-    <div class="day-subtitle">Casos de uso, interfaces de servicios, DTOs, y cómo orquestar sin conocer Infrastructure</div>
-    </div>
-    <span class="day-tag">⏱ ~5h</span>
-</div>
-
-<div class="concept-box">
-    <strong>¿Qué hace el Application Layer?</strong> Orquesta el flujo: "obtener los datos via <code>IProductRepository</code>, ejecutar lógica del Domain, guardar cambios, retornar un DTO". Conoce el Domain pero <strong>no conoce Entity Framework, SQL ni HTTP</strong>. Define las interfaces que Infrastructure implementará.
-</div>
-
-<div class="resources">
-    <div class="resource-card">
-    <div class="resource-icon ic-vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>Application Layer en Clean Architecture</h3>
-        <p>Construye el Application Layer: casos de uso como Services, interfaces de repositorios, mapeo a DTOs con Mapperly. ~40 min.</p>
-        <a  href="https://youtu.be/08nezLafM2Q?si=bjVQkt37eLWcZjlG" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
-    </div>
-
-    <div class="resource-card">
-    <div class="resource-icon ic-vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>CQRS Pattern en .NET sin MediatR</h3>
-        <p>Implementar Commands y Queries sin depender de MediatR: separar operaciones de lectura y escritura desde el Application Layer. ~30 min.</p>
-        <a href="https://youtu.be/Okeu--CUV6w?si=6tHvgW01H0lOyEa8" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
-    </div>
-
-    <div class="resource-card">
-    <div class="resource-icon ic-doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Documentación Oficial</div>
-        <h3>Implementing the Application Layer with Web API</h3>
-        <p>Cómo estructurar el Application Layer, definir casos de uso, manejar excepciones de dominio y mapear resultados.</p>
-        <a class="rc-link" href="https://learn.microsoft.com/es-es/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/microservice-application-layer-implementation-web-api" target="_blank">📘 Microsoft Docs →</a>
-    </div>
-    </div>
-
-    <div class="resource-card">
-        <div class="resource-icon ic-code">💻</div>
-        <div class="resource-body">
-          <div class="resource-type code">💻 Código – Application Layer</div>
-          <h3>Estructura de un caso de uso (Application Service)</h3>
-          <p>El Application Layer define la interface del repositorio y el servicio de aplicación que la usa.</p>
-          <pre><code>{{codeExample2}}</code></pre>
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Application Layer</div>
+        <div class="day-subtitle">Casos de uso, interfaces de servicios, DTOs, y cómo orquestar sin conocer Infrastructure</div>
         </div>
-      </div>
-
-    <div class="resource-card">
-    <div class="resource-icon ic-doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Artículo – Milan Jovanović Blog</div>
-        <h3>Application Layer: Services vs CQRS vs Use Cases</h3>
-        <p>Diferencias entre organizar el Application Layer con Services, con CQRS (Commands/Queries), o con Use Cases. Cuándo usar cada enfoque.</p>
-        <a class="rc-link" href="https://www.milanjovanovic.tech/blog/clean-architecture-and-the-benefits-of-structured-software-design" target="_blank">📘 Leer artículo →</a>
-    </div>
+        <span class="day-tag">⏱ ~5h</span>
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon ic-doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Documentación Oficial</div>
-        <h3>Unit of Work Pattern en .NET</h3>
-        <p>Cómo IUnitOfWork encapsula SaveChanges y coordina múltiples repositorios en una sola transacción.</p>
-        <a class="rc-link" href="https://learn.microsoft.com/es-es/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application" target="_blank">📘 Microsoft Docs →</a>
+    <div class="concept-box">
+        <strong>¿Qué hace el Application Layer?</strong> Orquesta el flujo: "obtener los datos via <code>IProductRepository</code>, ejecutar lógica del Domain, guardar cambios, retornar un DTO". Conoce el Domain pero <strong>no conoce Entity Framework, SQL ni HTTP</strong>. Define las interfaces que Infrastructure implementará.
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Application Layer en Clean Architecture</h3>
+                    <div class="mb-1 text-body-secondary">Construye el Application Layer: casos de uso como Services, interfaces de repositorios, mapeo a DTOs con Mapperly. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/08nezLafM2Q?si=bjVQkt37eLWcZjlG" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">CQRS Pattern en .NET sin MediatR</h3>
+                    <div class="mb-1 text-body-secondary">Implementar Commands y Queries sin depender de MediatR: separar operaciones de lectura y escritura desde el Application Layer. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/Okeu--CUV6w?si=6tHvgW01H0lOyEa8" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial – .NET</strong> 
+                    <h3 class="mb-0">Implementing the Application Layer with Web API</h3>
+                    <div class="mb-1 text-body-secondary">Cómo estructurar el Application Layer, definir casos de uso, manejar excepciones de dominio y mapear resultados.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/microservice-application-layer-implementation-web-api" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código – Application Layer</strong> 
+                    <h3 class="mb-0">Estructura de un caso de uso (Application Service)</h3>
+                    <div class="mb-1 text-body-secondary">El Application Layer define la interface del repositorio y el servicio de aplicación que la usa.</div>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo – Milan Jovanović Blog</strong> 
+                    <h3 class="mb-0">Application Layer: Services vs CQRS vs Use Cases</h3>
+                    <div class="mb-1 text-body-secondary">Diferencias entre organizar el Application Layer con Services, con CQRS (Commands/Queries), o con Use Cases. Cuándo usar cada enfoque.</div>
+                    <a class="link" href="https://www.milanjovanovic.tech/blog/clean-architecture-and-the-benefits-of-structured-software-design" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Unit of Work Pattern en .NET</h3>
+                    <div class="mb-1 text-body-secondary">Cómo IUnitOfWork encapsula SaveChanges y coordina múltiples repositorios en una sola transacción.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 </div>
 
 <div class="divider"></div>
 
 <!-- DÍA 4 -->
-<div class="day-section" id="dia4">
-<div class="day-header">
-    <div class="day-number">4</div>
-    <div class="day-info">
-    <div class="day-title">Infrastructure Layer</div>
-    <div class="day-subtitle">EF Core, implementaciones de repositorios, configuración de la BD y servicios externos</div>
-    </div>
-    <span class="day-tag">⏱ ~5h</span>
-</div>
-
-<div class="concept-box">
-    <strong>Regla de oro de Infrastructure:</strong> Este proyecto <em>implementa</em> las interfaces definidas en el Domain y Application. <code>ProductRepository : IProductRepository</code>. Aquí sí entra EF Core, Dapper, HttpClient, SendGrid, etc. La API no referencia Infrastructure directamente — se registra en DI desde la API.
-</div>
-
-<div class="resources">
-    <div class="resource-card">
-    <div class="resource-icon ic-vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>Infrastructure Layer con EF Core en Clean Architecture </h3>
-        <p>Implementa repositorios con EF Core, DbContext, configuraciones de entidades con Fluent API y el patrón Unit of Work. ~45 min.</p>
-        <a href="https://youtu.be/KME5D_pys0E?si=evwa7IA5L89HNzDt" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
-    </div>
-
-    <div class="resource-card">
-    <div class="resource-icon ic-vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>EF Core Best Practices en Clean Architecture </h3>
-        <p>Cómo configurar EF Core correctamente: sin exponer DbSets públicos a otras capas, configuraciones separadas por entidad, y ValueObject conversions. ~30 min.</p>
-        <a href="https://youtu.be/Bi8oRSu-QgU?si=gGNv_q9v0VMNa3Sr" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
-    </div>
-
-    <div class="resource-card">
-    <div class="resource-icon ic-doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Documentación – EF Core</div>
-        <h3>EF Core – Configuring DbContext for Clean Architecture</h3>
-        <p>Configuración de DbContext, IEntityTypeConfiguration por entidad, value conversions para Value Objects, y separación de concerns.</p>
-        <a href="https://learn.microsoft.com/es-es/ef/core/dbcontext-configuration/" target="_blank">📘 EF Core Docs →</a>
-    </div>
-    </div>
-
-    <div class="resource-card">
-        <div class="resource-icon ic-code">💻</div>
-        <div class="resource-body">
-          <div class="resource-type code">💻 Código – Infrastructure Layer</div>
-          <h3>Repositorio concreto con EF Core</h3>
-          <p>La implementación concreta que vive en Infrastructure y que EF Core usa internamente.</p>
-          <pre><code>{{codeExample3}}</code></pre>
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div class="day-info">
+        <div class="day-title">Infrastructure Layer</div>
+        <div class="day-subtitle">EF Core, implementaciones de repositorios, configuración de la BD y servicios externos</div>
         </div>
-      </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
 
-    <div class="resource-card">
-    <div class="resource-icon ic-doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Artículo – Andrew Lock</div>
-        <h3>Using EF Core Value Conversions for Value Objects</h3>
-        <p>Cómo hacer que EF Core mapee tu Value Object Money a columnas de la BD sin exponer EF en el Domain.</p>
-        <a href="https://andrewlock.net/strongly-typed-ids-in-ef-core-using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-4/" target="_blank">📘 Leer artículo →</a>
+    <div class="concept-box">
+        <strong>Regla de oro de Infrastructure:</strong> Este proyecto <em>implementa</em> las interfaces definidas en el Domain y Application. <code>ProductRepository : IProductRepository</code>. Aquí sí entra EF Core, Dapper, HttpClient, SendGrid, etc. La API no referencia Infrastructure directamente — se registra en DI desde la API.
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Infrastructure Layer con EF Core en Clean Architecture</h3>
+                    <div class="mb-1 text-body-secondary">Implementa repositorios con EF Core, DbContext, configuraciones de entidades con Fluent API y el patrón Unit of Work. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/KME5D_pys0E?si=evwa7IA5L89HNzDt" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">EF Core Best Practices en Clean Architecture</h3>
+                    <div class="mb-1 text-body-secondary">Cómo configurar EF Core correctamente: sin exponer DbSets públicos a otras capas, configuraciones separadas por entidad, y ValueObject conversions. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/Bi8oRSu-QgU?si=gGNv_q9v0VMNa3Sr" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación – EF Core</strong> 
+                    <h3 class="mb-0">EF Core – Configuring DbContext for Clean Architecture</h3>
+                    <div class="mb-1 text-body-secondary">Configuración de DbContext, IEntityTypeConfiguration por entidad, value conversions para Value Objects, y separación de concerns.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/ef/core/dbcontext-configuration/" target="_blank">📘 EF Core Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código – Infrastructure Layer</strong> 
+                    <h3 class="mb-0">Repositorio concreto con EF Core</h3>
+                    <div class="mb-1 text-body-secondary">La implementación concreta que vive en Infrastructure y que EF Core usa internamente.</div>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo – Andrew Lock</strong> 
+                    <h3 class="mb-0">Using EF Core Value Conversions for Value Objects</h3>
+                    <div class="mb-1 text-body-secondary">Cómo hacer que EF Core mapee tu Value Object Money a columnas de la BD sin exponer EF en el Domain.</div>
+                    <a class="link" href="https://andrewlock.net/strongly-typed-ids-in-ef-core-using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-4/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 </div>
 
 <div class="divider"></div>
 
 <!-- DÍA 5 -->
-<div class="day-section" id="dia5">
-<div class="day-header">
-    <div class="day-number">5</div>
-    <div class="day-info">
-    <div class="day-title">Repository Pattern bien aplicado + API Entregable</div>
-    <div class="day-subtitle">Generic Repository, anti-patrones a evitar, y reestructurar tu API de la semana 1</div>
-    </div>
-    <span class="day-tag">⏱ ~5h</span>
-</div>
-
-<div class="concept-box">
-    <strong>Repository Pattern bien aplicado:</strong> No es solo un wrapper de DbContext. El repositorio debe hablar el lenguaje del dominio: <code>GetActiveProductsAsync()</code>, no <code>GetWhere(p => p.IsActive)</code>. El <strong>Generic Repository</strong> puede ser útil como base, pero los repositorios específicos deben tener métodos propios del dominio.
-</div>
-
-<div class="tip">
-    <strong>⚠️ Anti-patrón a evitar:</strong> Exponer <code>IQueryable&lt;T&gt;</code> desde el repositorio. Esto rompe la abstracción — el caller empieza a construir queries con lógica que debería estar en el repositorio o en el Domain.
-</div>
-
-<div class="resources">
-    <div class="resource-card">
-    <div class="resource-icon ic-vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>Repository Pattern – Lo estás haciendo mal</h3>
-        <p>Analiza los errores más comunes al implementar Repository: IQueryable leak, repositorios genéricos usados mal, y cuándo el patrón hace daño. ~25 min.</p>
-        <a class="rc-link" href="https://youtu.be/b2tPRbQJing?si=rrAiCqFTCUxL8kTd" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div class="day-info">
+        <div class="day-title">Repository Pattern bien aplicado + API Entregable</div>
+        <div class="day-subtitle">Generic Repository, anti-patrones a evitar, y reestructurar tu API de la semana 1</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon ic-vid">▶️</div>
-    <div class="resource-body">
-        <div class="resource-type vid">▶️ Video – YouTube</div>
-        <h3>Repository Pattern bien aplicado en .NET</h3>
-        <p>Implementación completa y limpia del Repository Pattern con interfaces, Unit of Work y cómo registrarlo con DI. ~35 min.</p>
-        <a class="rc-link" href="https://youtu.be/FZAG_VLYwrc?si=tGrMwOGHaDAG9m9w" target="_blank">▶️ Ver en YouTube →</a>
-    </div>
+    <div class="concept-box">
+        <strong>Repository Pattern bien aplicado:</strong> No es solo un wrapper de DbContext. El repositorio debe hablar el lenguaje del dominio: <code>GetActiveProductsAsync()</code>, no <code>GetWhere(p => p.IsActive)</code>. El <strong>Generic Repository</strong> puede ser útil como base, pero los repositorios específicos deben tener métodos propios del dominio.
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon ic-doc">📄</div>
-    <div class="resource-body">
-        <div class="resource-type doc">📄 Artículo – Vladimir Khorikov</div>
-        <h3>¿Es el Repository Pattern todavía relevante con EF Core?</h3>
-        <p>Discusión seria sobre si usar EF Core directamente en Application Layer vs abstraerlo con repositorios. Argumentos a favor y en contra con código.</p>
-        <a class="rc-link" href="https://enterprisecraftsmanship.com/posts/do-you-need-an-orm/" target="_blank">📘 Leer artículo →</a>
-    </div>
+    <div class="tip">
+        <strong>⚠️ Anti-patrón a evitar:</strong> Exponer <code>IQueryable&lt;T&gt;</code> desde el repositorio. Esto rompe la abstracción — el caller empieza a construir queries con lógica que debería estar en el repositorio o en el Domain.
     </div>
 
-    <div class="resource-card">
-    <div class="resource-icon ic-repo">🗂</div>
-    <div class="resource-body">
-        <div class="resource-type repo">🗂 Repositorio GitHub – Referencia</div>
-        <h3>CleanArchitecture – Jason Taylor (el template más usado)</h3>
-        <p>El template de Clean Architecture .NET más popular en GitHub (~17k ⭐). Estudia su estructura de carpetas, cómo registra dependencias y cómo organiza los proyectos. Es tu guía de referencia para el entregable.</p>
-        <a class="rc-link" href="https://github.com/jasontaylordev/CleanArchitecture" target="_blank">🗂 Ver en GitHub →</a>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Repository Pattern – Lo estás haciendo mal</h3>
+                    <div class="mb-1 text-body-secondary">Analiza los errores más comunes al implementar Repository: IQueryable leak, repositorios genéricos usados mal, y cuándo el patrón hace daño. ~25 min.</div>
+                    <a class="link" href="https://youtu.be/b2tPRbQJing?si=rrAiCqFTCUxL8kTd" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Repository Pattern bien aplicado en .NET</h3>
+                    <div class="mb-1 text-body-secondary">Implementación completa y limpia del Repository Pattern con interfaces, Unit of Work y cómo registrarlo con DI. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/FZAG_VLYwrc?si=tGrMwOGHaDAG9m9w" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Artículo – Vladimir Khorikov</strong> 
+                    <h3 class="mb-0">¿Es el Repository Pattern todavía relevante con EF Core?</h3>
+                    <div class="mb-1 text-body-secondary">Discusión seria sobre si usar EF Core directamente en Application Layer vs abstraerlo con repositorios. Argumentos a favor y en contra con código.</div>
+                    <a class="link" href="https://enterprisecraftsmanship.com/posts/do-you-need-an-orm/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">🗂</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">🗂 Repositorio GitHub – Referencia</strong> 
+                    <h3 class="mb-0">CleanArchitecture – Jason Taylor (el template más usado)</h3>
+                    <div class="mb-1 text-body-secondary">El template de Clean Architecture .NET más popular en GitHub (~17k ⭐). Estudia su estructura de carpetas, cómo registra dependencias y cómo organiza los proyectos. Es tu guía de referencia para el entregable.</div>
+                    <a class="link" href="https://github.com/jasontaylordev/CleanArchitecture" target="_blank">🗂 Ver en GitHub →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código – Program.cs final</strong> 
+                    <h3 class="mb-0">Cómo conectar todo en Program.cs sin lógica</h3>
+                    <div class="mb-1 text-body-secondary">El entry point solo conecta las capas via DI. Nada de lógica de negocio aquí.</div>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
-
-    <div class="resource-card">
-    <div class="resource-icon ic-code">💻</div>
-    <div class="resource-body">
-        <div class="resource-type code">💻 Código – Program.cs final</div>
-        <h3>Cómo conectar todo en Program.cs sin lógica</h3>
-        <p>El entry point solo conecta las capas via DI. Nada de lógica de negocio aquí.</p>
-        <pre><code>{{codeExample4}}</code></pre>
-    </div>
-    </div>
-
-</div>
 </div>
 
 <div class="divider"></div>
@@ -449,7 +538,7 @@
 <div class="deliverable">
     
 <h2>🎯 Entregable – API Reestructurada con Clean Architecture</h2>
-<p style="font-size:0.88rem; color: var(--text-muted); margin-bottom: 1rem;">Tu API de la Semana 1 debe quedar reestructurada cumpliendo estos puntos:</p>
+<p style="font-size:0.88rem; margin-bottom: 1rem;">Tu API de la Semana 1 debe quedar reestructurada cumpliendo estos puntos:</p>
 <ul>
     <li>4 proyectos independientes: Domain, Application, Infrastructure, Api</li>
     <li>Domain sin referencias a NuGets de infraestructura (0 dependencias externas)</li>

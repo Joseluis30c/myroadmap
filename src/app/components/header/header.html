@@ -1,21 +1,21 @@
 <header>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <br>
-                <ul class="nav navbar-nav me-auto mb-2 mb-lg-2">
-                    <li class="nav-item">
-                        <a class="btn btn-primary phase" aria-current="page" routerLink="/phase1">🔥 FASE 1 - Introducción a .NET</a>
-                    </li>
-                    <li class="nav-item"><a class="btn btn-primary phase" routerLink="/phase2">🔥 FASE 2 - SQL Avanzado</a></li>
-                    <li class="nav-item"><a class="btn btn-primary phase" routerLink="/phase3">🔥 FASE 3 - Cloud + DevOps</a></li>
-                    <li class="nav-item"><a class="btn btn-primary phase" routerLink="/phase4">🔥 FASE 4 - Arquitectura Moderna</a></li>
-                    <li class="nav-item"><a class="btn btn-primary phase" routerLink="/phase5">🔥 FASE 5 - Extras</a></li>
+    <nav class="navbar navbar-expand-md sticky-top border-bottom glass-nav" data-bs-theme="light">
+        <div class="container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> 
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+            <div class="offcanvas-header">
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> 
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav flex-grow-1 justify-content-between">
+                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase1"><strong>🔥 FASE 1 Introducción a .NET</strong></a></li>
+                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase2"><strong>🔥 FASE 2 SQL Avanzado</strong></a></li>
+                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase3"><strong>🔥 FASE 3 Cloud + DevOps</strong></a></li>
+                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase4"><strong>🔥 FASE 4 Arquitectura Moderna</strong></a></li>
+                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase5"><strong>🔥 FASE 5 Extras</strong></a></li>
                 </ul>
             </div>
+        </div>
         </div>
     </nav>
 </header>

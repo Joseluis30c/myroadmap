@@ -1,44 +1,37 @@
 <div class="container">
-    <div class="badge-row">
-        @for (item of weeks; track item.id) {
-        <button 
-            class="badge badge-prev"
-            [class.active-week]="selectedWeekId === item.id"
-            (click)="loadWeek(item.id)">
-            {{item.name}}
-        </button>
+    <div class="nav-scroller py-1 mb-3 border-bottom">
+    <nav class="nav nav-underline justify-content-between"> 
+        @for (item of weeks; track item.id){
+            <button class="nav-item nav-link link-body-emphasis" (click)="loadWeek(item.id)">{{item.name}}</button> 
         }
+    </nav>
     </div>
-    <h1 class="title-header" [innerHTML]="titleWeek"></h1>
+    <h1 class="title-header fw-bold" [innerHTML]="titleWeek"></h1>
     <div class="progress-wrap">
         <div class="progress-track"><div class="progress-fill" [style.width.%]="progressPercentage"></div></div>
         <div class="progress-text">{{ progressLabel }}</div>
     </div>
-</div>
-<main class="content">
-    <div class="container">
-        @switch (selectedWeekId) {
-            @case (1) {
-                <app-week1></app-week1>
-            }
-            @case (2) {
-                <app-week2></app-week2>
-            }
-            @case (3) {
-                <app-week3></app-week3>
-            }
-            @case (4) {
-                <app-week4></app-week4>
-            }
-            @case (5) {
-                <app-week5></app-week5>
-            }
-            @case (6) {
-                <app-week6></app-week6>
-            }
-            @default {
-                <app-home></app-home>
-            }
+    @switch (selectedWeekId) {
+        @case (1) {
+            <app-week1></app-week1>
         }
-    </div>
-</main>
+        @case (2) {
+            <app-week2></app-week2>
+        }
+        @case (3) {
+            <app-week3></app-week3>
+        }
+        @case (4) {
+            <app-week4></app-week4>
+        }
+        @case (5) {
+            <app-week5></app-week5>
+        }
+        @case (6) {
+            <app-week6></app-week6>
+        }
+        @default {
+            <app-home></app-home>
+        }
+    }
+</div>
