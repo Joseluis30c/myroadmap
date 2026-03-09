@@ -1,38 +1,46 @@
-<div class="container">
-    <div class="badge-row">
-        @for (item of weeks; track item.id) {
-        <button 
-            class="badge badge-prev"
-            [class.active-week]="selectedWeekId === item.id"
-            (click)="loadWeek(item.id)">
-            {{item.name}}
-        </button>
-        }
-    </div>
-    <h1 class="title-header" [innerHTML]="titleWeek"></h1>
-    <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" [style.width.%]="progressPercentage"></div></div>
-        <div class="progress-text">{{ progressLabel }}</div>
+<div class="rn-page-wrapper">
+    <div class="container">
+
+        <!-- Week selector strip -->
+        <div class="rn-week-strip">
+            <nav class="rn-week-nav" aria-label="Semanas">
+                @for (item of weeks; track item.id){
+                    <button
+                        class="rn-week-btn"
+                        [class.active]="item.id === selectedWeekId"
+                        (click)="loadWeek(item.id)">
+                        {{ item.name }}
+                    </button>
+                }
+            </nav>
+        </div>
+
+        <!-- Page title + progress -->
+        <div class="rn-hero">
+            <h1 class="rn-title" [innerHTML]="titleWeek"></h1>
+
+            <div class="rn-progress-wrap">
+                <div class="rn-progress-track">
+                    <div class="rn-progress-fill" [style.width.%]="progressPercentage"></div>
+                    <div class="rn-progress-glow" [style.left.%]="progressPercentage"></div>
+                </div>
+                <div class="rn-progress-footer">
+                    <span class="rn-progress-label">{{ progressLabel }}</span>
+                    <!--<span class="rn-progress-pct">{{ progressPercentage }}%</span>-->
+                </div>
+            </div>
+        </div>
+
+        <!-- Week content router -->
+        <div class="rn-content">
+            @switch (selectedWeekId) {
+                @case (1) { <app-week1></app-week1> }
+                @case (2) { <app-week2></app-week2> }
+                @case (3) { <app-week3></app-week3> }
+                @case (4) { <app-week4></app-week4> }
+                @default  { <app-home></app-home> }
+            }
+        </div>
+
     </div>
 </div>
-<main class="content">
-    <div class="container">
-        @switch (selectedWeekId) {
-            @case (1) {
-                <app-week1></app-week1>
-            }
-            @case (2) {
-                <app-week2></app-week2>
-            }
-            @case (3) {
-                <app-week3></app-week3>
-            }
-            @case (4) {
-                <app-week4></app-week4>
-            }
-            @default {
-                <app-home></app-home>
-            }
-        }
-    </div>
-</main>

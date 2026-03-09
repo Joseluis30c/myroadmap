@@ -31,26 +31,26 @@ export class Phase {
   ];
 
   private phase3: PhaseData[] = [
-    { id: 1, name: 'Semana 11', description: '' },
-    { id: 2, name: 'Semana 12', description: '' },
-    { id: 3, name: 'Semana 13', description: '' },
-    { id: 4, name: 'Semana 14', description: '' },
-    { id: 5, name: 'Semana 15', description: '' },
-    { id: 6, name: 'Semana 16', description: '' },
+    { id: 1, name: 'Semana 11', description: 'Fundamentos de <span>Azure</span>' },
+    { id: 2, name: 'Semana 12', description: 'CI/CD con <span>GitHub Actions</span>' },
+    { id: 3, name: 'Semana 13', description: 'Docker para <span>.NET <span>Developers</span>' },
+    { id: 4, name: 'Semana 14', description: 'Docker en <span>Azure Cloud</span>' },
+    { id: 5, name: 'Semana 15', description: 'Redis <span>Cache para .NET</span>' },
+    { id: 6, name: 'Semana 16', description: 'Mensajería <span>Asíncrona con Colas</span>' },
   ];
 
   private phase4: PhaseData[] = [
-    { id: 1, name: 'Semana 17', description: '' },
-    { id: 2, name: 'Semana 18', description: '' },
-    { id: 3, name: 'Semana 19', description: '' },
-    { id: 4, name: 'Semana 20', description: '' },
-    { id: 5, name: 'Semana 21', description: '' },
+    { id: 1, name: 'Semana 17', description: 'Micro-<span>servicios</span> Conceptual y Práctico' },
+    { id: 2, name: 'Semana 18', description: 'API Gateway <span>+ Versioning</span>' },
+    { id: 3, name: 'Semana 19', description: 'Seguridad <span>Avanzada</span>' },
+    { id: 4, name: 'Semana 20', description: 'Observa<span>bilidad</span>' },
+    { id: 5, name: 'Semana 21', description: 'Refacto<span>rización</span>' },
   ];
 
   private phase5: PhaseData[] = [
-    { id: 1, name: 'Semana 22', description: '' },
-    { id: 2, name: 'Semana 23', description: '' },
-    { id: 3, name: 'Semana 24', description: '' },
+    { id: 1, name: 'Semana 22', description: 'Inglés <span>Técnico</span>' },
+    { id: 2, name: 'Semana 23', description: 'CV &amp; <span>LinkedIn</span>' },
+    { id: 3, name: 'Semana 24', description: 'Entrena<span>miento</span>' },
   ];
 
   getPhase(key: PhaseKey): PhaseData[] {

@@ -1,10 +1,10 @@
-<div class="nav-scroller py-1 mb-3 border-bottom">
-    <nav class="nav nav-underline justify-content-between"> 
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia1"><strong>Día 1</strong> – xUnit Fundamentos</button>
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia2"><strong>Día 2</strong> – Moq & Mocking</button>
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia3"><strong>Día 3</strong> – Testing de Servicios</button>
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia4"><strong>Día 4</strong> – Testing de Controllers</button>
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia5"><strong>Día 5</strong> – Cobertura & Entregable</button>
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – xUnit Fundamentos</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Moq & Mocking</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Testing de Servicios</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Testing de Controllers</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Cobertura</button>
     </nav>
 </div>
 
@@ -49,5 +49,576 @@
         <div class="concept-box">
             <strong>💡Regla 70-20-10:</strong> 70% Unit Tests, 20% Integration Tests, 10% E2E. Los unit tests son el grueso porque son rápidos, baratos y se ejecutan en cada commit.
         </div>
+    </div>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="aaa aaa-a1"><span class="al">A</span><div class="an">Arrange</div><div class="ad">Preparar datos, mocks y el SUT (System Under Test). El "estado inicial".</div></div>
+    <div class="aaa aaa-a2"><span class="al">A</span><div class="an">Act</div><div class="ad">Ejecutar la acción que se está probando. Solo una acción por test.</div></div>
+    <div class="aaa aaa-a3"><span class="al">A</span><div class="an">Assert</div><div class="ad">Verificar que el resultado es el esperado. Una assertion principal por test.</div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">xUnit — Fundamentos</div>
+        <div class="day-subtitle">Facts, Theories, fixtures, ciclo de vida y FluentAssertions</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>¿Por qué xUnit sobre NUnit?</strong> xUnit es el framework más moderno y el que usa el equipo de .NET internamente. No tiene <code>[SetUp]</code> ni <code>[TearDown]</code> — usa constructores y <code>IDisposable</code>, lo que es más limpio en OOP. <code>[Fact]</code> es un test simple; <code>[Theory]</code> con <code>[InlineData]</code> es un test parametrizado que corre N veces con datos distintos.
+    </div>
+
+    <div class="flow">
+        <h3>📋 Convenciones de naming — elige una y sé consistente:</h3>
+        <div class="principles">
+            <div class="pc"><div class="pc-title">Estilo 1 — El más popular</div><div class="pc-body">MethodName_StateUnderTest_<br>ExpectedBehavior<br>Create_WithEmptyName_<br>ThrowsDomainException</div></div>
+            <div class="pc"><div class="pc-title">Estilo 2 — BDD-like</div><div class="pc-body">Should_ExpectedBehavior_<br>When_StateUnderTest<br>Should_ThrowException_<br>When_NameIsEmpty</div></div>
+            <div class="pc"><div class="pc-title">Estilo 3 — Frase natural</div><div class="pc-body">Creating_product_with_<br>empty_name_fails<br>Muy legible, popular en equipos con BDD</div></div>
+        </div>
+    </div>
+    
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">xUnit.net — Getting Started con .NET Core / .NET 8</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial oficial de xUnit: instalación, primer test, Facts, Theories, InlineData, MemberData y ClassData. La referencia de arranque.</div>
+                    <a class="link" href="https://xunit.net/docs/getting-started/netcore/cmdline" target="_blank">📘 Ir xunit.net/docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Unit testing en .NET con xUnit — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial de Microsoft: crear un proyecto de tests, estructura, ejecutar con <code>dotnet test</code>, y conceptos de Test Isolation y Test Lifecycle.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/core/testing/unit-testing-with-dotnet-test" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Unit Testing in .NET — The Right Way</h3>
+                    <div class="mb-1 text-body-secondary">xUnit desde cero con las mejores prácticas actuales: naming conventions, Fact vs Theory, por qué FluentAssertions es mejor que Assert nativo, y cómo estructurar tus proyectos de tests. ~35 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=ub3P8c87cwk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">FluentAssertions — Por qué no usar Assert nativo</h3>
+                    <div class="mb-1 text-body-secondary">FluentAssertions hace los mensajes de error de tests 10x más legibles. Cubre Should().Be(), Should().Throw(), Should().BeEquivalentTo() y assertions de colecciones. ~20 min.</div>
+                    <a class="link" href="https://youtu.be/TytferBCLOo?si=7byZ59w7esxT0KFV" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Documentación — FluentAssertions</strong> 
+                    <h3 class="mb-0">FluentAssertions — Documentación oficial</h3>
+                    <div class="mb-1 text-body-secondary">Referencia completa: assertions para strings, colecciones, excepciones, objetos complejos, async tasks y más. Muy superior a los asserts nativos de xUnit.</div>
+                    <a class="link" href="https://fluentassertions.com/introduction" target="_blank">📘 Ir fluentassertions.com →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Tests del Domain Layer con xUnit puro</strong> 
+                    <h3 class="mb-0">Empieza aquí: tests del Domain que no necesitan mocks</h3>
+                    <div class="mb-1 text-body-secondary">El Domain Layer es lo más fácil de testear — sin dependencias, sin mocks, lógica pura.</div>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Moq — Mocking de Dependencias</div>
+        <div class="day-subtitle">Mock, Setup, Verify, Returns, Callback y cuándo NO mockear</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>¿Para qué sirve Moq?</strong> Cuando el servicio que pruebas tiene dependencias (un repositorio, un servicio de email), no quieres usar las implementaciones reales en los tests. Moq crea objetos falsos (<strong>mocks</strong>) que puedes controlar: "cuando alguien llame a <code>GetByIdAsync</code>, devuelve este producto". Así pruebas solo la lógica de tu servicio, no la del repositorio.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Regla de oro del mocking:</strong> Solo mockea lo que cruzas un <em>boundary</em> arquitectónico: repositorios, servicios externos, email, etc. <strong>NO mockees</strong> clases concretas de tu propio dominio (Value Objects, Entities) — esas se usan directamente. Si sientes que necesitas mockear demasiado, probablemente tu diseño tiene demasiado acoplamiento.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ Moq v4.20+ cambió el modelo de licencia.</strong> Si trabajas en empresa, evalúa usar <strong>NSubstitute</strong> como alternativa (misma funcionalidad, licencia BSD, sintaxis igual de limpia). Ambos se cubren aquí.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Moq — Quickstart oficial en GitHub</h3>
+                    <div class="mb-1 text-body-secondary">La guía oficial de Moq: Setup, Returns, Throws, Callback, Verify, It.IsAny, It.Is, Sequences y más. Todo lo que necesitas en un documento.</div>
+                    <a class="link" href="https://github.com/devlooped/moq/blob/main/readme.md" target="_blank">📘 Ir Moq Quickstart →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Alternativa — NSubstitute</strong> 
+                    <h3 class="mb-0">NSubstitute — Documentación oficial</h3>
+                    <div class="mb-1 text-body-secondary">Alternativa open-source a Moq con sintaxis más fluida. Muy recomendable por la comunidad .NET en 2024+. Mismos conceptos, diferente sintaxis. <code>Substitute.For&lt;IRepo&gt;()</code></div>
+                    <a class="link" href="https://nsubstitute.github.io/help/getting-started/" target="_blank">📘 Ir nsubstitute.github.io →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Moq — Complete Guide for .NET Developers</h3>
+                    <div class="mb-1 text-body-secondary">Mock, Setup, Returns, Verify, Strict Mock vs Loose, Callbacks, y los errores más comunes al mockear. Con ejemplos reales de repositorios. ~40 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=9ZvDBSQa_so" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">NSubstitute vs Moq</h3>
+                    <div class="mb-1 text-body-secondary">Comparativa práctica entre ambos frameworks con los mismos tests escritos en los dos. Útil para decidir cuál adoptar en tu proyecto. ~20 min.</div>
+                    <a class="link" href="https://youtu.be/hE1_ByNG2J0?si=uzkX5OVZg_SGmSiY" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Moq cheatsheet completo</strong> 
+                    <h3 class="mb-0">Los patrones de Moq que más usarás</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Andrew Lock</strong> 
+                    <h3 class="mb-0">When to Mock — The hardest part of unit testing</h3>
+                    <div class="mb-1 text-body-secondary">Explica la diferencia entre Mock, Stub y Fake; cuándo usar cada uno; y por qué sobre-mockear hace los tests frágiles y difíciles de mantener.</div>
+                    <a class="link" href="https://andrewlock.net/should-you-unit-test-controllers-in-aspnetcore/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Testing de Servicios (Application Layer)</div>
+        <div class="day-subtitle">Testear casos de uso, caminos felices y tristes, y el Result Pattern</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El Application Layer es el núcleo del testing:</strong> Aquí está toda la lógica orquestada — obtener datos, ejecutar reglas de negocio, guardar, retornar. Es donde más valor tienes al testear. Mockeas el repositorio y la Unit of Work, y verificas que tu servicio se comporta correctamente en el happy path y en todos los caminos de error.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Testing Application Services en Clean Architecture</h3>
+                    <div class="mb-1 text-body-secondary">Cómo testear servicios de aplicación completos con Moq: mock de repositorios, casos de uso de creación/actualización/eliminación y cómo testear el Result Pattern. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/_D6Kai4RdGY?si=S6kCWFfKrvosHm8L" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Unit Testing Best Practices — Arrange Act Assert</h3>
+                    <div class="mb-1 text-body-secondary">Estructura de tests profesional: clases de tests bien organizadas, helpers para Arrange, datos de prueba reutilizables, y tests que documentan el comportamiento del sistema. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/pXoCHf9tCNE?si=QfjMnRHcLGKxNztP" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Artículo — Microsoft</strong> 
+                    <h3 class="mb-0">Best Practices for Unit Testing in .NET</h3>
+                    <div class="mb-1 text-body-secondary">Las mejores prácticas oficiales de Microsoft: test isolation, naming, un Assert por test, evitar lógica en tests, builders pattern para test data.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/core/testing/unit-testing-best-practices" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Tests completos del ProductService</strong> 
+                    <h3 class="mb-0">Happy path + error path + verify de llamadas</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Builder Pattern para Test Data</strong> 
+                    <h3 class="mb-0">Evitar repetición en el Arrange con Builders</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Testing de Controllers</div>
+        <div class="day-subtitle">Testear action results, status codes, y cuándo usar integration tests en su lugar</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>¿Vale la pena testear Controllers unitariamente?</strong> Hay debate en la comunidad. Los Controllers son delgados (thin controllers) — solo mapean Result a HTTP. Un unit test de Controller prueba básicamente <code>if (result.IsSuccess) return Ok()</code>. La mayoría del valor está en los tests de servicios. Aun así, vale la pena para cubrir todos los status codes y asegurarse que el mapping es correcto.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Testing Controllers in ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Unit testing de Controllers con Moq del service layer: verificar OkObjectResult, CreatedAtActionResult, NotFoundResult y ProblemDetails. Con casos reales. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/brSFKUuMOFk?si=fzc3wnBytgvPUu5R" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Unit vs Integration Tests for Controllers — Which is better?</h3>
+                    <div class="mb-1 text-body-secondary">Debate real: ¿cuándo testear Controllers unitariamente vs integration tests con WebApplicationFactory? Nick da la perspectiva pragmática de la industria. ~25 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=7roqteWLw4s" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Test Controller Logic en ASP.NET Core — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial para testear lógica de controllers: crear instancias, mockear dependencias, verificar IActionResult, y las diferencias con integration testing.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/mvc/controllers/testing?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Tests completos del ProductsController</strong> 
+                    <h3 class="mb-0">Todos los action results cubiertos</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Cobertura de Código + Entregable Final</div>
+        <div class="day-subtitle">Coverlet, reportes HTML, qué medir y qué no, y alcanzar el 60%</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+    
+    <div class="concept-box">
+        <strong>Cobertura no es calidad:</strong> 100% de cobertura con assertions vacías es inútil. El objetivo no es el número, es usar el número como indicador de huecos en tu suite de tests. Enfócate en cubrir los <em>caminos de decisión</em> (branch coverage), no solo las líneas.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Tip para llegar al 60%:</strong> Domain Layer (entidades + value objects) es lo más fácil — 0 mocks, lógica pura, debería estar al 90%+ solo. Application Layer con Moq lleva el resto. Infrastructure no cuentes para el 60% — eso va con Integration Tests la semana que viene.
+    </div>
+
+    <div class="flow">
+        <h3>📊 ¿Qué significa cada nivel de cobertura?</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Cobertura</th>
+                        <th>Interpretación</th>
+                        <th>Típico de</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="progress"><div class="progress-bar bg-danger" role="progressbar" style="width:40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">0-40%</div></div></td>
+                        <td>Sin tests reales o muy básicos</td>
+                        <td>Proyectos legacy, prototipos</td>
+                    </tr>
+                    <tr>
+                        <td><div class="progress"><div class="progress-bar bg-warning" role="progressbar" style="width:60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">40-60%</div></div></td>
+                        <td>Tests básicos cubriendo happy paths</td>
+                        <td>Proyectos en crecimiento — tu meta esta semana</td>
+                    </tr>
+                    <tr>
+                        <td><div class="progress"><div class="progress-bar bg-success" role="progressbar" style="width:70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">60-80%</div></div></td>
+                        <td>Happy + error paths cubiertos</td>
+                        <td>Estándar profesional mínimo</td>
+                    </tr>
+                    <tr>
+                        <td><div class="progress"><div class="progress-bar bg-success" role="progressbar" style="width:80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%+</div></div></td>
+                        <td>Cobertura robusta de la lógica crítica</td>
+                        <td>Librerías, código de misión crítica</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>    
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Coverlet — Code Coverage para .NET</h3>
+                    <div class="mb-1 text-body-secondary">La herramienta estándar para medir cobertura en .NET. Guía de instalación, integración con <code>dotnet test</code>, y exportar reportes en HTML con ReportGenerator.</div>
+                    <a class="link" href="https://github.com/coverlet-coverage/coverlet/blob/master/README.md" target="_blank">📘 Coverlet docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Code Coverage en .NET — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Cómo configurar coverlet con <code>dotnet test --collect:"XPlat Code Coverage"</code> y visualizar reportes. Integración con Visual Studio y VS Code.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/core/testing/unit-testing-code-coverage?tabs=linux" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Code Coverage con Coverlet y ReportGenerator</h3>
+                    <div class="mb-1 text-body-secondary">Configuración completa: instalar Coverlet, ejecutar con dotnet test, generar reportes HTML con ReportGenerator y cómo interpretar el reporte. ~20 min.</div>
+                    <a class="link" href="https://youtu.be/CR4c5mABUr4?si=k3bsBJIYH5qqyBLD" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Testing en Clean Architecture — Estrategia completa</h3>
+                    <div class="mb-1 text-body-secondary">Estrategia de testing para una aplicación real con Clean Architecture: qué testear en cada capa, cómo organizar los proyectos de tests, y cómo alcanzar cobertura significativa. ~45 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=T6NRcX1vnz8" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Comandos — Generar reporte de cobertura HTML</strong> 
+                    <h3 class="mb-0">Paso a paso para ver tu cobertura en el browser</h3>
+                    <pre><code># 1. Instalar ReportGenerator como herramienta global
+dotnet tool install -g dotnet-reportgenerator-globaltool
+
+# 2. Ejecutar tests con cobertura
+dotnet test --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage
+
+# 3. Generar reporte HTML
+reportgenerator \
+  -reports:"./coverage/**/coverage.cobertura.xml" \
+  -targetdir:"./coverage/report" \
+  -reporttypes:Html
+
+# 4. Abrir el reporte
+open ./coverage/report/index.html   # macOS
+start ./coverage/report/index.html  # Windows
+
+# Alternativa: ver solo el summary en consola
+dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura \
+            /p:Threshold=60 /p:ThresholdType=line</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Estructura recomendada de proyectos de tests</strong> 
+                    <h3 class="mb-0">Cómo organizar tus test projects</h3>
+                    <pre><code>{{codeExample7}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Milan Jovanović Blog</strong> 
+                    <h3 class="mb-0">Unit Testing en Clean Architecture — What to Test and Where</h3>
+                    <div class="mb-1 text-body-secondary">Guía práctica sobre qué cosas testear en cada capa de Clean Architecture y cuáles NO vale la pena testear unitariamente (dejar para integration tests).</div>
+                    <a class="link" href="https://www.milanjovanovic.tech/blog/unit-testing-clean-architecture-use-cases" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — 60% de Cobertura en el Proyecto</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Para aprobar la semana debes poder ejecutar <code>dotnet test</code> y el reporte mostrar:</p>
+    <ul>
+        <li>Domain Layer: 90%+ de cobertura (Entities, Value Objects, reglas de negocio)</li>
+        <li>Application Layer: 70%+ de cobertura (todos los casos de uso, happy y error paths)</li>
+        <li>Al menos 20 tests en total, todos pasando en verde con <code>dotnet test</code></li>
+        <li>FluentValidation validators testeados con <code>TestValidate</code> de la Semana 3</li>
+        <li>Mocks verificados con <code>Times.Once</code> y <code>Times.Never</code> en tests críticos</li>
+        <li>Reporte HTML de Coverlet generado y cobertura global ≥ 60%</li>
+        <li>Builder pattern para test data (al menos un Builder reutilizable)</li>
+        <li>Naming consistente en todos los tests (elige uno de los 3 estilos y úsalo siempre)</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong >🔗 Conexión con Semanas 1–3:</strong>
+        Los <strong>validators de FluentValidation</strong> (Semana 3) se testean con <code>validator.TestValidate(request)</code> — sin levantar HTTP.
+        El <strong>Result Pattern</strong> hace tus assertions más simples: <code>result.IsSuccess.Should().BeTrue()</code>.
+        Los <strong>IExceptionHandler</strong> (Semana 3) se prueban mejor con Integration Tests (Semana 5) — esta semana solo unit tests.
     </div>
 </div>

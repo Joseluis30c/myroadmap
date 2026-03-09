@@ -1,21 +1,69 @@
 <header>
-    <nav class="navbar navbar-expand-md sticky-top border-bottom glass-nav" data-bs-theme="light">
-        <div class="container">
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> 
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
-            <div class="offcanvas-header">
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> 
-            </div>
-            <div class="offcanvas-body">
-                <ul class="navbar-nav flex-grow-1 justify-content-between">
-                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase1"><strong>🔥 FASE 1 Introducción a .NET</strong></a></li>
-                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase2"><strong>🔥 FASE 2 SQL Avanzado</strong></a></li>
-                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase3"><strong>🔥 FASE 3 Cloud + DevOps</strong></a></li>
-                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase4"><strong>🔥 FASE 4 Arquitectura Moderna</strong></a></li>
-                    <li class="nav-item text-center"><a class="blog-header-logo text-body-emphasis text-decoration-none" routerLink="/phase5"><strong>🔥 FASE 5 Extras</strong></a></li>
-                </ul>
-            </div>
-        </div>
+    <nav class="rn-navbar sticky-top" data-bs-theme="dark">
+        <div class="container rn-nav-inner">
+
+            <!-- Brand -->
+            <a class="rn-brand" routerLink="/">
+                <span class="rn-brand-icon">⬡</span>
+                <span class="rn-brand-text">.NET<span class="rn-brand-accent">Roadmap</span></span>
+            </a>
+
+            <!-- Desktop nav -->
+            <ul class="rn-phase-list d-none d-md-flex">
+                <li><a class="rn-phase-link" routerLink="/phase1" routerLinkActive="active">
+                    <span class="rn-phase-num">01</span><span class="rn-phase-name">Introducción .NET</span>
+                </a></li>
+                <li><a class="rn-phase-link" routerLink="/phase2" routerLinkActive="active">
+                    <span class="rn-phase-num">02</span><span class="rn-phase-name">SQL Avanzado</span>
+                </a></li>
+                <li><a class="rn-phase-link" routerLink="/phase3" routerLinkActive="active">
+                    <span class="rn-phase-num">03</span><span class="rn-phase-name">Cloud + DevOps</span>
+                </a></li>
+                <li><a class="rn-phase-link" routerLink="/phase4" routerLinkActive="active">
+                    <span class="rn-phase-num">04</span><span class="rn-phase-name">Arquitectura</span>
+                </a></li>
+                <li><a class="rn-phase-link" routerLink="/phase5" routerLinkActive="active">
+                    <span class="rn-phase-num">05</span><span class="rn-phase-name">Extras</span>
+                </a></li>
+            </ul>
+
+            <!-- Mobile toggle -->
+            <button class="rn-toggler d-md-none" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#rnOffcanvas"
+                aria-controls="rnOffcanvas" aria-label="Menú">
+                <span></span><span></span><span></span>
+            </button>
         </div>
     </nav>
+
+    <!-- Offcanvas mobile -->
+    <div class="offcanvas offcanvas-end rn-offcanvas" tabindex="-1"
+         id="rnOffcanvas" aria-labelledby="rnOffcanvasLabel">
+        <div class="offcanvas-header">
+            <span class="rn-brand">
+                <span class="rn-brand-icon">⬡</span>
+                <span class="rn-brand-text">.NET<span class="rn-brand-accent">Roadmap</span></span>
+            </span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="rn-mobile-nav list-unstyled">
+                <li><a class="rn-mobile-link" routerLink="/phase1" routerLinkActive="active" data-bs-dismiss="offcanvas">
+                    <span class="rn-phase-num">01</span> Introducción .NET
+                </a></li>
+                <li><a class="rn-mobile-link" routerLink="/phase2" routerLinkActive="active" data-bs-dismiss="offcanvas">
+                    <span class="rn-phase-num">02</span> SQL Avanzado
+                </a></li>
+                <li><a class="rn-mobile-link" routerLink="/phase3" routerLinkActive="active" data-bs-dismiss="offcanvas">
+                    <span class="rn-phase-num">03</span> Cloud + DevOps
+                </a></li>
+                <li><a class="rn-mobile-link" routerLink="/phase4" routerLinkActive="active" data-bs-dismiss="offcanvas">
+                    <span class="rn-phase-num">04</span> Arquitectura Moderna
+                </a></li>
+                <li><a class="rn-mobile-link" routerLink="/phase5" routerLinkActive="active" data-bs-dismiss="offcanvas">
+                    <span class="rn-phase-num">05</span> Extras
+                </a></li>
+            </ul>
+        </div>
+    </div>
 </header>

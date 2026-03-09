@@ -1,0 +1,222 @@
+/* ============================================================
+   RN-INDEX-COMPARE — Clustered vs Non-Clustered Index
+   ============================================================ */
+
+/* Section eyebrow label */
+.rn-section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--rn-text-muted);
+    margin-bottom: 0.75rem;
+}
+
+/* ── Grid ── */
+.rn-index-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 700px) {
+    .rn-index-compare { grid-template-columns: 1fr; }
+}
+
+/* ── Card base ── */
+.rn-idx-card {
+    border-radius: 14px;
+    padding: 1.4rem;
+    border: 1px solid var(--rn-border);
+    background: var(--rn-surface-2);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.rn-idx-clustered {
+    border-color: rgba(99, 102, 241, 0.25);
+    background: linear-gradient(160deg, rgba(99,102,241,0.06) 0%, var(--rn-surface-2) 60%);
+}
+.rn-idx-nonclustered {
+    border-color: rgba(0, 217, 255, 0.2);
+    background: linear-gradient(160deg, rgba(0,217,255,0.05) 0%, var(--rn-surface-2) 60%);
+}
+
+/* ── Header ── */
+.rn-idx-header { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.rn-idx-badge {
+    display: inline-flex;
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+}
+.rn-idx-badge-c {
+    background: rgba(99,102,241,0.15);
+    color: #a5b4fc;
+    border: 1px solid rgba(99,102,241,0.3);
+}
+.rn-idx-badge-nc {
+    background: rgba(0,217,255,0.1);
+    color: var(--rn-cyan);
+    border: 1px solid rgba(0,217,255,0.25);
+}
+
+.rn-idx-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--rn-text);
+    letter-spacing: -0.02em;
+}
+
+.rn-idx-desc {
+    font-size: 0.82rem;
+    color: var(--rn-text-soft);
+    line-height: 1.65;
+    margin: 0;
+}
+.rn-idx-desc strong { color: var(--rn-text); }
+
+/* ── B-tree diagram ── */
+.rn-btree {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--rn-border);
+    border-radius: 10px;
+    padding: 1rem 0.8rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+/* Row of nodes */
+.rn-btree-level {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+/* Connector lines between levels */
+.rn-btree-connector {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    width: 60%;
+    margin: 0.1rem 0;
+}
+.rn-btree-connector-wide {
+    width: 90%;
+    gap: 0;
+    justify-content: space-around;
+}
+.rn-btree-connector span {
+    display: block;
+    width: 1px;
+    height: 14px;
+    background: var(--rn-border-mid);
+}
+
+/* Node base */
+.rn-btree-node {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.35rem 0.5rem;
+    border-radius: 7px;
+    line-height: 1.4;
+    min-width: 52px;
+    flex: 0 0 auto;
+}
+.rn-btree-node small {
+    font-size: 0.58rem;
+    font-weight: 400;
+    opacity: 0.75;
+    display: block;
+}
+
+/* Node variants */
+.rn-btn-root {
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: #fbbf24;
+}
+.rn-btn-int {
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.3);
+    color: #a5b4fc;
+}
+.rn-btn-leaf-c {
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: #34d399;
+}
+.rn-btn-leaf-nc {
+    background: rgba(0,217,255,0.08);
+    border: 1px solid rgba(0,217,255,0.2);
+    color: var(--rn-cyan);
+}
+
+/* Leaf row label */
+.rn-btree-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--rn-text-muted);
+    margin-top: 0.6rem;
+    text-align: center;
+}
+
+/* ── Rules list ── */
+.rn-idx-rules {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+.rn-idx-rules li {
+    font-size: 0.8rem;
+    color: var(--rn-text-soft);
+    padding-left: 1.1rem;
+    position: relative;
+    line-height: 1.5;
+}
+.rn-idx-rules li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--rn-text-muted);
+    font-weight: 700;
+}
+.rn-idx-clustered .rn-idx-rules li::before  { color: #a5b4fc; }
+.rn-idx-nonclustered .rn-idx-rules li::before { color: var(--rn-cyan); }
+
+.rn-idx-rules li code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--rn-cyan) !important;
+    background: rgba(0,217,255,0.07);
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+}
+
+/* ── Responsive node size adjustments ── */
+@media (max-width: 900px) {
+    .rn-btree-node { min-width: 44px; font-size: 0.6rem; padding: 0.28rem 0.4rem; }
+}
+@media (max-width: 700px) {
+    .rn-btree-node { min-width: 52px; font-size: 0.65rem; }
+    .rn-idx-card   { padding: 1.1rem; }
+}

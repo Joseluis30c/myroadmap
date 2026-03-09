@@ -1,0 +1,616 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – CTEs Avanzados</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Window Functions</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Optimización de JOINs</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Estadísticas</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Queries Complejas</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">CTEs recursivos</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">CTEs, OVER, UPDATE STATIC</div></div>
+</div>
+
+<div class="concept-box">
+    CTEs recursivos, window functions que reemplazan subconsultas lentas, joins que el optimizer puede paralelizar y estadísticas que le dicen la verdad al query planner.
+</div>
+
+<div class="flow">
+    <h3>Los 4 pilares de esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">01</span><div class="pc-title">CTEs Avanzados</div><div class="pc-body">Recursivos para jerarquías, CTEs múltiples encadenados y cuándo un CTE es mejor que una subquery.</div></div>
+    <div class="intro-card"><span class="icon">02</span><div class="pc-title">Window Functions</div><div class="pc-body">ROW_NUMBER, RANK, LAG/LEAD, SUM acumulativo, NTILE. Reemplaza self-joins y subconsultas correlacionadas.</div></div>
+    <div class="intro-card"><span class="icon">03</span><div class="pc-title">Optimización de JOINs</div><div class="pc-body">Nested Loops vs Hash Match vs Merge Join. Predicados tempranos, conversiones implícitas, APPLY.</div></div>
+    <div class="intro-card"><span class="icon">04</span><div class="pc-title">Estadísticas</div><div class="pc-body">Histogramas, density vectors, parameter sniffing y estadísticas obsoletas que generan planes catastróficos.</div></div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">CTEs Avanzados</div>
+        <div class="day-subtitle">CTEs múltiples encadenados, recursivos para jerarquías y cuándo usar temp table en lugar de CTE</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un CTE no es magia de performance.</strong> En SQL Server, un CTE no se materializa por defecto — se expande inline como una subquery. Lo que ganas es <em>legibilidad</em> y la capacidad de referenciar el mismo resultado múltiples veces. El CTE <strong>recursivo</strong> tiene valor semántico único: permite recorrer estructuras jerárquicas (org charts, categorías padre-hijo, BOM) que serían imposibles de expresar con SQL plano.
+    </div>
+
+    <div class="arch-diagram">
+        <h3>Anatomía de un CTE recursivo</h3>
+        <div class="layers">
+            <div class="layer layer-pres">
+            <div>
+                <div class="layer-name">Anchor Member (caso base)</div>
+                <div class="layer-rule">El punto de partida. Selecciona las filas raíz (empleados sin jefe, categorías de nivel 0). Se ejecuta UNA sola vez.</div>
+            </div>
+            </div>
+            <div class="arrow-down">↓ UNION ALL ↓</div>
+            <div class="layer layer-app">
+            <div>
+                <div class="layer-name">Recursive Member (paso iterativo)</div>
+                <div class="layer-rule">Se une al CTE mismo para ir un nivel más abajo en la jerarquía. Se ejecuta repetidamente hasta que no retorna filas.</div>
+            </div>
+            </div>
+            <div class="arrow-down">↓ RESULT ↓</div>
+            <div class="layer layer-domain">
+            <div>
+                <div class="layer-name">Query final sobre el CTE</div>
+                <div class="layer-rule">Usa el CTE como si fuera una tabla. Filtra, ordena o agrega los datos de todos los niveles de la jerarquía.</div>
+            </div>
+            </div>
+            <div class="arrow-down"></div>
+            <div class="tip">
+                <strong>⚠️ MAXRECURSION:</strong> El default es 100 niveles. Si tu jerarquía puede ser más profunda, agrega <code>OPTION (MAXRECURSION 0)</code>. Sin esto, una jerarquía circular lanzará un error.
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">WITH — Common Table Expressions en T-SQL (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Referencia completa de CTEs en SQL Server: sintaxis, CTEs múltiples, recursivos, limitaciones y diferencias con subqueries. Incluye ejemplos con jerarquías y MAXRECURSION.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/t-sql/queries/with-common-table-expression-transact-sql?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Recursive CTEs in SQL Server — Hierarchies and Trees</h3>
+                    <div class="mb-1 text-body-secondary">El tutorial más claro sobre CTEs recursivos: org charts, categorías padre-hijo, cálculo de nivel de profundidad y path completo desde la raíz. Casos reales con demos en SSMS. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/sZA1DLADck8" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">CTEs vs Subqueries vs Temp Tables — Performance real</h3>
+                    <div class="mb-1 text-body-secondary">Compara los 3 con execution plans reales: cuándo el optimizer los trata igual, cuándo una temp table es la única solución correcta, y el mito de que los CTEs son "más rápidos". ~40 min.</div>
+                    <a class="link" href="https://youtu.be/vstJyDo88kA?si=hsVApP_u8i7Y83Xb" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Artículo — SQLServerTutorial.net</strong> 
+                    <h3 class="mb-0">Guía completa de CTEs con 8 ejemplos progresivos</h3>
+                    <div class="mb-1 text-body-secondary">Desde el CTE básico hasta múltiples CTEs encadenados y recursivos. Cada ejemplo incluye el problema que resuelve y la alternativa sin CTE.</div>
+                    <a class="link" href="https://www.sqlservertutorial.net/sql-server-basics/sql-server-cte/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — CTE recursivo + múltiples CTEs encadenados</strong> 
+                    <h3 class="mb-0">Org chart con nivel, path y comparación salarial</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Window Functions</div>
+        <div class="day-subtitle">OVER, PARTITION BY, frame clauses, funciones de ranking y analytics sin colapsar filas</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Las window functions son la herramienta más poderosa y subutilizada del SQL moderno.</strong> A diferencia de <code>GROUP BY</code>, no colapsan filas — calculan sobre una "ventana" de filas relacionadas manteniendo el detalle. Esto elimina self-joins y subconsultas correlacionadas que son lentas por naturaleza. Un <code>SUM() OVER (PARTITION BY ...)</code> reemplaza un subquery correlacionado con un solo escaneo.
+    </div>
+
+    <div class="flow">
+        <div class="tip">
+            <span class="text-warning">SUM(Salary)</span>&nbsp;OVER&nbsp;(<span class="text-primary">PARTITION BY DepartmentId</span>&nbsp;<span class="text-success">ORDER BY HireDate</span>&nbsp;<span class="text-info">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>)
+        </div>
+        <div class="principles">
+            <div class="pc"><div class="pc-title text-warning">Función</div><div class="pc-body">SUM, AVG, COUNT, MIN, MAX, ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, NTILE, FIRST_VALUE, LAST_VALUE</div></div>
+            <div class="pc"><div class="pc-title text-primary">PARTITION BY</div><div class="pc-body">Reinicia el cálculo para cada grupo. Equivalente al GROUP BY pero sin colapsar filas. Opcional.</div></div>
+            <div class="pc"><div class="pc-title text-success">ORDER BY</div><div class="pc-body">Define el orden dentro de cada partición. Requerido para funciones de ranking y LAG/LEAD.</div></div>
+            <div class="pc"><div class="pc-title text-info">Frame Clause</div><div class="pc-body">Define qué filas forman la ventana. ROWS vs RANGE, UNBOUNDED PRECEDING, CURRENT ROW, N PRECEDING.</div></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Cláusula OVER — Window Functions completas</h3>
+                    <div class="mb-1 text-body-secondary">Todas las funciones de ventana disponibles en SQL Server con sintaxis exacta, PARTITION BY, ORDER BY y ROWS/RANGE BETWEEN con ejemplos de cada una.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/t-sql/queries/select-over-clause-transact-sql?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Window Functions — La guía definitiva</h3>
+                    <div class="mb-1 text-body-secondary">Curso completo: ROW_NUMBER para deduplicación, RANK/DENSE_RANK, totales acumulados, promedios móviles con frame clause, LAG/LEAD para comparar fila anterior/siguiente. ~55 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=Ww71knvhQ-s" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Window Functions vs GROUP BY — La diferencia semántica real</h3>
+                    <div class="mb-1 text-body-secondary">Por qué GROUP BY colapsa filas y las window functions no, y cómo reemplazar subconsultas correlacionadas con OVER para una sola pasada por la tabla. ~30 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=QFj-hZi8MKk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Recurso — Use The Index Luke</strong> 
+                    <h3 class="mb-0">Window Functions y performance — el operador Window Spool en el plan</h3>
+                    <div class="mb-1 text-body-secondary">Cómo el optimizer ejecuta las window functions, cuándo crean un Window Spool, y cómo los índices correctos en la columna PARTITION BY y ORDER BY eliminan ese operador.</div>
+                    <a class="link" href="https://use-the-index-luke.com/sql/partial-results/window-functions" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — 7 patrones esenciales de window functions</strong> 
+                    <h3 class="mb-0">Los casos de uso que usarás en producción cada semana</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Optimización de JOINs</div>
+        <div class="day-subtitle">Nested Loops vs Hash Match vs Merge Join, conversiones implícitas, subconsultas correlacionadas y APPLY</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>SQL Server elige el algoritmo de join automáticamente basándose en estadísticas.</strong> Nested Loops es ideal cuando la tabla exterior es pequeña y la interior tiene índice. Hash Match cuando no hay índices útiles. Merge Join cuando ambas entradas ya están ordenadas. Entender cuándo cada algoritmo es correcto te permite diagnosticar cuándo el optimizer tomó una mala decisión — y cuál es la causa raíz.
+    </div>
+
+    <div class="flow">
+        <h3>Los 3 algoritmos de JOIN</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Algoritmo</th>
+                        <th>Complejidad</th>
+                        <th>Cuándo el optimizer lo elige</th>
+                        <th>Señal de problema</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rn-code-badge">Nested Loops</span></td>
+                        <td class="text-success">O(n · log m)</td>
+                        <td>Tabla exterior pequeña + índice en columna JOIN de la tabla interior</td>
+                        <td>Sin índice en la FK → O(n · m), catastrófico</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge">Hash Match</span></td>
+                        <td class="text-warning">O(n+m)</td>
+                        <td>Sin índice útil, tablas grandes, cardinalidad alta. Requiere memoria.</td>
+                        <td>Memory Spill a TempDB si estimación es mala</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge">Merge Join</span></td>
+                        <td class="text-success">O(n+m)</td>
+                        <td>Ambas entradas ya ordenadas por la columna JOIN (índice o Sort explícito)</td>
+                        <td>Sort explícito agrega costo si no hay índice</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>❌ Patrones que dañan los JOINs</h4>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>✅ La forma correcta</h4>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Hash Match vs Nested Loops vs Merge Join — Cuándo el plan falla</h3>
+                    <div class="mb-1 text-body-secondary">Usa execution plans reales para mostrar cuándo el optimizer elige el algoritmo equivocado y cómo los join hints pueden forzarlo. Por qué forzar un join es casi siempre una señal de otro problema. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/Roubv_TpXYY?si=CRkJFrT1PQIuPDfX" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Implicit Conversions — El JOIN killer silencioso</h3>
+                    <div class="mb-1 text-body-secondary">Las conversiones implícitas de tipos en columnas JOIN causan Index Scans silenciosos que no se ven en el código. Cómo detectarlos en el plan y la solución permanente. ~25 min.</div>
+                    <a class="link" href="https://youtu.be/EOX0eU9tU9o?si=BolQDoNKAZMPjcwI" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Recurso — Use The Index Luke</strong> 
+                    <h3 class="mb-0">Join internals — cómo los índices determinan el algoritmo elegido</h3>
+                    <div class="mb-1 text-body-secondary">Cómo el índice en la columna FK determina si el optimizer puede usar Nested Loops, y por qué un índice en la tabla "many" de una relación 1:N es crítico para performance de JOINs.</div>
+                    <a class="link" href="https://use-the-index-luke.com/sql/join" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Reemplazar subconsultas correlacionadas + CROSS APPLY</strong> 
+                    <h3 class="mb-0">El patrón más común de optimización: subconsulta N+1 → JOIN único</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Estadísticas</div>
+        <div class="day-subtitle">Histogramas, density vectors, parameter sniffing y cómo las estadísticas obsoletas destruyen planes óptimos</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El optimizador trabaja con estadísticas, no con los datos reales.</strong> Para elegir entre Index Seek vs Scan, Nested Loops vs Hash Match, necesita estimar cuántas filas retornará cada operación. Si las estadísticas están desactualizadas, esas estimaciones son incorrectas y el plan resultante puede ser catastrófico: estimó 1 fila, obtuvo 900,000 — eligió Nested Loops y tardó 8 minutos.
+    </div>
+
+    <div class="flow">
+        <div class="row g-3">
+            <div class="col-sm-6 d-flex">
+                <div class="card card-good h-100 w-100">
+                    <div class="card-body">
+                        <h4>✓ Estimación correcta → Plan óptimo</h4>
+                        <div class="tl-row-wrap">
+                            <span class="tl-row-label">Estimated</span>
+                            <div class="tl-row-track">
+                                <span class="layer-tag rn-b-free" style="width:60%"></span>
+                            </div>
+                            <span class="tl-row-label">620</span>
+                        </div>
+                        <div class="tl-row-wrap">
+                            <span class="tl-row-label">Actual</span>
+                            <div class="tl-row-track">
+                                <span class="layer-tag rn-b-free" style="width:65%"></span>
+                            </div>
+                            <span class="tl-row-label">650</span>
+                        </div>
+                        <p class="pc-body mt-2 mb-0">
+                            Diferencia ~5% → Index Seek elegido correctamente
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 d-flex">
+                <div class="card card-bad h-100 w-100">
+                    <div class="card-body">
+                        <h4>⚠ Estadísticas obsoletas → Plan caótico</h4>
+                        <div class="tl-row-wrap">
+                            <span class="tl-row-label">Estimated</span>
+                            <div class="tl-row-track">
+                                <span class="layer-tag rn-b-wait" style="width:1%"></span>
+                            </div>
+                            <span class="tl-row-label">1</span>
+                        </div>
+                        <div class="tl-row-wrap">
+                            <span class="tl-row-label">Actual</span>
+                            <div class="tl-row-track">
+                                <span class="layer-tag rn-b-wait" style="width:98%"></span>
+                            </div>
+                            <span class="tl-row-label">980k</span>
+                        </div>
+                        <p class="pc-body mt-2 mb-0">
+                            Estimó 1 fila, obtuvo 980k → Nested Loops = catástrofe
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tip">
+        <strong>💡 Parameter Sniffing:</strong> SQL Server compila el plan de un stored procedure con los parámetros de la primera ejecución y lo reutiliza. Si la primera llamada fue con un valor atípico, el plan es ineficiente para todos los demás. Soluciones: <code>OPTION (RECOMPILE)</code>, <code>OPTIMIZE FOR UNKNOWN</code>, o local variables.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Statistics in SQL Server — Por qué tu query es rápida hoy y lenta mañana</h3>
+                    <div class="mb-1 text-body-secondary">La explicación más clara sobre estadísticas: histograma, density vector, cómo leer DBCC SHOW_STATISTICS y los tres síntomas de estadísticas obsoletas en el execution plan. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/CRfXeDrfbmI?si=nzhQlNuw2pHOJMed" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Parameter Sniffing — El bug más difícil de diagnosticar</h3>
+                    <div class="mb-1 text-body-secondary">Reproducción en vivo: cómo el primer plan contamina todos los demás, cómo detectarlo con DMVs y las 4 soluciones con sus trade-offs reales. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/pd7xqLT_-2k?si=wuYTxeOAzMrb9216" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Estadísticas en SQL Server — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Cómo SQL Server crea y actualiza estadísticas, qué es el histograma (RANGE_HI_KEY, EQ_ROWS, RANGE_ROWS), cuándo la actualización automática no es suficiente y cómo forzarla.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/statistics/statistics?view=sql-server-ver16" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Diagnosticar estadísticas + resolver parameter sniffing</strong> 
+                    <h3 class="mb-0">DBCC SHOW_STATISTICS, histograma y las 3 soluciones a parameter sniffing</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Queries Complejas Reales</div>
+        <div class="day-subtitle">Temp tables vs CTEs, paginación eficiente, keyset pagination y el workflow completo de tuning</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Las temp tables materializan el resultado intermedio</strong> — esto es lo que el CTE no hace. Para queries de múltiples pasos donde el optimizador toma malas decisiones al encadenar CTEs (no puede ver las estadísticas del CTE anterior), una tabla temporal con índices te da control total. Es la herramienta de último recurso cuando todo lo demás falla.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Paginación: el offset penalty.</strong> <code>OFFSET 50000 FETCH NEXT 20</code> debe leer y descartar 50,000 filas antes de retornar las 20. Con keyset pagination (<code>WHERE Id > @lastId ORDER BY Id FETCH NEXT 20</code>) es O(log n) sin importar qué página. La página 1,000 es igual de rápida que la página 1.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">
+                        Temp Tables vs CTEs vs Table Variables — Performance real con planes
+                    </h3>
+                    <div class="mb-1 text-body-secondary">Las table variables no tienen estadísticas y generan planes pésimos, las temp tables tienen estadísticas completas y los CTEs se expanden inline. Demos con 1M de filas y comparativas reales. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/fMBNDLtDvQg?si=fX2V1IcR5w4yNMws" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Use The Index Luke</strong> 
+                    <h3 class="mb-0">Paginación correcta: OFFSET vs keyset y por qué OFFSET escala mal</h3>
+                    <div class="mb-1 text-body-secondary">El análisis más completo sobre paginación SQL: el problema de rendimiento de OFFSET con tablas grandes, la solución con keyset pagination y cuándo cada approach es apropiado.</div>
+                    <a class="link" href="https://use-the-index-luke.com/sql/partial-results/fetch-next-page" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">
+                        CROSS APPLY y OUTER APPLY — El operador más versátil de T-SQL
+                    </h3>
+                    <div class="mb-1 text-body-secondary">APPLY ejecuta una subquery para cada fila exterior: top-N por grupo, TVF correlacionadas y patrones imposibles con JOINs normales. Comparativas de performance vs ROW_NUMBER. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/ZSLq5-h9pSI?si=1IyjKXNaZJ-sMmeM" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Herramienta — Query Store</strong> 
+                    <h3 class="mb-0">Query Store — Historial de planes y detección de regresiones</h3>
+                    <div class="mb-1 text-body-secondary">Query Store registra el historial de todos los planes. Permite ver si tu query fue más lenta hoy que ayer, comparar planes antes/después de actualizar estadísticas y forzar un plan que funcionó bien.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/performance/monitoring-performance-by-using-the-query-store?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Temp Table + Keyset pagination + Query compleja optimizada</strong> 
+                    <h3 class="mb-0">El patrón completo de optimización para queries de múltiples pasos</h3>
+                    <pre><code>{{codeExample7}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Reduce tiempos de consultas complejas</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Toma 3 queries reales de tu BD con al menos 2 JOINs o subconsultas, y optimízalas documentando cada cambio con métricas:</p>
+    <ul>
+        <li>Query original con execution plan y logical reads medidos con SET STATISTICS IO ON</li>
+        <li>Al menos una query con CTE recursivo para una jerarquía real</li>
+        <li>Query optimizada: CTEs, window functions o reescritura de JOINs según corresponda</li>
+        <li>Diagnóstico de estadísticas: DBCC SHOW_STATISTICS comentado en la tabla principal</li>
+        <li>Al menos una query que use window functions en lugar de subconsulta correlacionada</li>
+        <li>Tabla comparativa: logical reads y tiempo de ejecución antes/después para cada query</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con semanas anteriores:</strong> Los índices creados en <strong>Semana 7</strong> son exactamente los que las window functions necesitan — un índice en <code>(CustomerId, OrderDate)</code> INCLUDE <code>(Total)</code> hace que el Window Spool se ejecute en memoria en lugar de derramar a TempDB. Las queries optimizadas aquí son las que llegan a EF Core desde los repositorios de <strong>Semana 2</strong>, y el profiling con <code>dotnet-trace</code> de <strong>Semana 6</strong> mostrará la mejora de latencia directamente.
+    </div>
+</div>

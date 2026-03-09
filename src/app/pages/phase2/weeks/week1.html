@@ -1,0 +1,717 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Execution Plans</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Scan vs Seek</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Clustered Index</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Non-Clustered + Covering</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Optimización Real</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Leerle la mente al SQL Server</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">SQL</div></div>
+</div>
+
+<div class="arch-diagram">
+    <h3>▶ ACTUAL EXECUTION PLAN — SELECT * FROM Orders | EXEC PLAN</h3>
+    <div class="layers">
+        <div class="layer layer-pres">
+        <div>
+            <div class="layer-name">⬛ Clustered Index Scan</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">78%</span>
+        </div>
+        </div>
+        <div class="arrow-down">↓→</div>
+        <div class="layer layer-app">
+        <div>
+            <div class="layer-name">🔶 Key Lookup</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">19%</span>
+        </div>
+        </div>
+        <div class="arrow-down">↓→</div>
+        <div class="layer layer-domain">
+        <div>
+            <div class="layer-name">✦ Index Seek (NonClustered)</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">2%</span>
+        </div>
+        </div>
+        <div class="arrow-down">↓→</div>
+        <div class="layer layer-infra">
+        <div>
+            <div class="layer-name">◈ Nested Loops (Inner Join)</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">1%</span>
+        </div>
+        </div>
+        <div class="arrow-down"></div>
+        <div class="layer layer-pres">
+        <div>
+            <div class="layer-name">⚠ Missing Index: CREATE NONCLUSTERED INDEX... ON Orders(CustomerId) INCLUDE (OrderDate, Total)<br>⚠ Estimated Cost: 0.847 (97% of batch)<br>⚠ Row Estimate: 1 actual vs 15,234 estimated → Stale Statistics</div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="rn-index-compare">
+
+    <!-- CLUSTERED -->
+    <div class="rn-idx-card rn-idx-clustered">
+        <div class="rn-idx-header">
+            <span class="rn-idx-badge rn-idx-badge-c">Clustered Index</span>
+            <div class="rn-idx-title">Los datos físicamente ordenados</div>
+        </div>
+        <p class="rn-idx-desc">El clustered index <strong>ES</strong> la tabla. Los datos de todas las columnas están en las hojas del B-tree, físicamente ordenados por la clave del índice. Solo puede existir uno por tabla.</p>
+
+        <!-- B-tree diagram -->
+        <div class="rn-btree">
+            <div class="rn-btree-level">
+                <div class="rn-btree-node rn-btn-root">Root<br><small>1000, 2000</small></div>
+            </div>
+            <div class="rn-btree-connector">
+                <span></span><span></span>
+            </div>
+            <div class="rn-btree-level">
+                <div class="rn-btree-node rn-btn-int">Int<br><small>500</small></div>
+                <div class="rn-btree-node rn-btn-int">Int<br><small>1500</small></div>
+            </div>
+            <div class="rn-btree-connector rn-btree-connector-wide">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="rn-btree-level">
+                <div class="rn-btree-node rn-btn-leaf-c">ID:1<br><small>ALL DATA</small></div>
+                <div class="rn-btree-node rn-btn-leaf-c">ID:2<br><small>ALL DATA</small></div>
+                <div class="rn-btree-node rn-btn-leaf-c">ID:3<br><small>ALL DATA</small></div>
+            </div>
+            <div class="rn-btree-label">↑ hojas = filas completas de la tabla</div>
+        </div>
+
+        <ul class="rn-idx-rules">
+            <li>Por defecto: la <code>PRIMARY KEY</code> es el clustered index</li>
+            <li>Ideal en columnas usadas en <code>ORDER BY</code>, <code>BETWEEN</code>, rangos</li>
+            <li>Mal en columnas <code>GUID</code> aleatorio → fragmentation</li>
+        </ul>
+    </div>
+
+    <!-- NON-CLUSTERED -->
+    <div class="rn-idx-card rn-idx-nonclustered">
+        <div class="rn-idx-header">
+            <span class="rn-idx-badge rn-idx-badge-nc">Non-Clustered Index</span>
+            <div class="rn-idx-title">Un mapa hacia los datos</div>
+        </div>
+        <p class="rn-idx-desc">Estructura separada de la tabla. Las hojas contienen la clave del índice + un puntero <strong>(Row Locator)</strong> a la fila real. Puedes tener hasta <strong>999</strong> por tabla en SQL Server.</p>
+
+        <!-- B-tree diagram -->
+        <div class="rn-btree">
+            <div class="rn-btree-level">
+                <div class="rn-btree-node rn-btn-root">Root<br><small>M, T</small></div>
+            </div>
+            <div class="rn-btree-connector">
+                <span></span><span></span>
+            </div>
+            <div class="rn-btree-level">
+                <div class="rn-btree-node rn-btn-int">Int<br><small>G</small></div>
+                <div class="rn-btree-node rn-btn-int">Int<br><small>R</small></div>
+            </div>
+            <div class="rn-btree-connector rn-btree-connector-wide">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="rn-btree-level">
+                <div class="rn-btree-node rn-btn-leaf-nc">Email<br><small>→ RID</small></div>
+                <div class="rn-btree-node rn-btn-leaf-nc">Email<br><small>→ RID</small></div>
+                <div class="rn-btree-node rn-btn-leaf-nc">Email<br><small>→ RID</small></div>
+            </div>
+            <div class="rn-btree-label">↑ hojas = clave + puntero a la fila real</div>
+        </div>
+
+        <ul class="rn-idx-rules">
+            <li>Múltiples por tabla, cada uno en una estructura separada</li>
+            <li>Requiere <code>Key Lookup</code> si necesita columnas fuera del índice</li>
+            <li>Se vuelve <code>Covering Index</code> al agregar <code>INCLUDE</code> columns</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Cómo leer Execution Plans</div>
+        <div class="day-subtitle">SSMS Actual vs Estimated, operadores clave, warnings y qué buscar primero</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El Execution Plan es el radiografía de tu query.</strong> SQL Server decide <em>cómo</em> ejecutar tu query: qué índices usar, en qué orden unir tablas, cuándo paralelizar. El Estimated Plan es la predicción antes de ejecutar; el <strong>Actual Plan</strong> es lo que realmente pasó con estadísticas reales. Siempre usa Actual. Las diferencias entre estimated y actual rows revelan estadísticas obsoletas.
+    </div>
+
+    <div class="flow">
+        <h3>Operadores que debes conocer</h3>
+        <div class="pf-grid">
+            <div class="pf">
+                <div class="pf-key">Table Scan / Clustered Index Scan</div>
+                <div class="pf-val">Lee TODAS las filas de la tabla. En tablas grandes es devastador. El clásico "full scan".</div>
+                <div class="pf-val text-success"> Crear un índice en la columna del WHERE</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">Key Lookup (Bookmark Lookup)</div>
+                <div class="pf-val">Encontró la fila con un non-clustered index pero necesita ir a la tabla principal por más columnas.</div>
+                <div class="pf-val text-success"> Convertir a Covering Index con INCLUDE</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">Hash Match / Sort</div>
+                <div class="pf-val">Requiere memoria para operar. Si derrama a disco (Spill to TempDB) es muy lento.</div>
+                <div class="pf-val text-success"> Revisar estadísticas, índices, orden de joins</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">Index Seek</div>
+                <div class="pf-val">Navega directamente a las filas que necesita usando el B-tree. O(log n). Lo que quieres ver.</div>
+                <div class="pf-val text-success"> ✓ Perfecto. El índice está siendo usado correctamente</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">Nested Loops (Index Seek)</div>
+                <div class="pf-val">JOIN eficiente cuando la tabla interior es pequeña y tiene índice. Muy rápido.</div>
+                <div class="pf-val text-success"> ✓ Óptimo para joins con tablas pequeñas</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">Parallelism (Gather Streams)</div>
+                <div class="pf-val">SQL Server paralelizó la query. Puede ser bueno o señal de que algo no tiene índice.</div>
+                <div class="pf-val text-success"> Investigar por qué eligió paralelismo</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Guía de Planes de Ejecución — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Referencia oficial completa: cómo obtener planes en SSMS (Ctrl+M para actual, Ctrl+L para estimated), interpretar los iconos de operadores y leer las propiedades de costo, filas y I/O.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/performance/execution-plans?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">How to Read Execution Plans</h3>
+                    <div class="mb-1 text-body-secondary">Este video es la introducción definitiva a leer execution plans: operadores, costos, flechas (su grosor = filas), warnings y cómo empezar siempre por el operador más costoso. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/O7AzUDogXsw?si=S0ndE8hY2XbHfCz8" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">SQL Server Execution Plans — Parte 1: Los conceptos que necesitas</h3>
+                    <div class="mb-1 text-body-secondary">Serie completa muy didáctica: qué son los planes, estimated vs actual, cómo leer costos en porcentaje, y los 5 operadores que más impacto tienen en performance. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/VcA92fe1Erw?si=HnhYzIu7HqEmvQB0" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Recurso — Use The Index Luke</strong> 
+                    <h3 class="mb-0">Use The Index, Luke — La biblia gratuita de índices SQL</h3>
+                    <div class="mb-1 text-body-secondary">El mejor recurso gratuito sobre indexación SQL de toda la web, escrito por Markus Winand. Explica B-Trees, index scans vs seeks, covering indexes y más con ilustraciones increíbles. Aplica a SQL Server, PostgreSQL y MySQL.</div>
+                    <a class="link" href="https://use-the-index-luke.com/" target="_blank">📘 Ir use-the-index-luke.com →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — SET STATISTICS para análisis completo</strong> 
+                    <h3 class="mb-0">Las 3 herramientas de análisis en T-SQL que más usarás</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Index Scan vs Index Seek — La diferencia que más importa</div>
+        <div class="day-subtitle">Por qué SQL Server elige scan sobre seek, SARGability y cómo escribir predicados que usen índices</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>SARGability (Search ARGument ABLE):</strong> Una condición es SARGable cuando SQL Server puede usarla para navegar directamente a las filas en un índice. Si tu condición envuelve la columna en una función o conversión implícita, SQL Server no puede usar el índice y hace un Scan completo. Este concepto explica el 60% de los problemas de performance con índices.
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>❌ NON-SARGable → Table Scan</h4>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>✅ SARGable → Index Seek</h4>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Index Scans vs Index Seeks — Cuándo y por qué</h3>
+                    <div class="mb-1 text-body-secondary">Muestra con execution plans reales cuándo SQL Server elige seek vs scan, el concepto de selectividad, y por qué a veces el optimizer prefiere un scan aunque exista un índice. Fundamental. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/1oySBkVuvI8?si=x_0K-Rt5zg8cenOC" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Artículo — Use The Index Luke</strong> 
+                    <h3 class="mb-0">SARGability — "The Where Clause" capítulo completo</h3>
+                    <div class="mb-1 text-body-secondary">El capítulo más importante de Use The Index Luke: explica con diagramas exactamente por qué las funciones en columnas indexadas causan scans, y cómo reescribir cada tipo de condición para hacerla SARGable.</div>
+                    <a class="link" href="https://use-the-index-luke.com/sql/where-clause/functions" target="_blank">📘 Leer capítulo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Query Hints e Index Hints — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Cómo usar OPTION(RECOMPILE), FORCESEEK, NOLOCK y otros hints cuando el optimizer toma malas decisiones. Cuándo son apropiados y cuándo son una señal de un problema más profundo.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/t-sql/queries/hints-transact-sql-query?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Ejercicio — Reescribir 5 queries NON-SARGable</strong> 
+                    <h3 class="mb-0">Practica convertir scans en seeks con estas queries reales</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Clustered Index — Diseño correcto</div>
+        <div class="day-subtitle">Elección de la clave, fragmentación, GUID vs INT, fill factor y estadísticas</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La elección del Clustered Index define el rendimiento físico de tu tabla.</strong> Una buena clave clustered es: <code>narrow</code> (pocos bytes), <code>unique</code>, <code>not null</code> y <code>ever-increasing</code> (INT IDENTITY, no GUID). Un GUID como clustered key causa fragmentación masiva porque inserta filas en posiciones aleatorias del B-tree, forzando page splits constantemente.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ El GUID como Primary Key / Clustered Index es el error más común y costoso:</strong> Genera hasta 99% de fragmentación en tablas con muchos inserts. Usa <code>INT IDENTITY</code> o <code>BIGINT IDENTITY</code> como PK. Si necesitas un GUID como identificador único externo, ponlo como columna separada con un non-clustered index UNIQUE — no como clustered.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Clustered Index Design — GUID vs INT y por qué importa</h3>
+                    <div class="mb-1 text-body-secondary">El impacto de usar GUID como clustered key: fragmentación, page splits, espacio en disco y cómo afecta el performance de INSERT y SELECT. Demo con 1 millón de filas. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/7CYsBM_a5Jg?si=Led62rh8M09Eb2TD" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Artículo — Johan Coureuil</strong> 
+                    <h3 class="mb-0">Why I Hate GUIDs as Clustered Indexes</h3>
+                    <div class="mb-1 text-body-secondary">Presenta un benchmark muy completo comparando INT, NEWID() y NEWSEQUENTIALID(). Mide no solo la inserción, sino también el impacto en la fragmentación</div>
+                    <a class="link" href="https://www.hts-learning.com/blog/2025-02-18/sql-server-et-les-identifiants-la-guerre-des-cles-int-vs-guid" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Index Fragmentation — Detectar, medir y resolver</h3>
+                    <div class="mb-1 text-body-secondary">Cómo usar <code>sys.dm_db_index_physical_stats</code> para medir fragmentación, cuándo usar REBUILD vs REORGANIZE, y configurar Fill Factor para prevenir page splits.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/indexes/reorganize-and-rebuild-indexes?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Detectar fragmentación y reconstruir índices</strong> 
+                    <h3 class="mb-0">Script completo de mantenimiento de índices</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Non-Clustered + Covering Indexes</div>
+        <div class="day-subtitle">Composite indexes, columnas INCLUDE, filtered indexes y cuándo un índice cuesta más de lo que ayuda</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Covering Index = el índice tiene TODO lo que la query necesita.</strong> Cuando SQL Server usa un non-clustered index pero necesita columnas que no están en él, hace un <strong>Key Lookup</strong> — va a buscar esas columnas a la tabla principal, fila por fila. Agregar esas columnas en la cláusula <code>INCLUDE</code> del índice las pone en las hojas, eliminando el Key Lookup completamente.
+    </div>
+
+    <div class="flow">
+        <h3>📋 Anatomía de un índice y cuándo usar cada parte | IX_Orders_CustomerId_Date</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Parte del índice</th>
+                        <th>Columnas</th>
+                        <th>Función</th>
+                        <th>Cuándo poner una columna aquí</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-warning">KEY COLUMNS</span></td>
+                        <td class="text-warning">CustomerId, OrderDate</td>
+                        <td class="text-light">Definen el orden del B-tree. Se usan en WHERE, JOIN, ORDER BY</td>
+                        <td>Columnas en cláusulas WHERE o JOIN. El orden importa — mayor selectividad primero.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">INCLUDE COLUMNS</span></td>
+                        <td class="text-success">Total, Status, ProductId</td>
+                        <td class="text-light">Solo en las hojas. No ordenadas. Eliminan Key Lookups.</td>
+                        <td>Columnas que el SELECT necesita pero no son parte del criterio de búsqueda. Sin overhead de ordenamiento.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge">FILTER</span></td>
+                        <td class="text-primary">WHERE Status = 'Active'</td>
+                        <td class="text-light">Filtered Index: solo indexa filas que cumplan el filtro</td>
+                        <td>Cuando consultas siempre el mismo subconjunto (activos, no eliminados, etc.). Índice más pequeño y rápido.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Recurso — Use The Index Luke</strong> 
+                    <h3 class="mb-0">Covering Indexes — Capítulo completo con diagramas</h3>
+                    <div class="mb-1 text-body-secondary">Markus Winand explica visualmente qué es un covering index, cómo el INCLUDE elimina el Key Lookup, y cómo diseñar índices para que cubran exactamente las queries que más se ejecutan.</div>
+                    <a class="link" href="https://use-the-index-luke.com/sql/clustering/index-only-scan-covering-index" target="_blank">📘 Leer Artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Non-Clustered Indexes Profundo — Key Lookups, Covering, Composite</h3>
+                    <div class="mb-1 text-body-secondary">Cómo eliminar Key Lookups con INCLUDE, cuándo un composite index ayuda vs cuando necesitas índices separados, y el costo real de tener demasiados índices en una tabla de alta escritura. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/gIjbh9wMfdI" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Filtered Indexes — El índice más subestimado</h3>
+                    <div class="mb-1 text-body-secondary">Los Filtered Indexes indexan solo un subconjunto de filas (ej: WHERE IsDeleted = 0). Son más pequeños, se actualizan más rápido, y son perfectos para tablas con soft deletes o estados diferenciados. ~25 min.</div>
+                    <a class="link" href="https://youtu.be/MdcTAuOOGcc" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Crear y verificar un Covering Index</strong> 
+                    <h3 class="mb-0">Antes y después: eliminando un Key Lookup con INCLUDE</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Columnar Store Indexes (Columnstore) — Para analytics</h3>
+                    <div class="mb-1 text-body-secondary">Los Columnstore Indexes son radicalmente distintos — orientados a columnas en lugar de filas. Dan 10-100x de mejora en queries analíticas (GROUP BY, SUM de millones de filas). Imprescindible conocerlos para el siguiente nivel.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/indexes/columnstore-indexes-overview?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Optimización de Queries Reales</div>
+        <div class="day-subtitle">Workflow completo: encontrar la query lenta, leer el plan, crear el índice correcto y medir la mejora</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El workflow de optimización en 5 pasos:</strong> 1) Identificar la query más costosa con DMVs → 2) Obtener el Actual Execution Plan → 3) Analizar el operador más costoso (% más alto) → 4) Crear el índice recomendado o reescribir la query → 5) Medir logical reads antes vs después con SET STATISTICS IO ON. Un índice bien diseñado puede reducir de 50,000 a 3 logical reads.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Regla de Brent Ozar:</strong> "If your query is slow, it's either the query or the indexes." Antes de cambiar el servidor, agregar RAM o acusar a la red — lee el execution plan. El 95% de los problemas de performance se resuelven en el SQL.
+    </div>
+
+    <div class="flow">
+        <h3>📊 Resultado típico de agregar el índice correcto</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Métrica</th>
+                        <th>Sin Índice</th>
+                        <th>Con Covering Index</th>
+                        <th>Mejora</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-light">Logical Reads</td>
+                        <td class="text-danger">48,230</td>
+                        <td class="text-success">3</td>
+                        <td class="text-success">16,000x menos I/O</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Operator</td>
+                        <td class="text-danger">Clustered Index Scan</td>
+                        <td class="text-success">Index Seek</td>
+                        <td class="text-success">O(n) → O(log n)</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Elapsed Time</td>
+                        <td class="text-danger">2,340 ms</td>
+                        <td class="text-success">4 ms</td>
+                        <td class="text-success">585x más rápido</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">CPU Time</td>
+                        <td class="text-danger">1,890 ms</td>
+                        <td class="text-success">0 ms</td>
+                        <td class="text-success">Casi cero CPU</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">How to Find Slow Queries and Fix Them — Workflow completo</h3>
+                    <div class="mb-1 text-body-secondary">El video más importante de la semana: workflow completo de principio a fin con un caso real. Encontrar la query lenta con sp_BlitzCache, leer el plan, crear el índice y medir. Es el proceso que usarás en producción. ~60 min.</div>
+                    <a class="link" href="https://youtu.be/EkLuXURMwso" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">sp_Blitz — La herramienta de diagnóstico de SQL Server</h3>
+                    <div class="mb-1 text-body-secondary">sp_BlitzCache, sp_BlitzIndex y sp_Blitz son scripts gratuitos de Brent Ozar que hacen el diagnóstico automático: top queries por CPU/reads, índices sin usar, índices duplicados y configuración incorrecta. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/2e1fKTzGQtE" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Herramienta — sp_Blitz (Gratuita)</strong> 
+                    <h3 class="mb-0">Brent Ozar's First Responder Kit — Scripts de diagnóstico gratuitos</h3>
+                    <div class="mb-1 text-body-secondary">Colección de stored procedures gratuitos que hacen el diagnóstico completo de SQL Server en segundos: sp_BlitzFirst (qué está pasando ahora), sp_BlitzCache (queries más costosas), sp_BlitzIndex (problemas de índices).</div>
+                    <a class="link" href="https://www.brentozar.com/blitz/" target="_blank">🔧 Descargar gratis →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Query Store — El historial de performance de SQL Server</h3>
+                    <div class="mb-1 text-body-secondary">Query Store registra el historial de planes y performance de cada query. Permite comparar el plan de hoy vs el de ayer, detectar regresiones de performance y forzar un plan que funcionó bien.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/performance/monitoring-performance-by-using-the-query-store?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Workflow completo de optimización</strong> 
+                    <h3 class="mb-0">El proceso exacto que usarás en producción</h3>
+                    <pre><code>{{codeExample7}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Recurso — SQLIndexAnalyzer</strong> 
+                    <h3 class="mb-0">EF Core — Cómo ver el SQL generado y optimizarlo</h3>
+                    <div class="mb-1 text-body-secondary">Si usas EF Core, cómo interceptar el SQL generado con <code>LogTo</code>, detectar N+1 queries, y cómo los índices que creas en SQL Server afectan directamente las queries de EF Core.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/ef/core/performance/efficient-querying" target="_blank">📘 EF Core Performance →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Optimizar Queries Reales</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Toma la BD de tu API (o descarga la BD de práctica StackOverflow de Brent Ozar) y entrega un documento con 3 optimizaciones documentadas:</p>
+    <ul>
+        <li>Query original + Execution Plan capturado (screenshot o XML del plan)</li>
+        <li>Logical reads ANTES medidos con SET STATISTICS IO ON</li>
+        <li>Diagnóstico: qué operador problemático encontraste y por qué era lento</li>
+        <li>El índice creado (o la query reescrita) con justificación</li>
+        <li>Logical reads DESPUÉS y porcentaje de mejora calculado</li>
+        <li>Nuevo Execution Plan mostrando el cambio (Scan → Seek, Key Lookup eliminado)</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con Fase 1:</strong>
+        Todo lo que optimices en SQL Server impacta directamente tus repositorios. Cuando EF Core genera un query con <code>AsNoTracking().Select()</code>, ese SQL llega a SQL Server y usa los índices que creas hoy. Las mejoras de esta semana se ven instantáneamente en el profiling con <code>dotnet-trace</code> porque los logical reads se convierten en latencia de red reducida entre tu app y la BD.
+    </div>
+</div>

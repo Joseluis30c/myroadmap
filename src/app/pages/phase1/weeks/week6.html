@@ -1,9 +1,717 @@
-<div class="nav-scroller py-1 mb-3 border-bottom">
-    <nav class="nav nav-underline justify-content-between"> 
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia1">📍Día 1 - Async/Await profundo</button>
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia2">📍Día 2 - Task vs Thread</button>
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia3">📍Día 3 - Anti-patrones async</button>
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia4">📍Día 4 - Kestrel + Profiling</button>
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia5">📍Día 5 - Optimización + Entregable</button>
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Async/Await profundo</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Task vs Thread</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Anti-patrones async</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Kestrel + Profiling</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Optimización</button>
     </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Objetivo</div><div class="value">Endpoints rápidos</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">28+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Patrón clave</div><div class="value">dotnet-trace + BenchmarkDotNet</div></div>
+</div>
+
+<div class="flow">
+    <div class="row g-3">
+        <div class="col-sm-6 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>❌ DataAnnotations (evitar)</h4>
+
+                    <div class="tl-row-wrap">
+                        <span class="tl-row-label">Thread 1</span>
+                        <div class="tl-row-track">
+                            <span class="layer-tag rn-b-work" style="width:30%">CPU</span>
+                            <span class="layer-tag rn-b-wait" style="width:70%">⏳ esperando DB…</span>
+                        </div>
+                    </div>
+                    <div class="tl-row-wrap">
+                        <span class="tl-row-label">Thread 2</span>
+                        <div class="tl-row-track">
+                            <span class="layer-tag rn-b-work" style="width:20%">CPU</span>
+                            <span class="layer-tag rn-b-wait" style="width:80%">⏳ esperando HTTP…</span>
+                        </div>
+                    </div>
+                    <div class="tl-row-wrap">
+                        <span class="tl-row-label">Thread 3</span>
+                        <div class="tl-row-track">
+                            <span class="layer-tag rn-b-wait" style="width:100%">⏳ BLOQUEADO</span>
+                        </div>
+                    </div>
+                    <div class="tl-row-wrap">
+                        <span class="tl-row-label">Thread 4</span>
+                        <div class="tl-row-track">
+                            <span class="layer-tag rn-b-wait" style="width:100%">⏳ BLOQUEADO</span>
+                        </div>
+                    </div>
+
+                    <p class="pc-body mt-2 mb-0">
+                        Con 4 threads síncronos: solo 2 requests se procesan simultáneamente. Las otras 2 esperan que un thread se libere. Máximo throughput: ~2 req/seg si cada una tarda 500 ms.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>✅ FluentValidation (usar)</h4>
+
+                    <div class="tl-row-wrap">
+                        <span class="tl-row-label">Thread 1</span>
+                        <div class="tl-row-track">
+                            <span class="layer-tag rn-b-work" style="width:15%">CPU</span>
+                            <span class="layer-tag rn-b-free" style="width:45%">libre (I/O)</span>
+                            <span class="layer-tag rn-b-work" style="width:15%">CPU</span>
+                            <span class="layer-tag rn-b-free" style="width:25%">libre</span>
+                        </div>
+                    </div>
+                    <div class="tl-row-wrap">
+                        <span class="tl-row-label">Thread 2</span>
+                        <div class="tl-row-track">
+                            <span class="layer-tag rn-b-free" style="width:20%">libre</span>
+                            <span class="layer-tag rn-b-work" style="width:15%">CPU</span>
+                            <span class="layer-tag rn-b-free" style="width:40%">libre (I/O)</span>
+                            <span class="layer-tag rn-b-work" style="width:25%">CPU</span>
+                        </div>
+                    </div>
+                    <div class="tl-row-wrap">
+                        <span class="tl-row-label">I/O →</span>
+                        <div class="tl-row-track">
+                            <span class="layer-tag rn-b-io" style="width:100%">🌐 DB + HTTP + File → kernel sin threads</span>
+                        </div>
+                    </div>
+
+                    <p class="pc-body mt-2 mb-0">
+                        Con async: los mismos 2 threads manejan 8–10 requests simultáneas. Mientras espera la DB, el thread atiende otra request. El kernel notifica cuando el I/O termina.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tip mt-3">
+        <strong>💡 La regla clave:</strong> <code>async/await</code> no hace que una operación termine más rápido. Hace que el thread no se quede bloqueado <em>esperando</em>. El beneficio es en <strong>throughput</strong> (cuántas requests por segundo), no en la latencia de una request individual.
+    </div>
+</div>
+
+<div class="flow">
+    <h3>⚡ Los 5 pilares de performance en backend .NET</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">🔄</span><div class="pc-title">Async I/O</div><div class="pc-body">Liberar threads durante operaciones de I/O. El mayor impacto en APIs.</div></div>
+    <div class="intro-card"><span class="icon">💾</span><div class="pc-title">Caché</div><div class="pc-body">No calcular ni ir a BD dos veces lo mismo. IMemoryCache y Redis.</div></div>
+    <div class="intro-card"><span class="icon">🗃️</span><div class="pc-title">Queries eficientes</div><div class="pc-body">AsNoTracking, proyecciones, índices. 80% de los problemas están aquí.</div></div>
+    <div class="intro-card"><span class="icon">⚙️</span><div class="pc-title">Kestrel tuning</div><div class="pc-body">Conexiones, keep-alive, response compression, minimal API.</div></div>
+    <div class="intro-card"><span class="icon">🔍</span><div class="pc-title">Profiling</div><div class="pc-body">Medir primero, optimizar después. Nunca optimizar a ciegas.</div></div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Async/Await Profundo</div>
+        <div class="day-subtitle">State machines, SynchronizationContext, ConfigureAwait y cómo realmente funciona el compilador</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Lo que hace el compilador con async/await:</strong> Cuando escribes <code>await</code>, el compilador transforma tu método en una <strong>state machine</strong>. El método se pausa, devuelve control al caller, y cuando el I/O termina, el kernel notifica al ThreadPool que retome la ejecución desde donde quedó. No hay thread bloqueado durante la espera — es cooperativo, no preemptivo.
+    </div>
+
+    <div class="tip">
+        <strong>💡 ConfigureAwait(false):</strong> En código de librería o Application/Infrastructure Layer, usa siempre <code>await algo.ConfigureAwait(false)</code>. Le dices al runtime que no necesitas volver al contexto original (UI thread o ASP.NET request context). Mejora performance y evita deadlocks en contextos síncronos.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Async/Await — Guía completa de Microsoft</h3>
+                    <div class="mb-1 text-body-secondary">La guía definitiva de Microsoft: TAP (Task-based Asynchronous Pattern), cómo funciona la state machine, best practices y los errores más comunes con ejemplos claros.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/csharp/asynchronous-programming/async-scenarios" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Artículo — Stephen Toub</strong> 
+                    <h3 class="mb-0">"The Zen of Async" — Cómo funciona async por dentro</h3>
+                    <div class="mb-1 text-body-secondary">Explica en detalle la state machine generada por el compilador, el rol del SynchronizationContext y por qué ConfigureAwait(false) importa.</div>
+                    <a class="link" href="https://devblogs.microsoft.com/dotnet/how-async-await-really-works/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Async/Await — What really happens under the hood</h3>
+                    <div class="mb-1 text-body-secondary">Nick desmonta con código IL y Sharplab.io lo que el compilador genera cuando escribes async/await. El video más visual para entender el modelo de ejecución real. ~35 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=R-z2Hv-7nxk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">ConfigureAwait — When to use it and why</h3>
+                    <div class="mb-1 text-body-secondary">Explica el SynchronizationContext, por qué ConfigureAwait(false) evita deadlocks, cuándo usarlo (librerías y capas internas) y cuándo NO (UI, controllers). ~20 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=avhLfcgIwbg" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Async correcto en cada capa</strong> 
+                    <h3 class="mb-0">Patrones async que debes conocer en producción</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo</strong> 
+                    <h3 class="mb-0">ValueTask vs Task — Cuándo usar cada uno</h3>
+                    <div class="mb-1 text-body-secondary">ValueTask es una optimización para hot paths donde la operación suele completarse sincrónicamente (cache hits). Evita una allocación en el heap. Cuándo vale la pena y cuándo no.</div>
+                    <a class="link" href="https://wearecommunity.io/communities/dotnettr/articles/6506" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Task vs Thread — El modelo de concurrencia de .NET</div>
+        <div class="day-subtitle">ThreadPool, Parallel, IAsyncEnumerable y cuándo usar cada primitiva</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La confusión más común: </strong> <code>Task</code> NO es un Thread. Un Task es una <em>promesa de un resultado futuro</em>. Puede ejecutarse en el ThreadPool, de manera síncrona, o nunca crear un thread (I/O bound). <code>Thread</code> es un hilo del sistema operativo — costoso (1MB de stack), lento de crear y destruir. Usa Tasks siempre; crea Threads solo en casos muy específicos (CPU-bound intensivo y de larga duración).
+    </div>
+
+    <div class="flow">
+        <h3>📋 ¿Qué primitiva usar para cada escenario?</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Escenario</th>
+                        <th>Usar</th>
+                        <th>Por qué</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Request a BD, HTTP, File</td>
+                        <td><span class="rn-code-badge rn-code-info">async/await Task</span></td>
+                        <td class="text-success">✅ I/O-bound: libera el thread mientras espera</td>
+                    </tr>
+                    <tr>
+                        <td>Múltiples operaciones independientes</td>
+                        <td><span class="rn-code-badge rn-code-info">Task.WhenAll</span></td>
+                        <td class="text-success">✅ Paralelismo real sin bloquear</td>
+                    </tr>
+                    <tr>
+                        <td>Procesar colección grande en memoria</td>
+                        <td><span class="rn-code-badge rn-code-info">Parallel.ForEach</span></td>
+                        <td class="text-warning">⚠️ CPU-bound: usa múltiples cores, cuidado con ASP.NET</td>
+                    </tr>
+                    <tr>
+                        <td>Streaming de resultados de BD</td>
+                        <td><span class="rn-code-badge rn-code-info">IAsyncEnumerable</span></td>
+                        <td class="text-success">✅ No carga todo en memoria, emite de a poco</td>
+                    </tr>
+                    <tr>
+                        <td>Background job de larga duración</td>
+                        <td><span class="rn-code-badge rn-code-info">IHostedService</span></td>
+                        <td class="text-success">✅ No bloquea el ThreadPool de Kestrel</td>
+                    </tr>
+                    <tr>
+                        <td>CPU-bound intensivo (video, crypto)</td>
+                        <td><span class="rn-code-badge rn-code-info">Task.Run</span></td>
+                        <td class="text-warning">⚠️ Mueve al ThreadPool, úsalo con moderación en APIs</td>
+                    </tr>
+                    <tr>
+                        <td>Crear un Thread manualmente</td>
+                        <td><span class="rn-code-badge rn-code-info">new Thread()</span></td>
+                        <td class="text-danger">❌ Casi nunca en .NET moderno. Usa Task.Run o IHostedService</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Task Parallel Library (TPL) — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Guía completa de TPL: Task, Task&lt;T&gt;, continuaciones, WhenAll, WhenAny, Parallel.ForEach, PLINQ y cómo trabaja el ThreadPool de .NET internamente.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/standard/parallel-programming/task-parallel-library-tpl" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">IAsyncEnumerable — Streaming asíncrono de datos</h3>
+                    <div class="mb-1 text-body-secondary">Cómo implementar y consumir <code>IAsyncEnumerable&lt;T&gt;</code> con <code>await foreach</code>. Perfecto para paginar resultados de BD sin cargar todo en memoria a la vez.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/csharp/asynchronous-programming/generate-consume-asynchronous-stream" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Task vs Thread vs ValueTask — El modelo completo de concurrencia</h3>
+                    <div class="mb-1 text-body-secondary">Desmonta con benchmarks la diferencia real entre Thread, Task y ValueTask. Muestra el costo de cada primitiva con BenchmarkDotNet y cuándo una asignación importa. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/mEhkelf0K6g?si=RhtG3pry-L_oKCAU" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">IAsyncEnumerable — Streaming de resultados de BD en ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Implementa un endpoint que hace streaming de miles de registros con IAsyncEnumerable + EF Core, sin cargar todo en memoria. Ideal para exportaciones y reportes. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/qTetsXmZLk0?si=DBHJZeS9jcXs157v" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — IAsyncEnumerable + Task.WhenAll + Channels</strong> 
+                    <h3 class="mb-0">Patrones avanzados de concurrencia para APIs</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Anti-patrones Async — Los errores que matan el performance</div>
+        <div class="day-subtitle">async void, .Result/.Wait(), fire-and-forget mal hecho y sync-over-async</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El anti-patrón más peligroso: <code>.Result</code> y <code>.Wait()</code>:</strong> Bloquean el thread actual esperando que la Task complete. En ASP.NET Core, si el SynchronizationContext está configurado, esto provoca un <strong>deadlock garantizado</strong> — el thread espera la Task, y la Task espera ese mismo thread para continuar. Tu endpoint cuelga para siempre.
+    </div>
+
+    <div class="principles">
+        <div class="intro-card"><span class="icon">💀</span><div class="pc-title">.Result / .Wait() en ASP.NET</div><div class="pc-body">Bloquea el thread. En escenarios con SynchronizationContext causa deadlock garantizado.</div><div class="pc-body text-success">Usa await siempre. Todo el camino hacia arriba.</div></div>
+        <div class="intro-card"><span class="icon">🔥</span><div class="pc-title">async void (excepto event handlers)</div><div class="pc-body">Las excepciones se pierden silenciosamente. No se puede hacer await. El llamador no sabe cuándo termina.</div><div class="pc-body text-success">Retorna Task siempre. async void solo en event handlers de UI.</div></div>
+        <div class="intro-card"><span class="icon">🐌</span><div class="pc-title">await dentro de un loop</div><div class="pc-body">N llamadas secuenciales cuando podrían ser paralelas. 10 llamadas de 100ms = 1000ms en vez de 100ms.</div><div class="pc-body text-success">Task.WhenAll para operaciones independientes.</div></div>
+        <div class="intro-card"><span class="icon">🪤</span><div class="pc-title">Task.Run para I/O bound</div><div class="pc-body">Task.Run toma un thread del ThreadPool innecesariamente para operaciones que no necesitan CPU.</div><div class="pc-body text-success">Solo Task.Run para trabajo CPU-bound real.</div></div>
+        <div class="intro-card"><span class="icon">🧨</span><div class="pc-title">Fire-and-forget sin manejo</div><div class="pc-body">_ = DoSomethingAsync() lanza una Task no observada. Las excepciones se pierden.</div><div class="pc-body text-success">Usa IHostedService o BackgroundService para background work.</div></div>
+        <div class="intro-card"><span class="icon">⛔</span><div class="pc-title">No propagar CancellationToken</div><div class="pc-body">Si el cliente cancela la request, tu código sigue ejecutando queries a la BD innecesariamente.</div><div class="pc-body text-success">Acepta y propaga CancellationToken en todos los métodos async.</div></div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>❌ Los 3 errores más comunes</h4>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>✅ La forma correcta</h4>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Async Anti-patterns — Los errores más costosos en .NET</h3>
+                    <div class="mb-1 text-body-secondary">Recorre con benchmarks reales cada anti-patrón: el costo de .Result, el overhead de async void, await en loop vs WhenAll. Muestra el impacto con números. ~35 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=lQu-eBIIh-w" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Stephen Cleary</strong> 
+                    <h3 class="mb-0">Don't Block on Async Code — El artículo de referencia sobre deadlocks</h3>
+                    <div class="mb-1 text-body-secondary">Explica con precisión por qué .Result y .Wait() causan deadlocks en ASP.NET clásico y cuándo aplica en ASP.NET Core. El artículo más citado sobre el tema.</div>
+                    <a class="link" href="https://blog.stephencleary.com/2012/07/dont-block-on-async-code.html" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Stephen Cleary</strong> 
+                    <h3 class="mb-0">Async Best Practices</h3>
+                    <div class="mb-1 text-body-secondary">El async all the way, avoid async void, use ConfigureAwait(false). La referencia completa en un solo lugar.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Herramienta — AsyncFixer</strong> 
+                    <h3 class="mb-0">AsyncFixer — Analizador de Roslyn que detecta anti-patrones automáticamente</h3>
+                    <div class="mb-1 text-body-secondary">Instala este NuGet en tu proyecto y el compilador te marcará en tiempo real los anti-patrones async: await innecesario, async void, Task.Result, etc.</div>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Configuración de Kestrel + Profiling Básico</div>
+        <div class="day-subtitle">Límites de conexiones, compresión, y medir con dotnet-trace y BenchmarkDotNet</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Medir primero, optimizar después:</strong> El 80% de los problemas de performance están en 20% del código (regla de Pareto). Nunca optimices a ciegas. Usa <strong>dotnet-trace</strong> para encontrar dónde se va el tiempo, luego optimiza, luego mide de nuevo. Sin números antes y después, no sabes si mejoraste.
+    </div>
+
+    <div class="flow">
+        <h3>🔍 El flujo de profiling profesional</h3>
+        <div class="flow-steps">
+            <div class="fs fs-req"><div class="fs-name">1</div><div class="fs-sub text-warning">Medir baseline</div><div class="fs-sub">Tiempo actual sin cambios</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-valid"><div class="fs-name">2</div><div class="fs-sub text-warning">Identificar hotspot</div><div class="fs-sub">dotnet-trace / PerfView</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-biz"><div class="fs-name">3</div><div class="fs-sub text-warning">Hipótesis</div><div class="fs-sub">¿Por qué es lento?</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-err"><div class="fs-name">4</div><div class="fs-sub text-warning">Optimizar</div><div class="fs-sub">Un cambio a la vez</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-res"><div class="fs-name">5</div><div class="fs-sub text-warning">Medir de nuevo</div><div class="fs-sub">¿Mejoró? ¿Cuánto?</div></div>
+        </div>
+    </div>
+
+    <div class="flow">
+        <h3>⚙️ Parámetros de Kestrel más importantes para performance</h3>
+        <div class="pf-grid">
+            <div class="pf">
+                <div class="pf-key">MaxConcurrentConnections</div>
+                <div class="pf-val">Máximo de conexiones TCP simultáneas</div>
+                <div class="pf-val text-success"> Default: null (ilimitado)</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">MaxRequestBodySize</div>
+                <div class="pf-val">Tamaño máximo del body en bytes</div>
+                <div class="pf-val text-success"> Default: 30,000,000 (30MB)</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">KeepAliveTimeout</div>
+                <div class="pf-val">Tiempo máximo de keep-alive de conexión</div>
+                <div class="pf-val text-success"> Default: 130 segundos</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">RequestHeadersTimeout</div>
+                <div class="pf-val">Tiempo máximo para recibir headers</div>
+                <div class="pf-val text-success"> Default: 30 segundos</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">Http2.MaxStreamsPerConnection</div>
+                <div class="pf-val">Streams simultáneos por conexión HTTP/2</div>
+                <div class="pf-val text-success"> Default: 100</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key">AllowSynchronousIO</div>
+                <div class="pf-val">Permite I/O síncrono (nunca en producción)</div>
+                <div class="pf-val text-success"> Default: false</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Configuración de Kestrel para alto rendimiento — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Guía completa de opciones de Kestrel: límites de conexión, tamaños de request/response, timeouts, HTTP/2, gRPC y configuración para producción de alto tráfico.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/fundamentals/servers/kestrel/options?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Response Compression en ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Cómo habilitar compresión Brotli y Gzip en Kestrel. Reduce dramáticamente el payload de responses JSON/HTML con una sola línea de configuración.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/performance/response-compression?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Profiling ASP.NET Core Apps with dotnet-trace</h3>
+                    <div class="mb-1 text-body-secondary">Cómo usar dotnet-trace, dotnet-counters y PerfView para encontrar hotspots de CPU y memoria. Ver dónde se va realmente el tiempo en tu API con herramientas gratuitas. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/sFVgOdxCr1s?si=GHA71jkV1pSNFZMz" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">BenchmarkDotNet — Micro-benchmarks profesionales en .NET</h3>
+                    <div class="mb-1 text-body-secondary">Cómo escribir benchmarks que midan con precisión el rendimiento de métodos específicos. Evitar los errores clásicos del micro-benchmarking: JIT warmup, GC interference, etc. ~25 min</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=EWmufbVF2A4" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Kestrel tuning + Response Compression + dotnet-trace</strong> 
+                    <h3 class="mb-0">Configuración completa de Kestrel para producción</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Optimización de Endpoints</div>
+        <div class="day-subtitle">IMemoryCache, Span&lt;T&gt;, Output Caching, pooling y técnicas de optimización concretas</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Las optimizaciones de mayor impacto, en orden:</strong> 1) Reducir trips a la BD (caché + queries eficientes) → 2) Async I/O correcto → 3) Compresión de responses → 4) Output Caching para endpoints repetidos → 5) Allocations (Span, ArrayPool) para hot paths muy específicos. Empieza siempre por el 1.
+    </div>
+
+    <div class="tip">
+        <strong>💡 EF Core y performance:</strong> El 80% de los problemas de performance en APIs .NET vienen de queries ineficientes a la BD. <code>AsNoTracking()</code> en queries de solo lectura, proyecciones con <code>Select()</code> en lugar de cargar toda la entidad, e índices correctos en la BD resuelven la mayoría de los casos antes de necesitar caché.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Output Caching en ASP.NET Core (.NET 7+)</h3>
+                    <div class="mb-1 text-body-secondary">La forma más simple de cachear responses de endpoints completos: <code>AddOutputCache()</code> + <code>[OutputCache]</code>. Con políticas de variación por usuario, tags para invalidación y configuración por endpoint.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/performance/caching/output?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Performance Best Practices para ASP.NET Core — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">La guía oficial de Microsoft con las mejores prácticas de performance: async I/O, caché, pooling, minimizar allocations, Span&lt;T&gt;, y configuración del servidor. Referencia completa.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/performance/performance-best-practices?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Output Caching en .NET 8 — Guía completa</h3>
+                    <div class="mb-1 text-body-secondary">Output Cache vs Response Cache vs IMemoryCache: diferencias, cuándo usar cada uno, cómo invalidar por tags y cómo configurar políticas por endpoint. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/BMXgJxSaDSo?si=QoUirZor2vfkxqLW" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">EF Core Performance Tips — AsNoTracking, Compiled Queries, Projections</h3>
+                    <div class="mb-1 text-body-secondary">Las técnicas de performance de EF Core que más impacto tienen: AsNoTracking(), Select() proyecciones, compiled queries, split queries y cómo medir con dotnet-trace. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/FMhhp56qCAQ?si=2xricowFY1xMT_Z0" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Las optimizaciones más impactantes en un endpoint real</strong> 
+                    <h3 class="mb-0">Antes y después: endpoint lento vs optimizado</h3>
+                    <pre><code>{{codeExample7}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación — BenchmarkDotNet</strong> 
+                    <h3 class="mb-0">BenchmarkDotNet — Documentación oficial</h3>
+                    <div class="mb-1 text-body-secondary">La librería estándar para micro-benchmarks en .NET. Maneja el warmup de JIT, múltiples iteraciones y genera reportes con comparativas. Imprescindible para validar optimizaciones.</div>
+                    <a class="link" href="https://benchmarkdotnet.org/articles/overview.html" target="_blank">📘 Ir benchmarkdotnet.org →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Optimización de Endpoints Lentos</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Elige 2 endpoints de tu API y optimízalos demostrando la mejora con números:</p>
+    <ul>
+        <li>Benchmark before/after con BenchmarkDotNet para al menos 2 endpoints</li>
+        <li>Cero instancias de .Result, .Wait() o async void en todo el proyecto</li>
+        <li>Todos los reads con AsNoTracking() + Select() (proyecciones en lugar de entidades completas)</li>
+        <li>Task.WhenAll en cualquier lugar donde había await en loop con operaciones independientes</li>
+        <li>CancellationToken propagado desde los controllers hasta los repositorios</li>
+        <li>Output Caching en al menos un endpoint de lectura frecuente</li>
+        <li>Response Compression (Brotli + Gzip) habilitado en Kestrel</li>
+        <li>Reporte de dotnet-trace o dotnet-counters mostrando métricas de la API</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con semanas anteriores:</strong>
+        Los <strong>repositorios de la Semana 2</strong> (Clean Architecture) son exactamente donde agregas <code>AsNoTracking()</code> y las proyecciones. Los <strong>unit tests de la Semana 4</strong> se corren ahora con <code>dotnet test</code> muy rápido gracias al async correcto. Los <strong>IExceptionHandler de la Semana 3</strong> reciben el <code>OperationCanceledException</code> cuando el cliente cancela y deben retornar 499 (Client Closed Request).
+    </div>
 </div>

@@ -1,10 +1,10 @@
-<div class="nav-scroller py-1 mb-3 border-bottom">
-    <nav class="nav nav-underline justify-content-between"> 
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia1"><strong>Día 1</strong> – FluentValidation base</button>
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia2"><strong>Día 2</strong> – FV avanzado + Pipeline</button>
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia3"><strong>Día 3</strong> – Manejo global de errores</button>
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia4"><strong>Día 4</strong> – API Response Pattern</button>
-        <button class="nav-item nav-link link-body-emphasis day" [routerLink]="[]" fragment="dia5"><strong>Día 5</strong> – REST Best Practices + API</button>
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – FluentValidation base</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – FV avanzado + Pipeline</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Manejo global de errores</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – API Response Pattern</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – REST Best Practices</button>
     </nav>
 </div>
 
@@ -457,25 +457,69 @@
 
     <div class="flow">
         <h3>📋 Códigos HTTP que más usarás y cuándo</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Código</th><th scope="col">Nombre</th><th scope="col">Cuándo usarlo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td class="table-success">200</td><td>OK</td><td>GET exitoso, PUT/PATCH exitoso con body de respuesta</td></tr>
-                <tr><td class="table-success">201</td><td>Created</td><td>POST que crea un recurso. Incluir header <code>Location</code></td></tr>
-                <tr><td class="table-success">204</td><td>No Content</td><td>DELETE exitoso, PUT/PATCH sin body de respuesta</td></tr>
-                <tr><td class="table-warning">400</td><td>Bad Request</td><td>Errores de validación de input (FluentValidation)</td></tr>
-                <tr><td class="table-warning">401</td><td>Unauthorized</td><td>Sin autenticación o token inválido</td></tr>
-                <tr><td class="table-warning">403</td><td>Forbidden</td><td>Autenticado pero sin permiso para ese recurso</td></tr>
-                <tr><td class="table-warning">404</td><td>Not Found</td><td>Recurso no encontrado. No para "lista vacía"</td></tr>
-                <tr><td class="table-warning">409</td><td>Conflict</td><td>Estado conflictivo: email duplicado, versión optimistic lock</td></tr>
-                <tr><td class="table-warning">422</td><td>Unprocessable Entity</td><td>Input válido sintácticamente pero inválido semánticamente</td></tr>
-                <tr><td class="table-danger">500</td><td>Internal Server Error</td><td>Error inesperado del servidor. Nunca exponer detalles en prod</td></tr>
-            </tbody>
-        </table>        
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Cuándo usarlo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">200</span></td>
+                        <td class="rn-code-name">OK</td>
+                        <td>GET exitoso, PUT/PATCH exitoso con body de respuesta</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">201</span></td>
+                        <td class="rn-code-name">Created</td>
+                        <td>POST que crea un recurso. Incluir header <code>Location</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">204</span></td>
+                        <td class="rn-code-name">No Content</td>
+                        <td>DELETE exitoso, PUT/PATCH sin body de respuesta</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-warning">400</span></td>
+                        <td class="rn-code-name">Bad Request</td>
+                        <td>Errores de validación de input (FluentValidation)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-warning">401</span></td>
+                        <td class="rn-code-name">Unauthorized</td>
+                        <td>Sin autenticación o token inválido</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-warning">403</span></td>
+                        <td class="rn-code-name">Forbidden</td>
+                        <td>Autenticado pero sin permiso para ese recurso</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-warning">404</span></td>
+                        <td class="rn-code-name">Not Found</td>
+                        <td>Recurso no encontrado. No aplica para "lista vacía"</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-warning">409</span></td>
+                        <td class="rn-code-name">Conflict</td>
+                        <td>Estado conflictivo: email duplicado, versión optimistic lock</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-warning">422</span></td>
+                        <td class="rn-code-name">Unprocessable Entity</td>
+                        <td>Input válido sintácticamente pero inválido semánticamente</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-danger">500</span></td>
+                        <td class="rn-code-name">Internal Server Error</td>
+                        <td>Error inesperado del servidor. Nunca exponer detalles en prod</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="row">

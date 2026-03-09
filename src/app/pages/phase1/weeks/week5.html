@@ -1,9 +1,715 @@
-<div class="nav-scroller py-1 mb-3 border-bottom">
-    <nav class="nav nav-underline justify-content-between"> 
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia1">📍Día 1 - JWT Fundamentos</button>
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia2">📍Día 2 - Roles y Claims</button>
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia3">📍Día 3 - Refresh Tokens</button>
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia4">📍Día 4 - Protección de Endpoints</button>
-        <button class="nav-item nav-link link-body-emphasis" [routerLink]="[]" fragment="dia5">📍Día 5 - Seguridad avanzada + API</button>
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – JWT Fundamentos</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Roles y Claims</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Refresh Tokens</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Protección de Endpoints</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Seguridad avanzada</button>
     </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Objetivo</div><div class="value">Auth robusta</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">28+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Patrón clave</div><div class="value">JWT + RFC 7519</div></div>
+</div>
+
+<div class="flow">
+    <h3>🔬 Anatomía de un JWT — Lo que realmente es ese string</h3>
+    <div class="principles">
+        <div class="pc">
+            <div class="pc-title" style="color:red;">Header</div>
+            <div class="pc-body">Algoritmo y tipo de token</div>
+            <div class="layer-items">
+                <span class="layer-tag">alg: HS256 / RS256</span><span class="layer-tag">typ: JWT</span>
+            </div>
+        </div>
+        <div class="pc">
+            <div class="pc-title" style="color: violet;">Payload — Claims</div>
+            <div class="pc-body">Los datos del usuario (NO secretos)</div>
+            <div class="layer-items">
+                <span class="layer-tag">sub: userId</span><span class="layer-tag">email</span><span class="layer-tag">role</span><span class="layer-tag">exp: timestamp</span><span class="layer-tag">iat: issued at</span><span class="layer-tag">jti: unique id</span>
+            </div>
+        </div>
+        <div class="pc">
+            <div class="pc-title" style="color: green;">Signature</div>
+            <div class="pc-body">Verifica integridad — NO encripta</div>
+            <div class="layer-items">
+                <span class="layer-tag">HMACSHA256(base64(header) + "." + base64(payload), secret)</span>
+            </div>
+        </div>
+    </div>
+    <pre><code><span style="color: red;">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span> <span style="color: violet;">eyJzdWIiOiJ1c2VyMTIzIiwiZW1haWwiOiJ1c2VyQGVtYWlsLmNvbSIsInJvbGUiOiJBZG1pbiIsImV4cCI6MTcxNTAwMDAwMH0</span> <span style="color: green;">SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</span></code></pre>
+    <div class="concept-box">⚠️ El payload está en Base64 no cifrado — cualquiera puede leerlo decodificándolo. Nunca pongas contraseñas, datos sensibles ni secretos en el payload.</div>
+</div>
+
+<div class="arch-diagram">
+    <h3>🗺 Flujo completo de autenticación con JWT + Refresh Token</h3>
+    <div class="layers">
+        <div class="layer layer-infra">
+        <div>
+            <div class="layer-name">POST /auth/login — Usuario envía email + password</div>
+            <div class="layer-rule">La API valida credenciales contra la BD (hash bcrypt). Si son válidas, genera tokens.</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">POST</span>
+        </div>
+        </div>
+        <div class="layer layer-app">
+        <div>
+            <div class="layer-name">API genera Access Token (15 min) + Refresh Token (7 días)</div>
+            <div class="layer-rule">Access Token: JWT firmado con claims del usuario. Refresh Token: GUID opaco guardado en BD + cookie HttpOnly.</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">JWT</span>
+        </div>
+        </div>
+        <div class="layer layer-domain">
+        <div>
+            <div class="layer-name">Cliente usa el Access Token en el header Authorization: Bearer {{'{'}}token{{'}'}}</div>
+            <div class="layer-rule">Cada request protegida envía el JWT. El servidor lo valida sin consultar la BD (stateless).</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">Bearer</span>
+        </div>
+        </div>
+        <div class="layer layer-infra">
+        <div>
+            <div class="layer-name">Middleware JWT valida firma, expiración y claims automáticamente</div>
+            <div class="layer-rule">Si el token es válido, el ClaimsPrincipal se inyecta en HttpContext.User. Si no, 401.</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">401 / OK</span>
+        </div>
+        </div>
+        <div class="layer layer-domain">
+        <div>
+            <div class="layer-name">Access Token expira → POST /auth/refresh con el Refresh Token</div>
+            <div class="layer-rule">La API valida el refresh token en BD, lo rota (invalida el anterior, genera uno nuevo) y emite nuevo Access Token.</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">Rotate</span>
+        </div>
+        </div>
+        <div class="layer layer-pres">
+        <div>
+            <div class="layer-name">POST /auth/logout → Revoca el Refresh Token en BD</div>
+            <div class="layer-rule">El Access Token sigue válido hasta que expire (corta duración lo hace aceptable). El refresh token queda inutilizable.</div>
+        </div>
+        <div class="layer-items">
+            <span class="layer-tag">Revoke</span>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="flow">
+    <h3>⚠️ Los 6 errores de seguridad JWT más comunes — aprende a evitarlos desde el día 1</h3>
+    <div class="pf-grid">
+        <div class="pf">
+            <div class="pf-key">Access Token de larga duración</div>
+            <div class="pf-val">Expiración de 24h o más hace que tokens robados sean útiles por mucho tiempo.</div>
+            <div class="pf-val" style="color: green;"> ✅ Fix: Máximo 15 min. Usa Refresh Tokens.</div>
+        </div>
+        <div class="pf">
+            <div class="pf-key">Secret Key débil o en appsettings</div>
+            <div class="pf-val">Clave corta o commiteada al repositorio es catastrófico.</div>
+            <div class="pf-val" style="color: green;"> ✅ Fix: Mínimo 256 bits. Usar User Secrets / Environment Variables.</div>
+        </div>
+        <div class="pf">
+            <div class="pf-key">Datos sensibles en el payload</div>
+            <div class="pf-val">El payload es Base64, cualquiera lo puede leer. No es cifrado.</div>
+            <div class="pf-val" style="color: green;"> ✅ Fix: Solo IDs, roles y claims mínimos necesarios.</div>
+        </div>
+        <div class="pf">
+            <div class="pf-key">Refresh Token en localStorage</div>
+            <div class="pf-val">Vulnerable a ataques XSS. El script malicioso lo roba fácilmente.</div>
+            <div class="pf-val" style="color: green;"> ✅ Fix: Refresh Token en cookie HttpOnly + Secure.</div>
+        </div>
+        <div class="pf">
+            <div class="pf-key">Sin rotación de Refresh Tokens</div>
+            <div class="pf-val">Si el refresh token se roba, el atacante puede renovar indefinidamente.</div>
+            <div class="pf-val" style="color: green;"> ✅ Fix: Rotar (invalidar + generar nuevo) en cada uso.</div>
+        </div>
+        <div class="pf">
+            <div class="pf-key">Sin validar el algoritmo</div>
+            <div class="pf-val">El ataque "alg:none" permite forjar tokens sin firma válida.</div>
+            <div class="pf-val" style="color: green;"> ✅ Fix: Especificar explícitamente el algoritmo válido. Nunca "none".</div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">JWT — Implementación Correcta</div>
+        <div class="day-subtitle">Generar, firmar, validar tokens y configurar el middleware de autenticación</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Authentication vs Authorization:</strong> Autenticación (<code>[Authorize]</code> sin policy) verifica <em>quién eres</em> — valida el JWT. Autorización (<code>[Authorize(Roles="Admin")]</code> o policies) verifica <em>qué puedes hacer</em>. Primero autenticas, luego autorizas. Son pasos distintos en el pipeline de ASP.NET Core.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">JWT Bearer Authentication en ASP.NET Core — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Cómo configurar <code>AddAuthentication().AddJwtBearer()</code>, parámetros de validación de tokens, y el pipeline de autenticación en .NET 8.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/security/authentication/?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 RFC Oficial</strong> 
+                    <h3 class="mb-0">RFC 7519 — JSON Web Token Specification</h3>
+                    <div class="mb-1 text-body-secondary">La especificación oficial de JWT. Imprescindible leer al menos las secciones 4 (Claims) y 6 (Validación). Entender el estándar evita implementaciones incorrectas.</div>
+                    <a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank">📘 RFC 7519 →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">JWT Authentication in ASP.NET Core — The RIGHT Way</h3>
+                    <div class="mb-1 text-body-secondary">Implementación completa y correcta de JWT en .NET 8: generación del token, claims, configuración del middleware, validación y errores de seguridad comunes que debes evitar. ~40 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=mgeuh8k3SWk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Authentication &amp; Authorization in ASP.NET Core — Full Guide</h3>
+                    <div class="mb-1 text-body-secondary">Desde el setup inicial hasta proteger endpoints: AddAuthentication, AddAuthorization, middleware order y cómo fluye el ClaimsPrincipal por todo el pipeline. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/4cFhYUK8wnc?si=c4DTlIUo2KPiRX6E" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Servicio JWT completo y seguro</strong> 
+                    <h3 class="mb-0">Generación de Access Token con todos los claims necesarios</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Configuración del middleware JWT en Program.cs</strong> 
+                    <h3 class="mb-0">Setup completo y seguro del middleware de autenticación</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Roles y Claims</div>
+        <div class="day-subtitle">Role-based y Policy-based authorization, claims personalizados y ClaimsPrincipal</div>
+        </div>
+        <span class="day-tag">⏱ ~4–5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Roles vs Policies vs Claims:</strong> <strong>Roles</strong> son simples grupos ("Admin", "User"). <strong>Claims</strong> son pares clave-valor sobre el usuario ("department: engineering", "subscription: premium"). <strong>Policies</strong> son reglas que combinan claims, roles y lógica custom. En APIs modernas, las policies son más flexibles y recomendadas sobre los roles solos.
+    </div>
+
+    <div class="flow">
+        <h3>📋 Claims estándar (RFC 7519) que deberías conocer</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Claim</th>
+                        <th>Nombre</th>
+                        <th>Uso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-info">sub</span></td>
+                        <td>Subject</td>
+                        <td>ID único del usuario — la identidad principal</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-info">iss</span></td>
+                        <td>Issuer</td>
+                        <td>Quién emitió el token — tu API URL</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-info">aud</span></td>
+                        <td>Audience</td>
+                        <td>Para quién es el token — tu frontend URL</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-info">exp</span></td>
+                        <td>Expiration</td>
+                        <td>Unix timestamp de expiración</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-info">iat</span></td>
+                        <td>Issued At</td>
+                        <td>Cuándo fue emitido</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-info">jti</span></td>
+                        <td>JWT ID</td>
+                        <td>ID único del token — permite revocación y detección de replay</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-info">email</span></td>
+                        <td>Email</td>
+                        <td>Email del usuario (claim custom pero muy usado)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-info">role</span></td>
+                        <td>Roles</td>
+                        <td>Rol(es) del usuario para autorización</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Policy-based Authorization en ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Cómo definir políticas de autorización con Requirements, Handlers, y cómo registrarlas. El sistema más flexible y potente para autorización en .NET.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/security/authorization/policies?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Claims-based identity en ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Cómo funcionan los claims, el ClaimsPrincipal, cómo acceder a los claims del usuario autenticado y cómo crear claims transformations.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/security/authorization/claims?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Claims, Roles y Policies en ASP.NET Core — Guía completa</h3>
+                    <div class="mb-1 text-body-secondary">Diferencias entre los tres sistemas de autorización, cuándo usar cada uno, claims personalizados en JWT y policies compuestas con múltiples requirements. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/Pmdvqszd8Z4?si=JeAv_n_m-1NdNM1f" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Role-based vs Policy-based Authorization — Cuál usar</h3>
+                    <div class="mb-1 text-body-secondary">Compara las dos estrategias con ejemplos reales: roles simples para RBAC básico vs policies para lógica de autorización compleja como "solo el dueño del recurso". ~25 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=RBMO_hruKaI" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Policies completas: roles, claims y resource-based</strong> 
+                    <h3 class="mb-0">Tres tipos de autorización en una sola aplicación</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Refresh Tokens</div>
+        <div class="day-subtitle">Implementación segura, rotación, almacenamiento en BD y revocación</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>¿Por qué necesitas Refresh Tokens?</strong> Los Access Tokens duran 15 minutos. Sin refresh tokens, el usuario tendría que hacer login cada 15 minutos. El Refresh Token es un token opaco (GUID) de larga vida (7 días) que permite obtener nuevos Access Tokens sin pedir credenciales otra vez. Siempre se almacena hasheado en la BD y se rota en cada uso.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Refresh Token Rotation:</strong> Cada vez que se usa un refresh token para obtener uno nuevo, el anterior se invalida inmediatamente. Si detectas que un refresh token ya usado intenta usarse de nuevo → alguien lo robó → invalida <strong>todos</strong> los tokens del usuario (Refresh Token Family Attack detection).
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>❌ Incorrecto — localStorage</h4>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>✅ Correcto — Cookie HttpOnly</h4>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Refresh Tokens en ASP.NET Core — Implementación Completa</h3>
+                    <div class="mb-1 text-body-secondary">Implementación de refresh tokens desde cero: tabla en BD, generación, validación, rotación y detección de reutilización. El video más completo sobre el tema. ~50 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=AU0TIOZhGqs" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Refresh Token Rotation &amp; Reuse Detection</h3>
+                    <div class="mb-1 text-body-secondary">La estrategia de seguridad avanzada: detectar cuando un refresh token robado intenta usarse (ya fue rotado) e invalidar toda la familia de tokens del usuario. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/EC69dEspO64?si=khQsO3bJyDCHrjRJ" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Auth0 Blog</strong> 
+                    <h3 class="mb-0">Refresh Token Rotation — Best Practices (Auth0)</h3>
+                    <div class="mb-1 text-body-secondary">Guía definitiva de Auth0 sobre refresh token rotation: qué es, cómo implementarlo, la estrategia de detección de reutilización y recomendaciones de almacenamiento.</div>
+                    <a class="link" href="https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation" target="_blank">📘 Auth0 Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Entidad RefreshToken + Repositorio + Rotación</strong> 
+                    <h3 class="mb-0">Implementación completa con detección de reúso</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Protección de Endpoints</div>
+        <div class="day-subtitle">Authorize attributes, resource-based auth, Rate Limiting y CORS correcto</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Defense in depth:</strong> La seguridad de un endpoint no es solo <code>[Authorize]</code>. Es la combinación de autenticación JWT + autorización por roles/policies + rate limiting (evitar brute force) + CORS correctamente configurado (no <code>AllowAnyOrigin</code>) + validación de input (Semana 3). Cada capa protege contra un vector diferente.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ CORS no es seguridad:</strong> CORS solo controla qué orígenes <em>del browser</em> pueden hacer requests. No protege contra ataques server-to-server, curl, Postman ni ninguna herramienta que no sea un browser. CORS es para UX, no para seguridad del servidor.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Rate Limiting en ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">El rate limiting nativo de .NET 7+: Fixed Window, Sliding Window, Token Bucket y Concurrency limiters. Sin necesidad de librerías externas para proteger endpoints de brute force.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/performance/rate-limit?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">CORS en ASP.NET Core — Configuración correcta</h3>
+                    <div class="mb-1 text-body-secondary">Cómo configurar CORS de manera segura: permitir solo orígenes específicos, métodos, headers y credenciales. Por qué <code>AllowAnyOrigin</code> con <code>AllowCredentials</code> es un error.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/security/cors?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Rate Limiting in ASP.NET Core .NET 8 — Full Guide</h3>
+                    <div class="mb-1 text-body-secondary">Implementación de rate limiting nativo con los 4 algoritmos, cómo aplicarlo por endpoint, por usuario autenticado y cómo retornar 429 Too Many Requests con headers estándar. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/pw_dscqzwmc?si=6mPd13UHVzPsYo_D" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Resource-based Authorization en ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Solo el dueño del recurso puede editarlo": implementar <code>IAuthorizationService</code> para verificar permisos contra el recurso específico, no solo contra el rol del usuario. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/lYvF63SvS3g?si=q0kFU5Z6HNoMK0oj" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Rate Limiting + CORS + Endpoint Protection combinados</strong> 
+                    <h3 class="mb-0">Program.cs con todas las capas de protección</h3>
+                    <pre><code>{{codeExample7}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Resource-based Authorization — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Cómo usar <code>IAuthorizationService.AuthorizeAsync(user, resource, policy)</code> para verificar si el usuario tiene permisos sobre un recurso específico dentro del handler.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/security/authorization/resourcebased?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Seguridad Avanzada + API Entregable</div>
+        <div class="day-subtitle">Password hashing, HTTPS, Security Headers, integrar todo y testear la autenticación</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Password hashing no es opcional:</strong> Las contraseñas nunca se guardan en texto plano ni como MD5/SHA1. Usa <code>BCrypt</code> o <code>PBKDF2</code> (que ya incluye ASP.NET Core Identity). Estos algoritmos son intencionalmente lentos para resistir ataques de fuerza bruta offline.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">ASP.NET Core Security Best Practices — OWASP Top 10 para APIs</h3>
+                    <div class="mb-1 text-body-secondary">Cubre las vulnerabilidades más comunes del OWASP Top 10 API Security aplicadas a ASP.NET Core: inyección, autenticación rota, exposición de datos, rate limiting y más. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/J4ix8Mhi3rs?si=0LvsnSJ2eWy9InZ3" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Secure Password Hashing en .NET — BCrypt y ASP.NET Core Identity</h3>
+                    <div class="mb-1 text-body-secondary">Por qué BCrypt, cómo usar IPasswordHasher de ASP.NET Core, salt automático, factor de trabajo y cómo verificar passwords correctamente. ~20 min.</div>
+                    <a class="link" href="https://youtu.be/UNLl4kCpwGo?si=osuB4na3bIe6Phyx" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 OWASP — API Security Top 10</strong> 
+                    <h3 class="mb-0">OWASP API Security Top 10 — 2023</h3>
+                    <div class="mb-1 text-body-secondary">La guía de referencia mundial de seguridad en APIs. Cada punto del Top 10 describe un tipo de vulnerabilidad, cómo se explota y cómo prevenirla. Imprescindible para todo backend developer.</div>
+                    <a class="link" href="https://owasp.org/API-Security/editions/2023/en/0x00-header/" target="_blank">📘 OWASP API Security →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Security Headers en ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Cómo agregar headers HTTP de seguridad: HSTS, X-Content-Type-Options, X-Frame-Options, Content-Security-Policy. Pequeñas configuraciones con gran impacto en seguridad.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/security/enforcing-ssl?view=aspnetcore-8.0" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Auth Controller completo: login, refresh, logout</strong> 
+                    <h3 class="mb-0">Los 3 endpoints de autenticación correctamente implementados</h3>
+                    <pre><code>{{codeExample8}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">🗂</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">🗂 Herramienta — JWT.io</strong> 
+                    <h3 class="mb-0">JWT.io — Debugger online para inspeccionar tokens</h3>
+                    <div class="mb-1 text-body-secondary">Pega cualquier JWT y verás inmediatamente el header, payload decodificado y si la firma es válida con tu secret. Indispensable para debugging de autenticación.</div>
+                    <a class="link" href="https://jwt.io" target="_blank">🔗 jwt.io →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">🗂</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">🗂 Repositorio GitHub</strong> 
+                    <h3 class="mb-0">JWT Authentication Full Implementation — Referencia completa</h3>
+                    <div class="mb-1 text-body-secondary">Implementación de referencia en GitHub con Clean Architecture + JWT + Refresh Tokens + Roles + Entity Framework: el código que deberías estudiar y usar como base.</div>
+                    <a class="link" href="https://github.com/iammukeshm/JWTAuthentication.WebApi" target="_blank">🗂 Ver en GitHub →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — API con Autenticación Robusta</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Tu API debe poder superar este checklist de seguridad:</p>
+    <ul>
+        <li>POST /auth/login devuelve Access Token (15 min) + Refresh Token en cookie HttpOnly</li>
+        <li>POST /auth/refresh rota el Refresh Token y emite nuevo Access Token</li>
+        <li>POST /auth/logout revoca el Refresh Token y borra la cookie</li>
+        <li>Endpoints protegidos con [Authorize] retornan 401 sin token válido</li>
+        <li>Endpoints Admin retornan 403 si el usuario autenticado no tiene el rol</li>
+        <li>Rate limiting en /auth/login: 429 después del 5to intento en 1 minuto</li>
+        <li>CORS configurado aceptando solo el origen de tu frontend</li>
+        <li>Unit tests del JwtTokenService y del AuthService con Moq</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong >🔗 Conexión con semanas anteriores:</strong>
+        El <strong>JwtTokenService</strong> va en tu capa <em>Infrastructure</em> (Semana 2) e implementa una interfaz <code>IJwtTokenService</code> definida en <em>Application</em>.
+        Los <strong>validators de FluentValidation</strong> (Semana 3) protegen el endpoint de login de inputs malformados.
+        El <strong>IExceptionHandler</strong> (Semana 3) captura las excepciones de autenticación y las mapea a ProblemDetails con status 401/403.
+        Los <strong>unit tests</strong> del AuthService (Semana 4) mockean <code>IUserRepository</code>, <code>IJwtTokenService</code> y <code>IRefreshTokenRepository</code>.
+    </div>
 </div>

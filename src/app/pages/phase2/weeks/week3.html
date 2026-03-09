@@ -1,0 +1,271 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – ACID &amp; Transacciones</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Isolation Levels</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Locks</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Deadlocks</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Escenarios Concurrentes</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Controlar Bugs</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">ACID, READ COMMITTED</div></div>
+</div>
+
+<div class="concept-box">
+    El 95% de los bugs de concurrencia no ocurren en tests. Ocurren cuando dos usuarios tocan los mismos datos al mismo tiempo en producción. Esta semana entiendes exactamente qué pasa y cómo controlarlo.
+</div>
+
+<div class="flow">
+    <h3>Los 4 pilares de esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">01</span><div class="pc-title">ACID + Transacciones</div><div class="pc-body">Atomicity, Consistency, Isolation, Durability. BEGIN/COMMIT/ROLLBACK con manejo correcto de errores en T-SQL y C#.</div></div>
+    <div class="intro-card"><span class="icon">02</span><div class="pc-title">Isolation Levels</div><div class="pc-body">READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE y SNAPSHOT. Trade-offs entre consistencia y concurrencia.</div></div>
+    <div class="intro-card"><span class="icon">03</span><div class="pc-title">Locks</div><div class="pc-body">Shared (S), Exclusive (X), Update (U), Intent. Cómo SQL Server adquiere y libera locks, escalada y blocking.</div></div>
+    <div class="intro-card"><span class="icon">04</span><div class="pc-title">Deadlocks</div><div class="pc-body">Por qué ocurren, cómo detectarlos con Deadlock Graph, cómo prevenirlos con orden de acceso y con SNAPSHOT isolation.</div></div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">ACID y Manejo Correcto de Transacciones</div>
+        <div class="day-subtitle">BEGIN/COMMIT/ROLLBACK, TRY/CATCH, savepoints, transacciones anidadas y el patrón correcto en C# con EF Core</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Una transacción es una unidad de trabajo que debe completarse en su totalidad o no ejecutarse en absoluto.</strong> ACID garantiza: <strong>Atomicity</strong> (todo o nada), <strong>Consistency</strong> (estado válido antes y después), <strong>Isolation</strong> (las transacciones concurrentes no se interfieren), <strong>Durability</strong> (los cambios committed sobreviven a fallos). El 99% de los bugs de transacciones vienen de manejo incorrecto de errores: olvidar el ROLLBACK en el catch.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ El error más costoso:</strong> una transacción abierta sin COMMIT ni ROLLBACK bloquea todos los recursos que tocó. Si una excepción escapa sin el ROLLBACK correspondiente, tendrás bloqueos que crecen hasta paralizar el servidor. <em>Siempre</em> envuelve transacciones en TRY/CATCH con ROLLBACK en el CATCH.
+    </div>
+
+    <div class="flow">
+        <div class="pf-grid">
+            <div class="pf">
+                <div class="pf-key text-danger">❌ Patrón incorrecto</div>
+                <div class="pf-val">Sin TRY/CATCH. Si el INSERT falla, la transacción queda abierta bloqueando recursos. El ROLLBACK nunca se ejecuta.<br><br><code>BEGIN TRAN</code> → <code>INSERT</code> → ❌ excepción → transacción abierta para siempre.</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-success">✓ Patrón correcto</div>
+                <div class="pf-val">TRY/CATCH con verificación de transacción activa antes del ROLLBACK. <code>XACT_STATE()</code> verifica si hay una transacción abierta y si es rollbackable.</div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-warning">⚡ C# + EF Core</div>
+                <div class="pf-val"><code>using var tx = await context.Database.BeginTransactionAsync()</code> con <code>await tx.CommitAsync()</code> en el try y <code>await tx.RollbackAsync()</code> en el catch.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Transacciones en SQL Server — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Referencia completa: BEGIN TRANSACTION, COMMIT, ROLLBACK, SAVE TRANSACTION (savepoints), transacciones anidadas con @@TRANCOUNT, y el comportamiento de XACT_ABORT.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/t-sql/language-elements/transactions-transact-sql?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Transacciones en EF Core — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Cómo usar BeginTransactionAsync, CommitAsync, RollbackAsync. Transacciones ambientales con TransactionScope, cómo compartir una transacción entre múltiples DbContext, y SaveChanges como transacción implícita.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/ef/core/saving/transactions" target="_blank">📘 EF Core Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Transactions in SQL Server — El fundamento con demos reales</h3>
+                    <div class="mb-1 text-body-secondary">Demuestra ACID en vivo: qué pasa cuando una transacción falla a la mitad, cómo el transaction log garantiza durability, y los errores clásicos que dejan transacciones abiertas en producción. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/d7-tJUnXOmc?si=1KiGeQ-J5pafmgI6" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Manejo correcto de transacciones en C# y EF Core</h3>
+                    <div class="mb-1 text-body-secondary">Muestra el patrón correcto de transacciones en .NET: BeginTransactionAsync, el patrón Unit of Work con EF Core, cómo manejar errores de concurrencia (DbUpdateConcurrencyException) y retry logic. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/25H84BXcr9M?si=UZDz5B6USLcT1Jau" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — TRY/CATCH correcto + EF Core Transaction</strong> 
+                    <h3 class="mb-0">El patrón que debes usar siempre en T-SQL y en C#</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Isolation Levels</div>
+        <div class="day-subtitle">Los 5 niveles, los fenómenos que cada uno permite, y por qué SNAPSHOT es la opción correcta para la mayoría de las aplicaciones</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El isolation level define qué anomalías de concurrencia son posibles en tu base de datos.</strong> Más isolation = menos anomalías = más locks = menos concurrencia. El default de SQL Server es <code>READ COMMITTED</code> — protege contra lecturas sucias pero permite non-repeatable reads. <strong>READ COMMITTED SNAPSHOT (RCSI)</strong> es una variante basada en versiones de fila que elimina bloqueos de lectura sin sacrificar consistencia. Es el que deberías usar por defecto en aplicaciones OLTP.
+    </div>
+
+    <div class="flow">
+        <h3>Comparativa de isolation levels</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Nivel</th>
+                        <th>Dirty Read</th>
+                        <th>Non-Repeatable Read</th>
+                        <th>Phantom Read</th>
+                        <th>Concurrencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rn-code-badge">READ UNCOMMITTED</span> NOLOCK hint </td>
+                        <td class="text-danger">✗ Posible</td>
+                        <td class="text-danger">✗ Posible</td>
+                        <td class="text-danger">✗ Posible</td>
+                        <td><div class="tl-row-track"><span class="layer-tag rn-b-wait" style="width:100%"></span></div> Max</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge">READ COMMITTED</span> Default SQL Server</td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td class="text-danger">✗ Posible</td>
+                        <td class="text-danger">✗ Posible</td>
+                        <td><div class="tl-row-track"><span class="layer-tag rn-b-orange" style="width:80%; color:#d39521 !important;"></span></div> Alta</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge">SNAPSHOT (RCSI)</span>⭐ Recomendado OLTP</td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td><div class="tl-row-track"><span class="layer-tag rn-b-free" style="width:20%"></span></div> Alta (sin locks)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge">REPEATABLE READ</span></td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td class="text-danger">✗ Posible</td>
+                        <td><div class="tl-row-track"><span class="layer-tag rn-b-warn" style="width:50%"></span></div> Media</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge">SERIALIZABLE</span> Máximo aislamiento</td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td class="text-success">✓ Protegido</td>
+                        <td><div class="tl-row-track"><span class="layer-tag rn-b-free" style="width:8%"></span></div> Mínima</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tip">
+        <strong>⚡ READ UNCOMMITTED / NOLOCK: el hint más peligroso del SQL.</strong> Permite leer datos que aún no fueron committed — puedes leer una fila que luego se hace ROLLBACK (dato fantasma) o una fila a la mitad de ser actualizada. NUNCA uses NOLOCK en datos financieros, inventario o cualquier dato donde la exactitud importe. "Más rápido pero incorrecto" no es una opción válida.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Isolation Levels en SQL Server — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Referencia completa de los 5 isolation levels, cómo habilitarlos, los fenómenos que cada uno previene, y la diferencia entre SNAPSHOT a nivel de statement vs a nivel de transacción completa.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Isolation Levels — Todos los niveles con demos en vivo</h3>
+                    <div class="mb-1 text-body-secondary">Reproduce cada fenómeno de concurrencia en vivo con dos ventanas de SSMS: dirty reads, non-repeatable reads, phantoms. Luego muestra cómo SNAPSHOT los elimina sin bloqueos. ~55 min.</div>
+                    <a class="link" href="https://youtu.be/jmFQSDcA6FA?si=MVkv4Q8fhvjqbiNh" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">NOLOCK / READ UNCOMMITTED — Por qué destruye tu data</h3>
+                    <div class="mb-1 text-body-secondary">Demo en vivo de los 5 tipos de datos incorrectos que NOLOCK puede retornar, incluyendo filas duplicadas y filas que nunca existieron. Con ejemplos de los desastres reales que ha causado en producción. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/5O8cz_HBoQM?si=Dgj7B4KX7h8pdIal" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Habilitar RCSI y demo de los fenómenos de concurrencia</strong> 
+                    <h3 class="mb-0">Reproducir dirty read, non-repeatable read y phantom en dos sesiones de SSMS</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
