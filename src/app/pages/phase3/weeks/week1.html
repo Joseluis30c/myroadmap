@@ -1,3 +1,185 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Azure Portal + CLI</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – App Service</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Azure SQL</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Storage + Networking</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Deploy tu API</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Llevar tu API a la nube</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">App Service, Azure SQL, Blob Storage</div></div>
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Los 4 servicios que necesitas esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">⚙️</span><div class="pc-title">App Service</div><div class="pc-body">PaaS para hospedar tu API .NET sin administrar servidores. Deploy con git push, zip deploy o GitHub Actions. Auto-scale incluido.</div></div>
+    <div class="intro-card"><span class="icon">🗄️</span><div class="pc-title">Azure SQL</div><div class="pc-body">SQL Server en la nube totalmente administrado. Compatible 100% con tu código T-SQL y EF Core. Backups automáticos, alta disponibilidad incluida.</div></div>
+    <div class="intro-card"><span class="icon">📦</span><div class="pc-title">Blob Storage</div><div class="pc-body">Almacenamiento de objetos: imágenes, archivos, backups. Integración con .NET SDK en minutos. Hot/Cool/Archive tiers para optimizar costo.</div></div>
+    <div class="intro-card"><span class="icon">🔒</span><div class="pc-title">Networking</div><div class="pc-body">VNet, NSG, Service Endpoints. Por qué tu App Service y Azure SQL NO deben estar expuestos a internet sin reglas de firewall.</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Azure Portal, Subscriptions, CLI y Conceptos Core</div>
+        <div class="day-subtitle">Subscriptions, Resource Groups, Regions, az CLI, nomenclatura de recursos y el modelo de precios</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Azure organiza todo en una jerarquía:</strong> Management Group → Subscription → Resource Group → Resource. Tu punto de entrada es la <strong>Subscription</strong> (facturación y límites), y dentro de ella creas <strong>Resource Groups</strong> como contenedores lógicos para todos los recursos de un proyecto. Todo lo que crees en este grupo se puede eliminar en bloque con <code>az group delete --name rg-miapi-dev</code> — perfecto para limpiar entornos de prueba. La <strong>región</strong> determina la latencia física y debe ser la misma para todos los recursos que se comunican entre sí.
+    </div>
+
+    <div class="tip">
+        <strong>💡Cuenta Gratuita:</strong> Azure ofrece $200 de crédito por 30 días + 12 meses de servicios gratuitos (incluyendo App Service B1, Azure SQL 250GB, Blob Storage 5GB). Crea tu cuenta en portal.azure.com — todo lo de esta semana cabe en el free tier.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Microsoft Learn — Ruta oficial</strong> 
+                    <h3 class="mb-0">Azure Fundamentals (AZ-900) — Módulo 1: Conceptos de nube</h3>
+                    <div class="mb-1 text-body-secondary">El punto de entrada oficial: qué es IaaS vs PaaS vs SaaS, el modelo de responsabilidad compartida, alta disponibilidad, escalabilidad, elasticidad y los modelos de costo (CapEx vs OpEx). Gratuito con sandbox interactivo.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Azure Full Course para Principiantes — Portal + CLI + Servicios Core</h3>
+                    <div class="mb-1 text-body-secondary">El mejor curso de Azure para desarrolladores .NET: navegación del portal, Resource Groups, az CLI con demos en vivo, nomenclatura de recursos y los servicios más usados. Orientado a devs, no a sysadmins. ~3h (puedes hacer 2x speed los conceptos básicos).</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=NKEFWyqJ5XA" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Azure CLI — Referencia completa de comandos</h3>
+                    <div class="mb-1 text-body-secondary">Los comandos que usarás toda la Fase 3: <code>az login</code>, <code>az group create</code>, <code>az webapp create</code>, <code>az sql server create</code>. La CLI es más rápida que el portal para operaciones repetitivas y es la base de los scripts de automatización.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/cli/azure/reference-index" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Setup inicial completo con az CLI</strong> 
+                    <h3 class="mb-0">Crear tu Resource Group y configurar el entorno desde la terminal</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Azure App Service — Deploy de tu API .NET</div>
+        <div class="day-subtitle">Planes de servicio, tiers gratuitos vs pagos, deployment slots, App Settings como variables de entorno y zip deploy</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>App Service es PaaS — tú subes el código, Azure maneja el servidor.</strong> Sin parches de SO, sin administración de IIS, sin configuración de TLS. Eliges un <strong>App Service Plan</strong> (las VMs subyacentes) y creas tantas apps como quieras en ese plan. Para desarrollo usa <code>B1</code> (~$13/mes o gratis con la cuenta free). Para producción, <code>S1</code> agrega deployment slots (blue/green deploy) y auto-scaling. Las <strong>App Settings</strong> son variables de entorno que sobreescriben el <code>appsettings.json</code> — la forma correcta de manejar connection strings en la nube.
+    </div>
+
+    <div class="tip">
+        <strong>NUNCA pongas connection strings en el código fuente.</strong> Usa App Settings en Azure (o Azure Key Vault para producción). El App Service inyecta esas variables como environment variables en tiempo de ejecución, que <code>IConfiguration</code> lee automáticamente en .NET.
+    </div>
+
+    <div class="flow">
+        PROXIMAMENTE...
+    </div>
+
+    <!--
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Microsoft Learn — Ruta oficial</strong> 
+                    <h3 class="mb-0">Azure Fundamentals (AZ-900) — Módulo 1: Conceptos de nube</h3>
+                    <div class="mb-1 text-body-secondary">El punto de entrada oficial: qué es IaaS vs PaaS vs SaaS, el modelo de responsabilidad compartida, alta disponibilidad, escalabilidad, elasticidad y los modelos de costo (CapEx vs OpEx). Gratuito con sandbox interactivo.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Azure Full Course para Principiantes — Portal + CLI + Servicios Core</h3>
+                    <div class="mb-1 text-body-secondary">El mejor curso de Azure para desarrolladores .NET: navegación del portal, Resource Groups, az CLI con demos en vivo, nomenclatura de recursos y los servicios más usados. Orientado a devs, no a sysadmins. ~3h (puedes hacer 2x speed los conceptos básicos).</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=NKEFWyqJ5XA" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Azure CLI — Referencia completa de comandos</h3>
+                    <div class="mb-1 text-body-secondary">Los comandos que usarás toda la Fase 3: <code>az login</code>, <code>az group create</code>, <code>az webapp create</code>, <code>az sql server create</code>. La CLI es más rápida que el portal para operaciones repetitivas y es la base de los scripts de automatización.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/cli/azure/reference-index" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Setup inicial completo con az CLI</strong> 
+                    <h3 class="mb-0">Crear tu Resource Group y configurar el entorno desde la terminal</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
 </div>

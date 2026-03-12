@@ -269,3 +269,309 @@
 </div>
 
 <div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Locks — Cómo SQL Server controla el acceso</div>
+        <div class="day-subtitle">Tipos de lock (S, X, U, IS, IX), compatibilidad, escalada, blocking chains y cómo diagnosticarlos</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>SQL Server usa locks para garantizar el aislamiento entre transacciones.</strong> Cuando una transacción lee datos, adquiere un <code>Shared lock (S)</code>. Cuando modifica, necesita un <code>Exclusive lock (X)</code>. Los locks son incompatibles: no puedes obtener un X si alguien tiene un S, y viceversa. El <strong>blocking</strong> ocurre cuando una sesión espera que otra libere su lock. El blocking no es un error — es el mecanismo correcto funcionando. El problema es cuando dura demasiado.
+    </div>
+
+    <div class="flow">
+        <h3>Tipos de lock en SQL Server</h3>
+        <div class="pf-grid">
+            <div class="pf">
+                <div class="pf-key text-success">S — Shared</div>
+                <div class="pf-val">Para lecturas. Múltiples sesiones pueden tener S al mismo tiempo. Compatible con otros S, incompatible con X.</div>
+                <div class="pf-val"><code class="text-success">SELECT sin WITH(NOLOCK)</code></div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-danger">X — Exclusive</div>
+                <div class="pf-val">Para escrituras. Solo una sesión puede tener X. Incompatible con S y con otros X. Se mantiene hasta COMMIT/ROLLBACK.</div>
+                <div class="pf-val"><code class="text-danger">INSERT / UPDATE / DELETE</code></div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-warning">U — Update</div>
+                <div class="pf-val">Previene deadlocks en patrones read-modify-write. Compatible con S pero solo uno puede existir. Se convierte a X antes de escribir.</div>
+                <div class="pf-val"><code class="text-warning">UPDATE (fase de búsqueda)</code></div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-primary">IS — Intent Shared</div>
+                <div class="pf-val">Lock jerárquico en la tabla/página que indica que se van a tomar S locks en filas. Permite saber si una tabla está siendo leída.</div>
+                <div class="pf-val"><code class="text-primary">Nivel tabla/página</code></div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-info">IX — Intent Exclusive</div>
+                <div class="pf-val">Indica que se van a tomar X locks en filas. El motor verifica IX a nivel tabla antes de permitir locks completos.</div>
+                <div class="pf-val"><code class="text-info">Nivel tabla antes de X</code></div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-secondary">Sch-S / Sch-M</div>
+                <div class="pf-val">Schema Stability / Modify. Se adquiere al ejecutar queries (Sch-S) o al modificar el esquema (ALTER TABLE). El Sch-M bloquea todo.</div>
+                <div class="pf-val"><code class="text-secondary">DDL / Compilación</code></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Lock Modes en SQL Server — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Todos los modos de lock, la matriz de compatibilidad completa (qué locks son compatibles entre sí), lock granularity (row vs page vs table vs database) y escalada de locks.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Locking in SQL Server — Diagnóstico completo de blocking</h3>
+                    <div class="mb-1 text-body-secondary">Cómo usar sys.dm_exec_requests para encontrar blocking chains, cómo leer el wait type LCK_M_X, sp_WhoIsActive para ver locks en tiempo real, y cómo resolver el blocking sin matar sesiones. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/Ialr_INJeHE?si=Dnl0iX2zyhuYPVt5" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Herramienta — sp_WhoIsActive</strong> 
+                    <h3 class="mb-0">sp_WhoIsActive — La herramienta de diagnóstico de concurrencia en tiempo real</h3>
+                    <div class="mb-1 text-body-secondary">Stored procedure gratuito de Adam Machanic que muestra todo sobre las sesiones activas: qué están ejecutando, qué locks tienen, cuánto tiempo llevan esperando, quién las está bloqueando y el execution plan. Esencial en producción.</div>
+                    <a class="link" href="http://whoisactive.com/" target="_blank">🔧 Descargar gratis →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Diagnosticar blocking con DMVs + visualizar lock chains</strong> 
+                    <h3 class="mb-0">Las queries que usarás cuando el servidor esté bloqueado</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Deadlocks — Diagnóstico y Prevención</div>
+        <div class="day-subtitle">Por qué ocurren, Deadlock Graph con Extended Events, los 4 patrones más comunes y cómo eliminarlos</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un deadlock ocurre cuando dos sesiones se esperan mutuamente y ninguna puede continuar.</strong> Sesión A tiene lock sobre Recurso 1 y quiere Recurso 2. Sesión B tiene lock sobre Recurso 2 y quiere Recurso 1. SQL Server detecta automáticamente el ciclo y elige a una de las sesiones como "víctima" — la mata con error 1205, haciendo ROLLBACK de su transacción. La otra sesión continúa. El error 1205 en tu aplicación significa que hubo un deadlock y debes hacer retry.
+    </div>
+
+    <div class="flow">
+        <h3>🔍 El flujo de profiling profesional</h3>
+        <div class="flow-steps">
+            <div class="fs fs-req"><div class="fs-name">SPID 52</div><div class="fs-sub"><strong class="text-success">HOLDS X lock</strong> en Orders(Id=1)</div><div class="fs-sub">⟶ <strong class="text-danger">WANTS X lock</strong> en Inventory(Id=1)</div></div>
+            <span class="fs-arrow">⟵ <span style="font-size: 0.6rem;">DEADLOCK</span> ⟶</span>
+            <div class="fs fs-req"><div class="fs-name">SPID 53</div><div class="fs-sub"><strong class="text-success">HOLDS X lock</strong> en Inventory(Id=1)</div><div class="fs-sub">⟶ <strong class="text-danger">WANTS X lock</strong> en Orders(Id=1)</div></div>
+        </div><br>
+        <div class="tip">
+            <strong class="text-danger">SQL Server elige víctima:</strong> SPID 53 recibe error 1205, su transacción hace ROLLBACK. SPID 52 continúa y hace COMMIT. Tu aplicación debe tener retry logic para el 1205.
+        </div>        
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Detectar y resolver Deadlocks — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Cómo habilitar el Deadlock Graph con Extended Events (el flag de trace 1222 está deprecado), cómo leer el XML del deadlock graph, y las mejores prácticas para eliminar deadlocks.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/sql-server-deadlocks-guide?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Deadlocks — Cómo reproducirlos, diagnosticarlos y eliminarlos</h3>
+                    <div class="mb-1 text-body-secondary">Reproduce un deadlock en vivo con dos sesiones de SSMS, captura el Deadlock Graph con Extended Events, lo lee en SSMS y muestra las tres soluciones: orden de acceso, SNAPSHOT isolation y retry logic. El video definitivo. ~60 min.</div>
+                    <a class="link" href="https://youtu.be/UHerysRUy-o?si=AbSL-OigGt1Y5O1g" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Deadlocks en C# y EF Core — Retry con Polly</h3>
+                    <div class="mb-1 text-body-secondary">Cómo capturar el error 1205 en C#, implementar retry automático con Polly para deadlocks y errores transitorios, y configurar la política de retry con backoff exponencial y jitter. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/DSMdUvL8N30?si=iLeiRznx-wSRMW5l" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Reproducir deadlock + captura + retry en C#</strong> 
+                    <h3 class="mb-0">El ciclo completo: crear deadlock → Extended Events → retry con Polly</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Simular Escenarios Concurrentes</div>
+        <div class="day-subtitle">Lost update, optimistic vs pessimistic concurrency, SELECT FOR UPDATE, UPDLOCK hints y el entregable final</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El problema del Lost Update:</strong> Dos usuarios leen el mismo stock (100 unidades), ambos restan 10, ambos guardan 90. El resultado correcto sería 80. Este es el escenario concurrente más común y tiene dos soluciones: <strong>Pessimistic concurrency</strong> (bloquear la fila al leer con UPDLOCK para que nadie más la modifique) o <strong>Optimistic concurrency</strong> (no bloquear al leer, pero verificar antes de guardar que nadie cambió la fila — usando un rowversion/timestamp).
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>⚠ LOST UPDATE — El bug silencioso</h4>
+                    <pre><code>{{codeExample7}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>✓ PESSIMISTIC — UPDLOCK bloquea al leer</h4>
+                    <pre><code>{{codeExample8}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Lost Updates, Optimistic vs Pessimistic Locking — Demos con dos sesiones</h3>
+                    <div class="mb-1 text-body-secondary">Reproduce el lost update en vivo, muestra la diferencia entre pessimistic locking con UPDLOCK y optimistic locking con ROWVERSION, y cuándo usar cada estrategia según el tipo de aplicación. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/VxGKvqHhU5c?si=cPdBuOVe0uL6oeQk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Concurrency en EF Core — Optimistic Concurrency con RowVersion</h3>
+                    <div class="mb-1 text-body-secondary">Implementa optimistic concurrency completa en EF Core: columna RowVersion, configuración con IsRowVersion(), manejo de DbUpdateConcurrencyException y retry logic. Con el patrón correcto para APIs REST concurrentes. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/EXcCk9-cr3U?si=wgM_ZaLrXUIyHbQd" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Concurrencia optimista en EF Core — Tokens de concurrencia</h3>
+                    <div class="mb-1 text-body-secondary">Documentación oficial sobre ConcurrencyToken y IsRowVersion() en EF Core, cómo configurar el modelo, qué excepción se lanza cuando hay conflicto y cómo acceder a los valores original/actual/propuesto para resolver el conflicto.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/sql-server-deadlocks-guide?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Reproducir deadlock + captura + retry en C#</strong> 
+                    <h3 class="mb-0">El ciclo completo: crear deadlock → Extended Events → retry con Polly</h3>
+                    <pre><code>{{codeExample9}}</code></pre>
+                    <pre><code>{{codeExample10}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Simular escenarios concurrentes</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Crea un escenario de prueba de concurrencia usando dos conexiones de SSMS y reproduce, diagnostica y resuelve los 3 escenarios principales:</p>
+    <ul>
+        <li>Demo reproducible de dirty read y non-repeatable read con dos sesiones SSMS y screenshots del behavior</li>
+        <li>Un deadlock reproducible, capturado con Extended Events y el Deadlock Graph explicado</li>
+        <li>Retry logic en C# para error 1205 con Polly, con logs que muestren los reintentos funcionando</li>
+        <li>Lost Update resuelto dos veces: una con UPDLOCK (pessimistic) y otra con ROWVERSION (optimistic)</li>
+        <li>Tabla de BD de prueba configurada con RCSI habilitado, con demo mostrando que las lecturas no bloquean escrituras</li>
+        <li>Script de diagnóstico de blocking que puedas ejecutar en producción cuando el servidor se bloquee</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con semanas anteriores:</strong> El isolation level SNAPSHOT que habilitas hoy elimina la mayoría de los deadlocks que podrían aparecer en los índices creados en <strong>Semana 7</strong>. El retry logic de Polly para deadlocks se integra directamente con el patrón de transacciones de EF Core de <strong>Semana 1 (Fase 1)</strong>. Las window functions y CTEs optimizados de <strong>Semana 8</strong> ejecutan más rápido dentro de transacciones cortas, reduciendo el tiempo de holding de locks y por tanto la probabilidad de deadlocks en producción.
+    </div>
+</div>

@@ -1,3 +1,518 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Identificar Cuellos</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Medir Baseline</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Refactorizar SPs</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Medir Después</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Documento Técnico</button>
+    </nav>
+</div>
+
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Encontrar, medir, refactorizar y documentar</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">DMVs, Query Store, Wait Stats</div></div>
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Los 4 pilares de esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">01</span><div class="pc-title">Identificar</div><div class="pc-body">DMVs, Query Store, Wait Stats y sp_BlitzCache para encontrar las queries más costosas sin adivinar.</div></div>
+    <div class="intro-card"><span class="icon">02</span><div class="pc-title">Medir Baseline</div><div class="pc-body">SET STATISTICS IO/TIME, Actual Execution Plan, logical reads y elapsed time. Documentar antes de tocar nada.</div></div>
+    <div class="intro-card"><span class="icon">03</span><div class="pc-title">Refactorizar SPs</div><div class="pc-body">Índices cubrientes, reescritura de CTEs, eliminación de cursores, parameter sniffing, planes forzados.</div></div>
+    <div class="intro-card"><span class="icon">04</span><div class="pc-title">Documentar</div><div class="pc-body">Documento técnico con problema, diagnóstico, cambios realizados, métricas antes/después y ROI.</div></div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Identificar Cuellos de Botella</div>
+        <div class="day-subtitle">Wait Stats, sp_BlitzCache, Query Store y DMVs — encontrar las queries problemáticas sin adivinar</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Nunca optimices sin datos.</strong> El 90% de los problemas de performance están en el 10% del código. Las <em>Wait Statistics</em> son el punto de partida: dicen exactamente qué espera SQL Server — si espera I/O (PAGEIOLATCH), CPU, locks (LCK_M_X) o red (ASYNC_NETWORK_IO). Con ese diagnóstico, vas a <strong>sp_BlitzCache</strong> para encontrar las queries exactas que causan esas esperas. Solo entonces abres el execution plan.
+    </div>
+
+    <div class="arch-diagram">
+        <h3>🗺 Workflow de identificación — en este orden exacto</h3>
+        <div class="layers">
+            <div class="layer layer-infra">
+                <div>
+                    <div class="layer-name">1 Wait Statistics — ¿Qué espera el servidor?</div>
+                    <div class="layer-rule">Ejecuta <code>sys.dm_os_wait_stats</code> para ver los top wait types. <strong>PAGEIOLATCH_SH</strong> = falta memoria o índices. <strong>LCK_M_X</strong> = bloqueos. <strong>CXPACKET</strong> = paralelismo excesivo. <strong>ASYNC_NETWORK_IO</strong> = la app lee filas demasiado lento. El wait type te dice el tipo de problema antes de ver una sola query.</div>
+                </div>
+                <div class="layer-items">
+                    <span class="layer-tag">Herramienta</span><span class="layer-tag">sys.dm_os_wait_stats</span>
+                </div>
+            </div>
+            <div class="layer layer-infra">
+                <div>
+                    <div class="layer-name">2 sp_BlitzCache — Top queries por impacto</div>
+                    <div class="layer-rule">Ejecuta <code>sp_BlitzCache @SortOrder = 'reads'</code> para ver las queries ordenadas por lecturas lógicas. Luego <code>'cpu'</code>, <code>'duration'</code> y <code>'executions'</code>. Una query que ejecuta 10,000 veces con lecturas moderadas puede ser más impactante que una que ejecuta 1 vez con lecturas enormes.</div>
+                </div>
+                <div class="layer-items">
+                    <span class="layer-tag">Herramienta</span><span class="layer-tag">sp_BlitzCache</span>
+                </div>
+            </div>
+            <div class="layer layer-infra">
+                <div>
+                    <div class="layer-name">3 Query Store — Historial y regresiones</div>
+                    <div class="layer-rule">En SSMS: <strong>Query Store → Top Resource Consuming Queries</strong>. Filtra por las últimas 24h. Permite comparar el plan de hoy con el de ayer — si la misma query tiene planes distintos, hay parameter sniffing o estadísticas obsoletas. También muestra queries con <em>plan regression</em> automáticamente.</div>
+                </div>
+                <div class="layer-items">
+                    <span class="layer-tag">Herramienta</span><span class="layer-tag">Query Store SSMS</span>
+                </div>
+            </div>
+            <div class="layer layer-infra">
+                <div>
+                    <div class="layer-name">4 Priorizar por impacto × frecuencia</div>
+                    <div class="layer-rule"><strong>Score = avg_logical_reads × execution_count.</strong> Una query con 1,000 reads que ejecuta 50,000 veces/día tiene score 50M — mucho más impactante que una con 500,000 reads que ejecuta 2 veces/semana. Optimiza por score total, no por la query que "se ve más fea".</div>
+                </div>
+                <div class="layer-items">
+                    <span class="layer-tag">Fórmula</span><span class="layer-tag">reads × executions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">How to Find the Worst Queries — Workflow completo con sp_BlitzCache</h3>
+                    <div class="mb-1 text-body-secondary">Mestra su workflow completo de identificación de bottlenecks — Wait Stats primero, sp_BlitzCache segundo, execution plan tercero. Con una BD real de 50GB. ~60 min.</div>
+                    <a class="link" href="https://youtu.be/EkLuXURMwso?si=MyDF7c_rxZ7bdPt7" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Wait Statistics — El diagnóstico más poderoso de SQL Server</h3>
+                    <div class="mb-1 text-body-secondary">Cómo interpretar los top wait types: qué significa cada uno, cómo limpiar las estadísticas para hacer una medición limpia, y los 5 wait types que representan el 90% de los problemas de performance reales. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/lPKR9FLbX2g?si=PwqofYl_9bBi65Na" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Herramienta — Brent Ozar First Responder Kit</strong> 
+                    <h3 class="mb-0">sp_Blitz, sp_BlitzCache, sp_BlitzFirst — El kit gratuito completo</h3>
+                    <div class="mb-1 text-body-secondary">sp_Blitz diagnostica la configuración del servidor. sp_BlitzCache muestra las queries más costosas del plan cache. sp_BlitzFirst muestra qué está pasando AHORA. Instálalo en todas tus BDs de desarrollo y producción.</div>
+                    <a class="link" href="https://www.brentozar.com/blitz/" target="_blank">🔧 Descargar gratis →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Script completo de identificación de bottlenecks</strong> 
+                    <h3 class="mb-0">Las 4 queries que ejecutas cuando llegas a un servidor lento</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Medir el Baseline — Antes de Tocar Nada</div>
+        <div class="day-subtitle">SET STATISTICS IO/TIME, Actual Execution Plan XML, Extended Events y la plantilla de documentación de métricas</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Nunca optimices sin un baseline documentado.</strong> Si no mides antes de cambiar, no puedes probar que mejoraste. El baseline incluye exactamente: <em>logical reads</em> (cuántas páginas de datos leyó), <em>elapsed time</em> (tiempo total incluyendo esperas), <em>CPU time</em> (tiempo real de procesador), el <em>execution plan en XML</em> (para comparar con el plan después), y el <em>número de filas estimadas vs actuales</em>. Guarda todo esto antes de crear un solo índice.
+    </div>
+
+    <div class="intro-grid" style="margin-top:1.5rem;">
+        <div class="aaa aaa-a1"><span class="al text-danger" style="font-size: 1.3rem;">48,312</span><div class="ad">Logical Reads (antes)</div></div>
+        <div class="aaa aaa-a1"><span class="al text-success" style="font-size: 1.3rem;">4</span><div class="ad">Logical Reads (después)</div></div>
+        <div class="aaa aaa-a1"><span class="al text-warning" style="font-size: 1.3rem;">12,078x</span><div class="ad">Mejora en I/O</div></div>
+        <div class="aaa aaa-a1"><span class="al text-danger" style="font-size: 1.3rem;">2,840ms</span><div class="ad">Elapsed (antes)</div></div>
+        <div class="aaa aaa-a1"><span class="al text-success" style="font-size: 1.3rem;">198ms</span><div class="ad">Elapsed (después)</div></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Cómo medir performance correctamente — SET STATISTICS y Extended Events</h3>
+                    <div class="mb-1 text-body-secondary">Por qué SET STATISTICS IO es más confiable que el tiempo de reloj, cómo capturar el plan XML para comparar antes/después, y cómo usar Extended Events para capturar el baseline de un SP en producción sin impacto. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/k55KxvjVBcY?si=hH8IGqkoNqCJ-Apb" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Query Store — Comparar planes antes y después (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Cómo usar Query Store para tener un historial automático de planes: comparar plan A vs plan B en la misma query, detectar regresiones y forzar el plan que funcionó mejor.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/performance/monitoring-performance-by-using-the-query-store?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Plantilla completa de baseline</strong> 
+                    <h3 class="mb-0">El script que ejecutas para documentar métricas antes de cada optimización</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Refactorizar Stored Procedures Complejos</div>
+        <div class="day-subtitle">Las 8 transformaciones más impactantes: cursores→sets, temp tables, índices cubrientes, parameter sniffing, reescritura de JOINs</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un SP complejo tiene capas de problemas apilados.</strong> El orden correcto de ataque: primero los <em>índices</em> (mayor impacto, menor riesgo), luego <em>reescritura de queries</em> (eliminar scans, cursores, subconsultas correlacionadas), luego <em>parameter sniffing</em> si el plan varía por parámetros, y por último <em>arquitectura</em> (temp tables intermedias, dividir el SP en partes). Un cambio a la vez — mide después de cada uno.
+    </div>
+
+    <div class="flow">
+        <h3>Anatomía de un SP problemático — diagnóstico por zonas | usp_GenerateMonthlyReport</h3>
+        <div class="principles">
+            <div class="pc"><div class="pc-title text-danger">🔴 Zona 1 — Cursor Loop</div><div class="pc-body">Itera fila por fila con <code>CURSOR FOR SELECT</code>. Ejecuta N queries en lugar de 1. Impacto: 100x–1000x más lento que la versión set-based.</div></div>
+            <div class="pc"><div class="pc-title text-danger">🔴 Zona 2 — Subconsulta N+1</div><div class="pc-body">Subconsulta correlacionada en el SELECT que ejecuta una vez por cada fila del resultado exterior. Con 10,000 clientes = 10,000 queries adicionales.</div></div>
+            <div class="pc"><div class="pc-title text-warning">🟡 Zona 3 — Table Variable</div><div class="pc-body">Usa <code>@TableVariable</code> con JOIN posterior. Sin estadísticas → optimizer estima 1 fila → plan incorrecto. Reemplazar con <code>#TempTable</code>.</div></div>
+            <div class="pc"><div class="pc-title text-warning">🟡 Zona 4 — Función en WHERE</div><div class="pc-body">Condición <code>WHERE YEAR(OrderDate) = 2024</code>. Non-SARGable → Clustered Index Scan en lugar de Seek. Reescribir con rango explícito.</div></div>
+            <div class="pc"><div class="pc-title text-warning">🟡 Zona 5 — Parameter Sniffing</div><div class="pc-body">Plan compilado para @CustomerId=1 (VIP con 50k órdenes) usado para @CustomerId=999 (1 orden). Nested Loops × 50k cuando debería ser 1 seek.</div></div>
+            <div class="pc"><div class="pc-title text-success">🟢 Zona 6 — Oportunidad de índice</div><div class="pc-body">Missing Index en la tabla Orders para (CustomerId, OrderDate) INCLUDE (Total, Status). Elimina el Clustered Index Scan del 78% del costo.</div></div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Refactoring Stored Procedures — Caso real de principio a fin</h3>
+                    <div class="mb-1 text-body-secondary">Toma un SP de producción lento, lo analiza con execution plans, identifica los 3 problemas principales, los corrige uno a uno y mide la mejora después de cada cambio. El formato exacto del entregable de esta semana. ~70 min.</div>
+                    <a class="link" href="https://youtu.be/7hv4vD7Cfy0?si=wwC4yjsqpKVzUaX3" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Eliminar Cursores — Cada cursor tiene una versión set-based</h3>
+                    <div class="mb-1 text-body-secondary">Los 5 patrones de cursor más comunes y su equivalente set-based: cursor de acumulación → window function SUM acumulativo, cursor de jerarquía → CTE recursivo, cursor de procesamiento por lotes → batch UPDATE con TOP. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/fFzOd2MZ5Co?si=KqLuwKe28wgX-hJ1" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Brent Ozar Blog</strong> 
+                    <h3 class="mb-0">How to Start Troubleshooting a Slow Stored Procedure</h3>
+                    <div class="mb-1 text-body-secondary">Cuando un stored procedure es lento, recomienda seguir un orden de investigación, en lugar de empezar a cambiar índices o reescribir queries al azar.</div>
+                    <a class="link" href="https://www.brentozar.com/archive/2016/08/start-troubleshooting-slow-stored-procedure/" target="_blank">📘 Leer artículo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Las 4 refactorizaciones más comunes con antes/después</strong> 
+                    <h3 class="mb-0">Cursor → Set, Subconsulta N+1 → JOIN, @TableVar → #Temp, Function → Range</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Medir Después — Validar y Comparar</div>
+        <div class="day-subtitle">Tabla antes/después, comparar planes XML, regresar si empeora, verificar que no rompiste nada</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La medición post-optimización es tan importante como el cambio mismo.</strong> Debes verificar tres cosas: que los <em>logical reads bajaron</em> (menos I/O), que el <em>elapsed time bajó</em> (más rápido para el usuario), y que <em>los resultados son idénticos</em> (mismas filas, mismo orden si aplica). Un cambio que mejora 10x la performance pero retorna datos incorrectos no es una optimización — es un bug.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Comparar planes XML con SentryOne Plan Explorer:</strong> guarda el plan XML antes y después (clic derecho en el plan → Save Execution Plan As), luego ábrelos en Plan Explorer y usa la vista "Compare Plans". Verás exactamente qué operadores cambiaron, qué índice se está usando ahora y dónde fue la mejora de costo.
+    </div>
+
+    <div class="flow">
+        <h3>📋 Tabla comparativa — formato del documento final</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Query / SP</th>
+                        <th>Métrica</th>
+                        <th>Antes</th>
+                        <th>Después</th>
+                        <th>Mejora</th>
+                        <th>Cambio aplicado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>usp_GetOrdersByCustomer</code></td>
+                        <td>Logical Reads</td>
+                        <td class="text-danger">48,312</td>
+                        <td class="text-success">4</td>
+                        <td class="text-warning">12,078x</td>
+                        <td>Covering index <code>(CustomerId, Date) INCLUDE (Total)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>usp_GetOrdersByCustomer</code></td>
+                        <td>Elapsed Time</td>
+                        <td class="text-danger">2,840 ms</td>
+                        <td class="text-success">198 ms</td>
+                        <td class="text-warning">14.3x</td>
+                        <td>Index Seek reemplazó Clustered Index Scan (78% del costo)</td>
+                    </tr>
+                    <tr>
+                        <td><code>usp_SearchProducts</code></td>
+                        <td>Logical Reads</td>
+                        <td class="text-danger">31,200</td>
+                        <td class="text-success">88</td>
+                        <td class="text-warning">354x</td>
+                        <td>Condición SARGable: <code>LIKE '%txt%'</code> → Full Text Search</td>
+                    </tr>
+                    <tr>
+                        <td><code>usp_GenerateReport</code></td>
+                        <td>CPU Time</td>
+                        <td class="text-danger">6,234 ms</td>
+                        <td class="text-success">780 ms</td>
+                        <td class="text-warning">8x</td>
+                        <td>Cursor eliminado → window functions + #TempTable con índice</td>
+                    </tr>
+                    <tr>
+                        <td><code>usp_GenerateReport</code></td>
+                        <td>Operador principal</td>
+                        <td class="text-danger">Table Scan + Sort</td>
+                        <td class="text-success">Index Seek + Stream Aggr.</td>
+                        <td class="text-warning">Plan óptimo</td>
+                        <td>Estadísticas actualizadas con FULLSCAN + OPTION(RECOMPILE)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Validar y comparar optimizaciones — No solo midas velocidad</h3>
+                    <div class="mb-1 text-body-secondary">Por qué el tiempo de reloj puede engañar (caché caliente vs frío), cómo los logical reads son la métrica más confiable, y cómo verificar que los resultados son correctos con EXCEPT para comparar rowsets antes/después. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/uDFX1YHfRqo?si=5_jmV6HphsZ75oKJ" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Herramienta — SentryOne Plan Explorer</strong> 
+                    <h3 class="mb-0">Plan Explorer — Comparar planes antes/después visualmente</h3>
+                    <div class="mb-1 text-body-secondary">La herramienta gratuita que hace la comparación de planes visual y clara. Muestra qué operadores aparecieron, cuáles desaparecieron y el cambio de costo. Imprescindible para el documento de optimización.</div>
+                    <a class="link" href="https://www.sentryone.com/plan-explorer" target="_blank">🔧 Descargar gratis →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Verificar resultados + comparar métricas automáticamente</strong> 
+                    <h3 class="mb-0">Confirmar que los datos son idénticos y medir la mejora exacta</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Documento Técnico de Mejoras</div>
+        <div class="day-subtitle">Estructura del reporte profesional, cómo comunicar mejoras a stakeholders técnicos y no técnicos, y el entregable final</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un documento técnico de performance tiene dos audiencias simultáneas:</strong> los desarrolladores (que necesitan los detalles técnicos para reproducir y mantener las mejoras) y los stakeholders (que necesitan entender el impacto de negocio en términos de tiempo, costo y experiencia de usuario). La estructura correcta satisface a ambos: resumen ejecutivo primero, detalles técnicos después.
+    </div>
+
+    <div class="flow">
+        <h3>Documento Técnico: Informe de Optimización de Performance — [Proyecto]</h3>
+        <div class="principles">
+            <div class="pc">
+                <div class="pc-title">1. Resumen Ejecutivo</div>
+                <div class="pc-body">3 stored procedures identificados como cuellos de botella críticos. Después de la optimización, el tiempo promedio de respuesta del endpoint /api/orders se redujo de 2,840ms a 198ms (14.3x). Reducción estimada en costo de servidor: 40% de CPU en horas pico.</div>
+                <div class="pc-title">2. Metodología de Diagnóstico</div>
+                <div class="pc-body">Herramientas usadas: <code>sys.dm_os_wait_stats</code> (Wait Stats baseline), <code>sp_BlitzCache</code> (top queries por reads×executions), Query Store (historial de planes), <code>SET STATISTICS IO/TIME</code> (métricas por query). Criterio de priorización: score = avg_logical_reads × execution_count/día.</div>
+                <div class="pc-title">3. Hallazgos por Stored Procedure</div>
+                <div class="pc-body">Para cada SP: problema identificado (operador en el plan), causa raíz (missing index / cursor / non-SARGable / parameter sniffing), cambio aplicado (código antes/después), métricas comparativas (tabla con logical reads, elapsed time, plan antes vs plan después).</div>
+                <div class="pc-title">4. Cambios Aplicados</div>
+                <div class="pc-body">Scripts DDL de los índices creados (con justificación de cada columna), código T-SQL de los SPs refactorizados, configuración de RCSI si se habilitó, actualización de estadísticas con FULLSCAN.</div>
+                <div class="pc-title">5. Verificación y Regresión</div>
+                <div class="pc-body">Comparación EXCEPT de resultados old vs new (0 diferencias). Unit tests ejecutados antes/después. Métricas en entorno QA que replican producción.</div>
+                <div class="pc-title">6. Próximos Pasos Recomendados</div>
+                <div class="pc-body">3 queries adicionales identificadas con score medio. Recomendación de mantenimiento de estadísticas automático. Habilitar Query Store en producción para monitoreo continuo.</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Cómo presentar un informe de performance a tu equipo</h3>
+                    <div class="mb-1 text-body-secondary">Cómo comunicar mejoras de performance a desarrolladores, arquitectos y managers: qué métricas incluir, cómo traducir logical reads a "segundos que ahorra el usuario", y cómo justificar los cambios con datos. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/kxwEkeBCbdE?si=fXeJZ-XWVMJ5at1c" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo — Microsoft Docs</strong> 
+                    <h3 class="mb-0">Performance Tuning Best Practices — Guía completa SQL Server</h3>
+                    <div class="mb-1 text-body-secondary">Referencia oficial de Microsoft con las mejores prácticas de performance tuning: indexación, estadísticas, configuración de servidor, Query Store y monitoreo continuo. El marco completo para el documento.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/sql/relational-databases/performance/performance-center-for-sql-server-database-engine-and-azure-sql-database?view=sql-server-ver16" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Script de mantenimiento continuo + monitoreo post-deploy</strong> 
+                    <h3 class="mb-0">El script que dejas corriendo después de deployar las optimizaciones</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Documento técnico con mejoras de performance</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">El entregable de esta semana es un documento técnico completo que demuestra el ciclo completo de optimización aplicado a casos reales de tu BD o del StackOverflow DB de Brent Ozar:</p>
+    <ul>
+        <li>Sección de diagnóstico: Wait Stats analizados + top 3 queries identificadas con sp_BlitzCache y justificación de la priorización</li>
+        <li>Tabla de baseline: logical reads, CPU time, elapsed time y plan XML guardado para cada query antes de cualquier cambio</li>
+        <li>Para cada query optimizada: código SQL antes vs después, justificación del cambio, y el execution plan antes/después como imagen o XML</li>
+        <li>Scripts DDL de todos los índices creados con comentarios que explican cada columna KEY y cada columna INCLUDE</li>
+        <li>Tabla comparativa final: logical reads, elapsed time y mejora multiplicativa (Nx) para las 3 queries</li>
+        <li>Verificación de correctitud: resultado EXCEPT query confirma 0 diferencias entre versión original y optimizada</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Cierre de la Fase 2 — SQL Server Avanzado:</strong> Esta semana integra todo: los índices cubrientes de <strong>Semana 7</strong>, los CTEs y window functions de <strong>Semana 8</strong>, las transacciones y concurrencia de <strong>Semana 9</strong>, y los execution plans de todas las semanas. El documento técnico que produces aquí es el artefacto profesional que demuestra que puedes diagnosticar y resolver problemas de performance reales — exactamente lo que distingue a un desarrollador .NET junior de uno senior. Guárdalo como parte de tu portfolio.
+    </div>
 </div>
