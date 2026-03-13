@@ -1,3 +1,856 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Conceptos CI/CD</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Build Pipeline</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Test Pipeline</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Deploy Pipeline</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Pipeline Completo</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Deploy Automático</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">GitHub Action</div></div>
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Los 4 conceptos de esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">🔄</span><div class="pc-title">CI — Integración Continua</div><div class="pc-body">Cada push a cualquier rama ejecuta automáticamente: restore, build y tests. Si algo falla, el merge está bloqueado.</div></div>
+    <div class="intro-card"><span class="icon">🚀</span><div class="pc-title">CD — Entrega Continua</div><div class="pc-body">Cada merge a main despliega automáticamente a staging. El deploy a producción puede ser manual (aprobación) o automático.</div></div>
+    <div class="intro-card"><span class="icon">📄</span><div class="pc-title">Workflows YAML</div><div class="pc-body">Los pipelines de GitHub Actions son archivos YAML en <code>.github/workflows/</code>. Viven en el mismo repo que el código.</div></div>
+    <div class="intro-card"><span class="icon">🔒</span><div class="pc-title">Secrets y Environments</div><div class="pc-body">Credenciales de Azure, connection strings, tokens. Nunca en el YAML — siempre en GitHub Secrets o Azure Key Vault.</div></div>
+    </div>
+</div>
+
+<div class="flow">
+    <h3>El pipeline completo de la semana</h3>
+    <div class="flow-steps">
+        <div class="fs fs-req"><div class="fs-name">Trigger</div><div class="fs-sub">push → main<br>push → develop<br>pull_request</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-valid"><div class="fs-name">Build</div><div class="fs-sub">dotnet restore<br>dotnet build<br>upload artifact</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-biz"><div class="fs-name">Test</div><div class="fs-sub">unit tests<br>coverage report<br>quality gate</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-err"><div class="fs-name">Publish</div><div class="fs-sub">dotnet publish<br>zip artifact<br>upload release</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-req"><div class="fs-name">Deploy</div><div class="fs-sub">staging auto<br>smoke test<br>prod (approve)</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-valid"><div class="fs-name">Verify</div><div class="fs-sub">/health check<br>App Insights<br>rollback ready</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Conceptos CI/CD + GitHub Actions Core</div>
+        <div class="day-subtitle">Workflows, jobs, steps, runners, triggers, contextos, expresiones y la anatomía completa de un archivo YAML</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un workflow de GitHub Actions es un proceso automatizado definido en YAML que se activa por un evento.</strong> Cada workflow tiene <em>jobs</em> (grupos de trabajo que corren en paralelo o en secuencia), y cada job tiene <em>steps</em> (comandos o actions individuales). Los jobs corren en <em>runners</em> — máquinas virtuales gratuitas de GitHub (<code>ubuntu-latest</code>, <code>windows-latest</code>) o tus propias máquinas (<em>self-hosted</em>). El contexto <code>github</code>, <code>env</code> y <code>secrets</code> dan acceso a variables del evento, variables de entorno y secretos configurados en el repositorio.
+    </div>
+
+    <div class="tip">
+        <strong>💡 GitHub Actions es gratis para repositorios públicos, ilimitado.</strong> Para repos privados: 2,000 minutos/mes en el plan gratuito, ~33h de pipeline. Más que suficiente para aprender y proyectos personales.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial — GitHub</strong> 
+                    <h3 class="mb-0">GitHub Actions — Understanding workflows (docs.github.com)</h3>
+                    <div class="mb-1 text-body-secondary">La referencia más completa: sintaxis YAML, todos los triggers (<code>on</code>), jobs, steps, runners, contextos y expresiones. Incluye el playground interactivo para validar YAML en tiempo real sin commitear.</div>
+                    <a class="link" href="https://docs.github.com/es/actions/writing-workflows/about-workflows" target="_blank">📘 GitHub Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">GitHub Actions Full Course — De cero a CI/CD completo</h3>
+                    <div class="mb-1 text-body-secondary">Nana explica GitHub Actions desde cero con demos en vivo: anatomía del YAML, todos los tipos de trigger, jobs en paralelo y en secuencia, artifacts entre jobs, y el primer workflow real para una app. El video introductorio más completo disponible. ~2h.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=R8_veQiYBjI" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Workflow syntax reference — Referencia completa de sintaxis</h3>
+                    <div class="mb-1 text-body-secondary">Todos los keywords del YAML: <code>on</code>, <code>jobs</code>, <code>runs-on</code>, <code>needs</code>, <code>if</code>, <code>env</code>, <code>with</code>, <code>uses</code>. Con ejemplos para cada uno. La página que tendrás abierta al escribir tus primeros workflows.</div>
+                    <a class="link" href="https://docs.github.com/es/actions/writing-workflows/workflow-syntax-for-github-actions" target="_blank">📘 GitHub Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Anatomía completa de un workflow</strong> 
+                    <h3 class="mb-0">El YAML mínimo que necesitas entender antes de escribir el pipeline real</h3>
+                    <pre ngNonBindable><code>.github/workflows/anatomy.yml
+
+name: CI Pipeline Anatomy  # nombre del workflow en GitHub UI
+
+# ── TRIGGERS: qué eventos activan este workflow ──────────────
+on:
+  push:
+    branches: [main, develop]       # push a main o develop
+    paths-ignore: ['**.md', 'docs/**'] # ignorar cambios de docs
+  pull_request:
+    branches: [main]                # PRs hacia main
+  workflow_dispatch:             # trigger manual desde GitHub UI
+
+# ── VARIABLES DE ENTORNO GLOBALES ─────────────────────────────
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION_PATH:  './src/MiApi.sln'
+
+# ── JOBS ──────────────────────────────────────────────────────
+jobs:
+  build:                            # id del job
+    name: 🔨 Build
+    runs-on: ubuntu-latest         # runner de GitHub, gratis
+    outputs:                        # datos que pasan a otros jobs
+      version: ${{ steps.version.outputs.value }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4      # action del marketplace
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore + Build
+        run: |
+          dotnet restore ${{ env.SOLUTION_PATH }}
+          dotnet build   ${{ env.SOLUTION_PATH }} -c Release --no-restore
+
+  test:
+    name: ✅ Test
+    runs-on: ubuntu-latest
+    needs: build                     # espera a que build termine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - run: dotnet test --no-build -c Release</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Build Pipeline — Restore, Build y Artifacts</div>
+        <div class="day-subtitle">Caché de NuGet, build matricial para múltiples .NET versions, artifacts entre jobs, versionado semántico con GitVersion</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El build pipeline hace tres cosas críticas:</strong> <em>restaurar</em> dependencias (el paso más lento — se cachea para acelerar), <em>compilar</em> en modo Release (no Debug — el modo Release incluye optimizaciones que afectan el comportamiento), y <em>publicar</em> el artifact (el binario compilado que se deployará). Los artifacts se pasan entre jobs usando <code>actions/upload-artifact</code> y <code>actions/download-artifact</code> — el job de deploy descarga el artifact del job de build, sin recompilar.
+    </div>
+
+    <div class="tip">
+        <strong>💡 El caché de NuGet puede ahorrar 2-3 minutos por pipeline.</strong> Con <code>actions/cache</code> se cachea la carpeta <code>~/.nuget/packages</code> usando como key el hash del <code>.csproj</code>. Si los paquetes no cambiaron, se restauran del caché en segundos en lugar de descargarse.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Build y Test Pipeline para .NET con GitHub Actions</h3>
+                    <div class="mb-1 text-body-secondary">Construye el pipeline de build desde cero para una ASP.NET Core API: caché de NuGet, build matricial, publicación de artifacts y cómo el pipeline bloquea el merge si el build falla. El pipeline más limpio y profesional disponible para .NET. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/Tx9DNX_yYZU?si=7LJjrvx03PVwhGzi" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Building and testing .NET — Guía oficial para pipelines .NET</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial de GitHub para proyectos .NET: restore con caché, build, test con xUnit/NUnit, publicación de artifacts, y cómo usar <code>actions/setup-dotnet</code> para múltiples versiones. Con ejemplos de ASP.NET Core.</div>
+                    <a class="link" href="https://docs.github.com/es/actions/use-cases-and-examples/building-and-testing/building-and-testing-net" target="_blank">📘 GitHub Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Build pipeline completo con caché, versionado y artifacts</strong> 
+                    <h3 class="mb-0">El workflow de build que usarás como base para todos tus proyectos .NET</h3>
+                    <pre ngNonBindable><code>.github/workflows/build.yml
+
+name: 🔨 Build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  DOTNET_VERSION:    '8.0.x'
+  PROJECT_PATH:     './src/Api/Api.csproj'
+  ARTIFACT_NAME:   'api-release'
+
+jobs:
+  build:
+    name: Build & Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0               # historial completo para GitVersion
+
+      - name: ⚙️ Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Cachear paquetes NuGet — key = hash del .csproj
+      - name: 📦 Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key:  ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: 🔧 Restore
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: 🔨 Build Release
+        run: |
+          dotnet build ${{ env.PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            -p:Version=${{ github.run_number }}.0.0
+
+      - name: 📤 Publish
+        run: |
+          dotnet publish ${{ env.PROJECT_PATH }} \
+            --configuration Release \
+            --no-build \
+            --output ./dist
+
+      # Subir el binario como artifact para que el job de deploy lo descargue
+      - name: ⬆️ Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name:            ${{ env.ARTIFACT_NAME }}
+          path:            ./dist
+          retention-days: 7
+          if-no-files-found: error</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Test Pipeline — Quality Gates y Cobertura</div>
+        <div class="day-subtitle">xUnit en CI, code coverage con Coverlet, threshold de cobertura, reporte de test en GitHub UI y branch protection rules</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El test pipeline es la barrera de calidad que impide que código roto llegue a producción.</strong> Configurado correctamente: si cualquier test falla, el pipeline se detiene y el merge queda bloqueado por las <em>branch protection rules</em> de GitHub. La <em>cobertura de código</em> con Coverlet agrega un quality gate adicional — si la cobertura baja del umbral definido (ej. 80%), el pipeline falla aunque todos los tests pasen.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ Los tests de integración necesitan una BD real.</strong> Usa <em>Service Containers</em> de GitHub Actions para levantar SQL Server (imagen Docker <code>mcr.microsoft.com/mssql/server</code>) directamente en el runner — sin mockear, con una BD real de prueba. Es la forma correcta de testear repositorios y queries.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Tests automatizados en GitHub Actions con xUnit + cobertura</h3>
+                    <div class="mb-1 text-body-secondary">Pipeline de testing completo para .NET: xUnit con dotnet test, Coverlet para cobertura, reporte HTML publicado como artifact, quality gate que falla si la cobertura baja del umbral, y cómo ver los resultados directamente en el PR. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/xwMWGYD8rgk?si=p_QH5S-YIq90R-Nu" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Integration Tests con SQL Server en GitHub Actions — Service Containers</h3>
+                    <div class="mb-1 text-body-secondary">Cómo usar Service Containers para levantar una instancia real de SQL Server en el runner de GitHub Actions, ejecutar migrations antes de los tests y correr tests de integración contra una BD real sin mocks. ~25 min.</div>
+                    <a class="link" href="https://youtu.be/YtF0rzIYgEk?si=ec55jTLApMtjrj38" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Branch Protection Rules — Bloquear merges si CI falla</h3>
+                    <div class="mb-1 text-body-secondary">Cómo configurar que el merge a main esté bloqueado hasta que todos los checks de CI pasen: Settings → Branches → Branch protection rules → "Require status checks to pass before merging". La configuración que hace que el pipeline sea obligatorio.</div>
+                    <a class="link" href="https://docs.github.com/es/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches" target="_blank">📘 GitHub Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Test pipeline con coverage + SQL Server en Docker</strong> 
+                    <h3 class="mb-0">Quality gate que bloquea el merge si los tests fallan o la cobertura baja</h3>
+                    <pre ngNonBindable><code>.github/workflows/test.yml
+
+name: ✅ Test
+
+on:
+  push:     branches: [main, develop]
+  pull_request: branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # SQL Server en Docker para integration tests
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          SA_PASSWORD:           TestPass!2024
+          ACCEPT_EULA:           Y
+          MSSQL_PID:             Developer
+        ports:
+          - 1433:1433
+        options: |
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P TestPass!2024 -Q 'SELECT 1' -No"
+          --health-interval 10s
+          --health-retries 5
+
+      steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: 🧪 Run Tests with Coverage
+        env:
+          # Connection string al SQL Server del service container
+          TEST_DB_CONNECTION: "Server=localhost;Database=TestDb;User Id=sa;Password=TestPass!2024;TrustServerCertificate=True"
+        run: |
+          dotnet test ./tests/Api.Tests/Api.Tests.csproj \
+            --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+    
+      # Publicar reporte de cobertura en el PR como comment
+      - name: 📊 Coverage Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename:        ./coverage/**/coverage.cobertura.xml
+          badge:           true
+          fail_below_min:  true         # pipeline falla si coverage < threshold
+          format:          markdown
+          thresholds:      '60 80'      # warn 60%, fail 80%
+          output:          both
+
+      - name: 💬 Post Coverage Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path:     code-coverage-results.md</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Deploy Pipeline — Secrets, Environments y Azure</div>
+        <div class="day-subtitle">GitHub Secrets, OIDC sin contraseñas, Environments con aprobación manual, deploy a staging y producción, smoke tests</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El deploy pipeline tiene dos destinos: staging (automático) y producción (requiere aprobación).</strong> La autenticación con Azure se hace con <em>OIDC (OpenID Connect)</em> — en lugar de guardar una contraseña en los Secrets, se configura una relación de confianza entre GitHub y Azure. El runner de GitHub obtiene un token temporal de Azure sin contraseñas almacenadas. Esto es la forma moderna y segura. Los <em>Environments</em> de GitHub permiten configurar reglas de aprobación: "nadie puede deployar a producción sin que el CTO apruebe".
+    </div>
+
+    <div class="flow">
+        <h3>Secrets necesarios en el repo</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Secret Name</th>
+                        <th>Tipo</th>
+                        <th>Cómo obtenerlo</th>
+                        <th>Obligatorio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">AZURE_CLIENT_ID</span></td>
+                        <td>OIDC</td>
+                        <td>App Registration en Azure AD → Application ID</td>
+                        <td class="text-danger">Sí</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">AZURE_TENANT_ID</span></td>
+                        <td>OIDC</td>
+                        <td>Azure AD → Properties → Tenant ID</td>
+                        <td class="text-danger">Sí</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">AZURE_SUBSCRIPTION_ID</span></td>
+                        <td>OIDC</td>
+                        <td><span class="rn-code-badge rn-code-success">az account show --query id</span></td>
+                        <td class="text-danger">Sí</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">AZURE_WEBAPP_NAME_STG</span></td>
+                        <td>Config</td>
+                        <td>Nombre del App Service de staging</td>
+                        <td class="text-danger">Sí</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">AZURE_WEBAPP_NAME_PRD</span></td>
+                        <td>Config</td>
+                        <td>Nombre del App Service de producción</td>
+                        <td class="text-danger">Sí</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rn-code-badge rn-code-success">AZURE_RESOURCE_GROUP</span></td>
+                        <td>Config</td>
+                        <td>Nombre del Resource Group</td>
+                        <td class="text-warning">Recomendado</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="flow">
+        <h3>Environments de GitHub — flujo de aprobaciones</h3>
+        <div class="pf-grid">
+            <div class="pf">
+                <div class="pf-key text-primary">Development</div>
+                <div class="pf-val">Cada push a cualquier branch feature. Corre CI solamente — sin deploy. Validación rápida de que el código compila y los tests pasan.</div>
+                <div class="pf-val"><code class="text-primary">Auto — push any branch</code></div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-warning">Staging</div>
+                <div class="pf-val">Cada merge a main. Deploy automático después de CI verde. URL de staging para QA manual y smoke tests automáticos.</div>
+                <div class="pf-val"><code class="text-warning">Auto — merge to main</code></div>
+            </div>
+            <div class="pf">
+                <div class="pf-key text-success">Production</div>
+                <div class="pf-val">Requiere aprobación manual. Un reviewer debe hacer click en "Approve" en GitHub UI. Solo corre si staging deploy fue exitoso.</div>
+                <div class="pf-val"><code class="text-success">Manual — requiere aprobación</code></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Deploy a Azure App Service con GitHub Actions + OIDC</h3>
+                    <div class="mb-1 text-body-secondary">Configurar OIDC entre GitHub y Azure, federated credentials, permisos con Managed Identity, y el workflow completo de deploy a App Service sin una sola contraseña en los Secrets. La forma moderna y segura. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/XkhkkLBkAT4?si=ZQcgwHe3-cPPdmzg" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Deployment Environments con aprobaciones requeridas (GitHub Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Cómo configurar Environments en GitHub con required reviewers (aprobación manual), wait timers, y deployment branches restrictions. La configuración que separa staging de producción con un gate humano.</div>
+                    <a class="link" href="https://docs.github.com/es/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment" target="_blank">📘 GitHub Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static" ngNonBindable>
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Deploy pipeline completo con OIDC y Environments</strong> 
+                    <h3 class="mb-0">El workflow que despliega a staging automáticamente y pide aprobación para producción</h3>
+                    <pre><code>.github/workflows/deploy.yml
+
+name: 🚀 Deploy
+
+on:
+  workflow_run:                # se activa cuando otro workflow termina
+    workflows: ["🔨 Build"]
+    types:     [completed]
+    branches:  [main]
+
+permissions:
+  id-token:  write               # necesario para OIDC
+  contents: read
+
+jobs:
+  # ── JOB 1: Deploy a Staging (automático) ──────────────────────
+  deploy-staging:
+    name: 🟡 Deploy → Staging
+    runs-on: ubuntu-latest
+    environment: staging          # Environment de GitHub → logging + secrets
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: 🔑 Login Azure (OIDC — sin passwords)
+        uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: ⬇️ Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name:             api-release
+          path:             ./dist
+          run-id:           ${{ github.event.workflow_run.id }}
+
+      - name: 🚀 Deploy to Staging
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name:  ${{ secrets.AZURE_WEBAPP_NAME_STG }}
+          package:   ./dist
+
+      - name: 🩺 Smoke Test Staging
+        run: |
+          STG_URL="https://${{ secrets.AZURE_WEBAPP_NAME_STG }}.azurewebsites.net"
+          echo "Testing $STG_URL/health"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{{http_code}}" "$STG_URL/health")
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "❌ Health check failed: $HTTP_STATUS"
+            exit 1
+          fi
+          echo "✅ Staging healthy: $HTTP_STATUS"
+
+  # ── JOB 2: Deploy a Producción (requiere aprobación) ──────────
+  deploy-production:
+    name: 🟢 Deploy → Production
+    runs-on: ubuntu-latest
+    environment: production       # tiene Required Reviewers en GitHub Settings
+    needs: deploy-staging          # solo corre si staging fue exitoso
+
+    steps:
+      - name: 🔑 Login Azure
+        uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: ⬇️ Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name:    api-release
+          run-id:  ${{ github.event.workflow_run.id }}
+      - name: 🚀 Deploy to Production
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME_PRD }}
+          package:  ./dist</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Pipeline Completo + Azure DevOps como alternativa</div>
+        <div class="day-subtitle">Unificar build + test + deploy en un solo workflow, rollback automático, Azure DevOps Pipelines y el entregable final</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Azure DevOps Pipelines es la alternativa empresarial a GitHub Actions.</strong> Usa YAML también (azure-pipelines.yml), tiene stages, jobs y steps similares, pero está integrado con Azure Boards (tickets), Azure Repos (git) y Azure Artifacts (paquetes NuGet privados). En empresas con stack Microsoft, es la opción estándar. La semana termina con el pipeline unificado funcionando: un solo push a main que ejecuta todo el ciclo automáticamente.
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>GitHub Actions</h4>
+                    <pre><code>✅ Gratis para repos públicos
+✅ Marketplace de 20,000+ actions
+✅ Integrado con GitHub (PRs, Issues)
+✅ OIDC con Azure nativo
+⚠️ 2,000 min/mes en repos privados
+⚠️ Sin Boards/Artifacts nativos</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>Azure DevOps Pipelines</h4>
+                    <pre><code>✅ Integrado con Azure Boards/Repos
+✅ Azure Artifacts para NuGet privado
+✅ Release Gates con métricas de App Insights
+✅ Variable Groups compartidos entre pipelines
+⚠️ UI más compleja
+⚠️ Menos marketplace que GitHub Actions</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">CI/CD Pipeline completo para .NET en Azure DevOps — De cero a producción</h3>
+                    <div class="mb-1 text-body-secondary">Construye el pipeline completo en Azure DevOps: azure-pipelines.yml, stages para CI y CD, conexión de servicio a Azure, deploy a App Service con Azure SQL y rollback automático ante fallos en producción. ~55 min.</div>
+                    <a class="link" href="https://youtu.be/eOQL0nXQlLs?si=rgk3dfqWNk_DRRV5" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Crear tu primer pipeline en Azure DevOps (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Quickstart oficial: crear la organización de Azure DevOps, conectar un repositorio GitHub, crear el azure-pipelines.yml con trigger, pool, steps y service connection a Azure. Con ejemplos para ASP.NET Core.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/devops/pipelines/create-first-pipeline" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">GitHub Actions vs Azure DevOps — Cuándo usar cada uno</h3>
+                    <div class="mb-1 text-body-secondary">Comparativa directa entre GitHub Actions y Azure DevOps Pipelines: similitudes de sintaxis YAML, diferencias en ecosistema, cuándo elegir cada uno según el tipo de proyecto, y cómo migrar entre los dos. ~30 min</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=NuYDAs3kNV8" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static" ngNonBindable>
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Workflow unificado CI + CD + Rollback automático</strong> 
+                    <h3 class="mb-0">Un solo archivo que hace todo: build → test → staging → producción → rollback si falla</h3>
+                    <pre><code>.github/workflows/ci-cd.yml
+
+name: ⚡ CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token:  write
+  contents: read
+
+jobs:
+  # ── CI ─────────────────────────────────────────────────────────
+  ci:
+    name: 🔨 Build + ✅ Test
+    runs-on: ubuntu-latest
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          SA_PASSWORD:  TestPass!2024
+          ACCEPT_EULA:  Y
+        ports:
+          - 1433:1433
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key:  ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+      - run: dotnet restore && dotnet build -c Release --no-restore
+      - run: dotnet test -c Release --no-build --collect:"XPlat Code Coverage"
+        env:
+          TEST_DB_CONNECTION: "Server=localhost;Database=TestDb;User Id=sa;Password=TestPass!2024;TrustServerCertificate=True"
+      - run: dotnet publish -c Release --no-build -o ./dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: ./dist
+
+  # ── STAGING (automático) ───────────────────────────────────────
+  staging:
+    name: 🟡 Staging
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: staging
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME_STG }}
+      - name: 🩺 Smoke Test
+        run: |
+          STATUS=$(curl -sf -o /dev/null -w "%{{http_code}}" \
+            "https://${{ secrets.AZURE_WEBAPP_NAME_STG }}.azurewebsites.net/health")
+          [ "$STATUS" = "200" ] && echo "✅ OK" || (echo "❌ $STATUS" && exit 1)
+
+  # ── PRODUCTION (aprobación manual requerida) ───────────────────
+  production:
+    name: 🟢 Production
+    needs: staging
+    runs-on: ubuntu-latest
+    environment: production    # ← aquí está el gate de aprobación
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME_PRD }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Pipeline automático funcionando</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">El entregable es el repositorio de tu API con el pipeline CI/CD completo configurado y funcionando. Cada push a main debe disparar el ciclo completo:</p>
+    <ul>
+        <li>Workflow <code>ci-cd.yml</code> en <code>.github/workflows/</code> con los 3 jobs: CI, staging y production</li>
+        <li>Screenshot del pipeline verde en GitHub Actions UI mostrando los 3 jobs completados</li>
+        <li>Screenshot del gate de aprobación de producción — mostrando que espera antes de deployar</li>
+        <li>Branch protection rules en main con el status check del CI como requisito de merge</li>
+        <li>Zero secrets hardcodeados — todos en GitHub Secrets con OIDC configurado</li>
+        <li>Smoke test automático en staging que verifica <code>/health → 200 OK</code> antes de pedir aprobación de prod</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con semanas anteriores:</strong>
+        El <code>/health</code> endpoint que creaste en la <strong>Semana 11</strong> (que verifica Azure SQL y Blob Storage) es ahora el smoke test automático del pipeline — si el deploy rompe algo, el pipeline lo detecta antes de llegar a producción. Los tests que escribiste en la <strong>Fase 1</strong> (xUnit, Moq) ahora corren automáticamente en cada PR. La <strong>Semana 13</strong> agrega Docker al pipeline — en lugar de publicar binarios, el pipeline construye una imagen Docker y la despliega en Azure Container Apps.
+    </div>
 </div>

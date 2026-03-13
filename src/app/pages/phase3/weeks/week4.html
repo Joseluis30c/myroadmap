@@ -1,3 +1,767 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – ACR + Container Apps</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Deploy completo</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Variables y Key Vault</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Logs y Monitoreo</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Pipeline</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Deploy en Container Apps</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">Azure Container Registry, Container Apps</div></div>
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Los 4 servicios Azure de esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">📦</span><div class="pc-title">Container Registry</div><div class="pc-body">Registro privado de imágenes Docker. Cada push al pipeline sube la imagen aquí antes de deployar.</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="pc-title">Container Apps</div><div class="pc-body">PaaS serverless para contenedores. Escala a cero, HTTPS automático, revisiones para blue/green deploy.</div></div>
+    <div class="intro-card"><span class="icon">🔐</span><div class="pc-title">Key Vault</div><div class="pc-body">Bóveda de secretos, claves y certificados. Tu API los lee en runtime via Managed Identity — sin contraseñas en ningún archivo.</div></div>
+    <div class="intro-card"><span class="icon">📊</span><div class="pc-title">Log Analytics</div><div class="pc-body">Centraliza logs de todos tus contenedores con KQL queries. Alertas automáticas cuando algo falla en producción.</div></div>
+    </div>
+</div>
+
+<div class="flow">
+    <h3>Arquitectura completa de la semana</h3>
+    <div class="flow-steps">
+        <div class="fs fs-req"><div class="fs-name">Git Push</div><div class="fs-sub">Developer hace push a main. GitHub Actions dispara el pipeline CI/CD.</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-valid"><div class="fs-name">Build + Test</div><div class="fs-sub">CI corre tests. Si pasan, <code>docker build</code> genera la imagen con el SHA del commit como tag.</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-biz"><div class="fs-name">Push a ACR</div><div class="fs-sub">La imagen se pushea a Azure Container Registry privado. Solo el Container App puede descargarla.</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-req"><div class="fs-name">Deploy ACA</div><div class="fs-sub">Container Apps descarga la nueva imagen, crea una revisión y redirige el tráfico gradualmente.</div></div>
+        <span class="fs-arrow">→</span>
+        <div class="fs fs-err"><div class="fs-name">Monitor</div><div class="fs-sub">Log Analytics recibe logs. App Insights trackea requests. Alertas si el error rate sube.</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Azure Container Registry — Tu registro privado</div>
+        <div class="day-subtitle">Crear ACR, SKUs, login con OIDC, push/pull de imágenes, geo-replication y políticas de retención</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Azure Container Registry (ACR) es el Docker Hub privado de Azure.</strong> En lugar de guardar tus imágenes en Docker Hub público, las guardas en un registro privado dentro de tu subscripción de Azure. Solo tus servicios de Azure (Container Apps, AKS, App Service) tienen acceso. El SKU <code>Basic</code> (~$5/mes) es suficiente para desarrollo. <code>Standard</code> agrega geo-replication y mayor throughput para producción. La integración con Managed Identity elimina la necesidad de guardar credenciales del registro en ningún lugar.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Usa <code>az acr build</code> en lugar de <code>docker build</code> + <code>docker push</code>.</strong> Este comando construye la imagen directamente en Azure usando los recursos del ACR — sin descargar el SDK de .NET en el runner de GitHub Actions. El build es más rápido y no consume los minutos del runner para compilar.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Quickstart: Azure Container Registry — Crear y usar tu primer registro</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial: crear el ACR con az CLI, autenticarse con Managed Identity, hacer push y pull de imágenes, y configurar las políticas de retención para limpiar imágenes antiguas automáticamente. Con ejemplos para .NET.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/container-registry/container-registry-get-started-azure-cli" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Azure Container Registry — Completo: crear, push y autenticar con Managed Identity</h3>
+                    <div class="mb-1 text-body-secondary">Muestra el flujo completo de ACR: crear el registro, build remoto con <code>az acr build</code>, configurar Managed Identity para que Container Apps acceda sin contraseñas, y las diferencias entre SKU Basic/Standard/Premium con sus casos de uso. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/New8K6R0hz8?si=o1cusTUPjom-fte3" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Crear ACR y hacer push de la primera imagen</strong> 
+                    <h3 class="mb-0">De cero a imagen en el registro privado con az CLI</h3>
+                    <pre ngNonBindable><code>acr_setup.sh
+
+# Variables (ajusta a tu proyecto)
+RESOURCE_GROUP="rg-miapi-prod"
+LOCATION="eastus"
+ACR_NAME="acrmiapi"          # único globalmente, solo letras/números
+APP_NAME="miapi"
+IMAGE_TAG=$(git rev-parse --short HEAD)
+
+# ─── 1. Crear Azure Container Registry ───────────────────────────
+az acr create \
+  --resource-group "$RESOURCE_GROUP" \
+  --name           "$ACR_NAME" \
+  --sku            "Basic" \
+  --admin-enabled  "false"    # no usar admin creds — usar Managed Identity
+
+# ─── 2. Build remoto (se compila en Azure, no en tu máquina) ──────
+# No necesitas Docker instalado para este comando
+az acr build \
+  --registry   "$ACR_NAME" \
+  --image      "$APP_NAME:$IMAGE_TAG" \
+  --image      "$APP_NAME:latest" \
+  --file       "Dockerfile" \
+  .
+
+# Verificar que la imagen se subió
+az acr repository show-tags \
+  --name       "$ACR_NAME" \
+  --repository "$APP_NAME" \
+  --output     table
+
+# ─── 3. Política de retención: borrar imágenes con más de 30 días ─
+az acr config retention update \
+  --registry "$ACR_NAME" \
+  --status   enabled \
+  --days     30 \
+  --type     UntaggedManifests
+
+# ─── 4. Login para pull manual (dev) ─────────────────────────────
+az acr login --name "$ACR_NAME"
+docker pull "$ACR_NAME.azurecr.io/$APP_NAME:latest"</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Azure Container Apps — Deploy del contenedor</div>
+        <div class="day-subtitle">Crear el Container App, asignar Managed Identity, pull desde ACR, scaling rules, revisiones y blue/green deploy</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Azure Container Apps (ACA) es la forma más sencilla de correr contenedores en Azure sin administrar Kubernetes.</strong> Cada deploy crea una nueva <em>revisión</em> — una versión inmutable de tu contenedor. Puedes dividir el tráfico: "80% a la revisión actual, 20% a la nueva" para blue/green deploy sin downtime. Escala a cero automáticamente cuando no hay tráfico (ideal para dev/staging — pagas cero cuando nadie lo usa). La <strong>Managed Identity</strong> le permite al Container App acceder a ACR y Key Vault sin guardar ninguna credencial.
+    </div>
+
+    <div class="flow">
+        <h3>Pasos para el primer deploy</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><span class="text-white">Crear Container Apps Environment</span><br>El environment es el namespace compartido para tus Container Apps — configura la red, el Log Analytics workspace y el dominio base. Un environment por entorno (staging, production).</td>
+                        <td class="text-center">🌐<br>Environment</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><span class="text-white">Crear Container App con Managed Identity</span><br>Crear la app apuntando a la imagen en ACR. Asignar <code>AcrPull</code> role para que pueda descargar imágenes sin contraseñas. La identity también se usa para Key Vault.</td>
+                        <td class="text-center">🔑<br>Identity</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><span class="text-white">Configurar Ingress y puerto</span><br>Habilitar ingress externo en el puerto que expone tu contenedor (<code>8080</code> en .NET 8). ACA genera automáticamente una URL HTTPS con certificado TLS válido: <code>https://miapi.azurecontainerapps.io</code></td>
+                        <td class="text-center">🌍<br>HTTPS</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><span class="text-white">Configurar variables de entorno y secrets</span><br>Las variables de entorno se configuran en el Container App igual que en Docker Compose. Los valores sensibles (connection strings, JWT secret) se referencian desde Key Vault.</td>
+                        <td class="text-center">⚙️<br>Config</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td><span class="text-white">Configurar scaling rules</span><br>Min replicas: 0 (escala a cero para dev). Max replicas: 3–10 para producción. Regla HTTP: 1 réplica por cada 100 requests concurrentes. Las réplicas arrancan en ~3s.</td>
+                        <td class="text-center">📈<br>Scaling</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>    
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Deploy a Azure Container Apps desde ACR con Managed Identity</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial: crear el environment, crear el Container App con imagen privada desde ACR, asignar el rol <code>AcrPull</code> a la Managed Identity, configurar ingress HTTPS, scaling y revisiones. La referencia definitiva para el deploy de esta semana.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/container-apps/tutorial-deploy-first-app-cli" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Azure Container Apps — Curso completo para desarrolladores .NET</h3>
+                    <div class="mb-1 text-body-secondary">Hace el deploy completo de una ASP.NET Core API a Container Apps: ACR, Managed Identity, ingress, variables de entorno, scaling a cero, revisiones para blue/green, y cómo el mismo <code>docker-compose.yml</code> de la Semana 13 se convierte en la configuración de ACA. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/tpNQpiwJexM?si=1bbL5O54-Ub8FLKh" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Crear Container App completo con az CLI</strong> 
+                    <h3 class="mb-0">Environment, Managed Identity, ingress, secrets y scaling en un script</h3>
+                    <pre ngNonBindable><code>container_app_deploy.sh
+
+# ─── Variables ────────────────────────────────────────────────────
+RG="rg-miapi-prod"
+LOCATION="eastus"
+ENV_NAME="cae-miapi-prod"
+APP_NAME="miapi"
+ACR_NAME="acrmiapi"
+IMAGE_TAG="latest"
+LOG_WS="log-miapi-prod"
+
+# ─── 1. Log Analytics Workspace (para los logs del contenedor) ───
+az monitor log-analytics workspace create \
+  --resource-group "$RG" \
+  --workspace-name "$LOG_WS" \
+  --location       "$LOCATION"
+
+LOG_WS_ID=$(az monitor log-analytics workspace show \
+  --resource-group "$RG" \
+  --workspace-name "$LOG_WS" \
+  --query customerId --output tsv)
+
+LOG_WS_KEY=$(az monitor log-analytics workspace get-shared-keys \
+  --resource-group "$RG" \
+  --workspace-name "$LOG_WS" \
+  --query primarySharedKey --output tsv)
+
+# ─── 2. Container Apps Environment ────────────────────────────────
+az containerapp env create \
+  --name                      "$ENV_NAME" \
+  --resource-group            "$RG" \
+  --location                  "$LOCATION" \
+  --logs-workspace-id         "$LOG_WS_ID" \
+  --logs-workspace-key        "$LOG_WS_KEY"
+
+# ─── 3. Container App con Managed Identity ────────────────────────
+az containerapp create \
+  --name                     "$APP_NAME" \
+  --resource-group           "$RG" \
+  --environment              "$ENV_NAME" \
+  --image                    "$ACR_NAME.azurecr.io/$APP_NAME:$IMAGE_TAG" \
+  --registry-server          "$ACR_NAME.azurecr.io" \
+  --registry-identity        system                  \
+  --target-port              8080                    \
+  --ingress                  external                \
+  --min-replicas             0                       \
+  --max-replicas             5                       \
+  --cpu                      0.5                     \
+  --memory                   "1Gi"                   \
+  --env-vars \
+    "ASPNETCORE_ENVIRONMENT=Production" \
+    "ASPNETCORE_HTTP_PORTS=8080"
+
+# ─── 4. Asignar rol AcrPull a la Managed Identity ─────────────────
+APP_PRINCIPAL_ID=$(az containerapp show \
+  --name           "$APP_NAME" \
+  --resource-group "$RG" \
+  --query          identity.principalId --output tsv)
+
+ACR_ID=$(az acr show --name "$ACR_NAME" --query id --output tsv)
+
+az role assignment create \
+  --assignee   "$APP_PRINCIPAL_ID" \
+  --role       "AcrPull" \
+  --scope      "$ACR_ID"
+
+# ─── 5. Ver la URL pública ─────────────────────────────────────────
+az containerapp show \
+  --name           "$APP_NAME" \
+  --resource-group "$RG" \
+  --query          properties.configuration.ingress.fqdn \
+  --output         tsv
+# → miapi.kindbeach-a1b2c3d4.eastus.azurecontainerapps.io</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Variables Seguras — Key Vault + Managed Identity</div>
+        <div class="day-subtitle">Azure Key Vault para secrets, Managed Identity vs Service Principal, integración con IConfiguration y rotación de secrets</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Azure Key Vault es la solución definitiva para secretos en producción.</strong> Tu API accede a Key Vault usando <em>Managed Identity</em> — Azure le asigna una identidad a tu Container App automáticamente. No hay contraseñas, no hay client secrets, no hay nada que rotar manualmente. La integración con <code>IConfiguration</code> de .NET es transparente: instalas el paquete <code>Azure.Extensions.AspNetCore.Configuration.Secrets</code> y los secretos aparecen en <code>builder.Configuration["NombreDelSecreto"]</code> igual que si fueran variables de entorno.
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>❌ Sin Key Vault (no hacer esto)</h4>
+                    <pre><code>✗ Connection string en App Settings como texto plano — visible para cualquiera con acceso al portal
+✗ JWT secret en variable de entorno — aparece en los logs de deploy y en el historial de az CLI
+✗ Credenciales en el código fuente o en el Dockerfile — en el historial de git para siempre
+✗ Rotar una contraseña requiere redeploy manual de todos los servicios que la usan</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>✅ Con Key Vault (la forma correcta)</h4>
+                    <pre><code>✓ Secrets en Key Vault — acceso controlado por RBAC, auditoría de cada acceso, versiones históricas
+✓ Container App accede via Managed Identity — cero credenciales almacenadas en ningún archivo
+✓ IConfiguration los lee como si fueran variables de entorno — cero cambios en el código
+✓ Rotar un secret en Key Vault actualiza automáticamente todos los servicios que lo usan</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Usar Key Vault con ASP.NET Core y Managed Identity (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial: crear el Key Vault, agregar secrets, asignar rol <code>Key Vault Secrets User</code> a la Managed Identity del Container App, configurar el provider en <code>Program.cs</code> con <code>AddAzureKeyVault()</code> y <code>DefaultAzureCredential</code>. La forma canónica de Microsoft.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/security/key-vault-configuration" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Azure Key Vault + Managed Identity + ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Configura Key Vault con Managed Identity para una API en Container Apps: crear el vault, agregar secrets, asignar permisos, y cómo <code>DefaultAzureCredential</code> funciona automáticamente en Azure sin cambiar nada entre local y producción. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/tpNQpiwJexM?si=1bbL5O54-Ub8FLKh" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static" >
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Key Vault + DefaultAzureCredential en ASP.NET Core</strong> 
+                    <h3 class="mb-0">Crear el vault, agregar secrets y leerlos en la API sin contraseñas</h3>
+                    <pre ngNonBindable><code>keyvault_setup.sh
+
+# ─── 1. Crear Key Vault ────────────────────────────────────────────
+KV_NAME="kv-miapi-prod"
+
+az keyvault create \
+  --name           "$KV_NAME" \
+  --resource-group "$RG" \
+  --location       "$LOCATION" \
+  --sku            standard \
+  --enable-rbac-authorization true   # RBAC en lugar de Access Policies
+
+# ─── 2. Agregar secrets ───────────────────────────────────────────
+az keyvault secret set \
+  --vault-name "$KV_NAME" \
+  --name       "DefaultConnection" \
+  --value      "Server=sql-miapi-prod.database.windows.net;Database=..."
+
+az keyvault secret set \
+  --vault-name "$KV_NAME" \
+  --name       "JwtSecret" \
+  --value      "$(openssl rand -base64 48)"  # generar secreto random
+
+az keyvault secret set \
+  --vault-name "$KV_NAME" \
+  --name       "StorageConnectionString" \
+  --value      "DefaultEndpointsProtocol=https;..."
+
+# ─── 3. Dar acceso a la Managed Identity del Container App ────────
+KV_ID=$(az keyvault show --name "$KV_NAME" --query id --output tsv)
+
+az role assignment create \
+  --assignee  "$APP_PRINCIPAL_ID" \
+  --role      "Key Vault Secrets User" \
+  --scope     "$KV_ID"</code></pre>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Logs en Producción — Log Analytics + App Insights</div>
+        <div class="day-subtitle">KQL queries, structured logging con Serilog, alertas automáticas, dashboards y diagnóstico de errores en producción</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>En producción no tienes acceso a la consola — los logs son tu única visibilidad.</strong> Azure Container Apps envía los logs del contenedor automáticamente a Log Analytics. Desde ahí, <em>KQL (Kusto Query Language)</em> permite consultar millones de líneas de log en segundos: "todos los errores 500 de las últimas 2 horas", "latencia promedio del endpoint <code>/api/orders</code> por minuto", "qué requests fallaron justo antes del pico de CPU". Application Insights agrega tracing distribuido — puedes ver la cadena completa de una request: API → SQL → Redis → respuesta.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Serilog con structured logging transforma tus logs.</strong> En lugar de <code>_logger.LogInformation($"Order {{'{'}}id{{'}'}} created")</code> (texto plano imposible de filtrar), usas <code>_logger.LogInformation("Order {{'{'}}OrderId{{'}'}} created by {{'{'}}UserId{{'}'}}", id, userId)</code> — KQL puede filtrar por <code>OrderId</code> o <code>UserId</code> como columnas independientes.
+    </div>
+
+    <div class="flow">
+        <h3>Queries KQL esenciales para diagnóstico en producción</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <th>Qué quieres ver</th>
+                    <th>Query KQL</th>
+                    <th>Cuándo usarlo</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Todos los errores recientes</td>
+                        <td><code>ContainerAppConsoleLogs | where Log contains "ERROR" | order by TimeGenerated desc</code></td>
+                        <td>Primera acción cuando reportan un bug</td>
+                    </tr>
+                    <tr>
+                        <td>Latencia por endpoint</td>
+                        <td><code>requests | summarize avg(duration) by name | order by avg_duration desc</code></td>
+                        <td>Identificar endpoints lentos</td>
+                    </tr>
+                    <tr>
+                        <td>Error rate por hora</td>
+                        <td><code>requests | summarize errors=countif(success==false), total=count() by bin(timestamp,1h)</code></td>
+                        <td>Ver tendencias de errores</td>
+                    </tr>
+                    <tr>
+                        <td>Exceptions con stack trace</td>
+                        <td><code>exceptions | where timestamp > ago(24h) | project timestamp, type, outerMessage, details</code></td>
+                        <td>Entender qué excepción se lanzó</td>
+                    </tr>
+                    <tr>
+                        <td>Requests lentas (>2s)</td>
+                        <td><code>requests | where duration > 2000 | project timestamp, name, duration, resultCode</code></td>
+                        <td>Encontrar candidatos a optimizar</td>
+                    </tr>
+                    <tr>
+                        <td>Logs de un contenedor específico</td>
+                        <td><code>ContainerAppConsoleLogs | where ContainerName == "miapi" | order by TimeGenerated desc</code></td>
+                        <td>Debug de un pod específico</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>    
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Logs y monitoreo en Azure Container Apps (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Cómo Container Apps envía logs a Log Analytics automáticamente, cómo usar la vista de logs en el portal, y cómo escribir queries KQL para los logs del sistema (<code>ContainerAppSystemLogs</code>) y de la aplicación (<code>ContainerAppConsoleLogs</code>).</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/container-apps/log-monitoring" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Serilog + Application Insights en ASP.NET Core</h3>
+                    <div class="mb-1 text-body-secondary">Configura Serilog con structured logging para una API: sink a Application Insights, correlación de requests con <code>ILogger</code>, queries KQL en el portal y cómo crear alertas automáticas cuando el error rate supera un umbral. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/ZL6JXAKMkpg?si=SQPi635AIeRTXija" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">KQL para desarrolladores .NET — Queries esenciales para diagnóstico</h3>
+                    <div class="mb-1 text-body-secondary">KQL desde cero para devs que nunca lo usaron: sintaxis básica, operadores más útiles (<code>where</code>, <code>summarize</code>, <code>project</code>, <code>bin</code>), las 10 queries que más usarás para diagnosticar problemas en producción con Application Insights y Log Analytics. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/WBiMTLIJXMo?si=CSI-FLL0PkaJwMly" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Serilog structured logging + alerta automática</strong> 
+                    <h3 class="mb-0">Configurar logging production-ready y la primera alerta de errores</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                    <pre><code>alert_setup.sh — Alerta cuando error rate > 5%
+# Crear Action Group (a quién notificar)
+az monitor action-group create \
+  --resource-group "$RG" \
+  --name           "ag-miapi-oncall" \
+  --short-name     "miapi" \
+  --email-receivers name="dev" email="dev@miempresa.com"
+
+# Crear alerta: error rate > 5% en los últimos 5 minutos
+az monitor scheduled-query create \
+  --resource-group     "$RG" \
+  --name               "alert-error-rate" \
+  --scopes             "$APPINSIGHTS_ID" \
+  --condition-query    "requests | where timestamp > ago(5m) | summarize errorRate = 100.0*countif(success==false)/count() | where errorRate > 5" \
+  --condition-threshold 0 \
+  --condition-operator  "GreaterThan" \
+  --evaluation-frequency "5m" \
+  --window-size        "5m" \
+  --severity           2 \
+  --action             "ag-miapi-oncall" \
+  --description        "Error rate above 5% in last 5 minutes"</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Pipeline CI/CD Completo</div>
+        <div class="day-subtitle">GitHub Actions: build imagen → push ACR → deploy ACA staging → aprobación → prod. Rollback con revisiones.</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El día 5 integra todo lo de la semana en un pipeline de producción real.</strong> El flujo: push a main → GitHub Actions hace <code>az acr build</code> (build en la nube) → actualiza el Container App de staging con la nueva imagen → smoke test contra <code>/health</code> → espera aprobación manual → actualiza producción. Si algo falla en producción, el rollback es instantáneo: <code>az containerapp revision activate</code> reactiva la revisión anterior — cero redeploy.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">CI/CD completo: GitHub Actions → ACR → Azure Container Apps</h3>
+                    <div class="mb-1 text-body-secondary">Pipeline end-to-end oficial de Microsoft: GitHub Actions con OIDC, <code>az acr build</code> para build remoto, deploy a Container Apps staging y producción con aprobación, rollback con revisiones y cómo agregar el health check al pipeline. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/yjbzWq7bvNc?si=ZT7cXAa2QKTAxAGO" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Revisiones y traffic splitting en Azure Container Apps</h3>
+                    <div class="mb-1 text-body-secondary">Cómo funcionan las revisiones (cada deploy crea una nueva), cómo dividir el tráfico entre dos revisiones para blue/green deploy, y cómo reactivar una revisión anterior para rollback instantáneo sin redesplegar la imagen.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/container-apps/revisions" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Pipeline completo GitHub Actions → ACR → Container Apps</strong> 
+                    <h3 class="mb-0">El workflow final de la Semana 14: build en ACR + deploy + rollback automático</h3>
+                    <pre ngNonBindable><code>.github/workflows/docker-azure.yml
+
+name: 🐳 Docker → Azure
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token:  write
+  contents: read
+
+env:
+  ACR_NAME:  acrmiapi
+  IMAGE:     miapi
+
+jobs:
+
+  # ── CI: Tests ─────────────────────────────────────────────────────
+  test:
+    name:     ✅ Test
+    runs-on:  ubuntu-latest
+    services:
+      sqlserver:
+        image:  mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          SA_PASSWORD:  TestPass!2024
+          ACCEPT_EULA:  Y
+        ports:
+          - 1433:1433
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run:  dotnet test --configuration Release
+        env:
+          TEST_DB: "Server=localhost;Database=TestDb;User Id=sa;Password=TestPass!2024;TrustServerCertificate=True"
+
+  # ── Build imagen en ACR (sin Docker instalado en el runner) ───────
+  build:
+    name:    🔨 Build → ACR
+    needs:   test
+    runs-on: ubuntu-latest
+    if:      github.ref == 'refs/heads/main'
+    outputs:
+      image-tag: ${{ steps.build.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Build en ACR
+        id:   build
+        run: |
+          TAG="${{ github.sha }}"
+          az acr build \
+            --registry "${{ env.ACR_NAME }}" \
+            --image    "${{ env.IMAGE }}:$TAG" \
+            --image    "${{ env.IMAGE }}:latest" \
+            --file     Dockerfile .
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+  # ── Deploy Staging (automático) ───────────────────────────────────
+  staging:
+    name:        🟡 Staging
+    needs:       build
+    runs-on:     ubuntu-latest
+    environment: staging
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - run: |
+          az containerapp update \
+            --name "${{ secrets.ACA_NAME_STG }}" \
+            --resource-group "${{ secrets.RG }}" \
+            --image "${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE }}:${{ needs.build.outputs.image-tag }}"
+      - name: 🩺 Smoke Test
+        run: |
+          sleep 15  # esperar que el contenedor arranque
+          STATUS=$(curl -sf -o /dev/null -w "%{{http_code}}" \
+            "https://${{ secrets.ACA_URL_STG }}/health")
+          [ "$STATUS" = "200" ] || (echo "❌ Health check failed: $STATUS" && exit 1)
+
+  # ── Deploy Production (aprobación requerida) ──────────────────────
+  production:
+    name:        🟢 Production
+    needs:       staging
+    runs-on:     ubuntu-latest
+    environment: production        # ← gate de aprobación
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy to Production
+        run: |
+          az containerapp update \
+            --name "${{ secrets.ACA_NAME_PRD }}" \
+            --resource-group "${{ secrets.RG }}" \
+            --image "${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE }}:${{ needs.build.outputs.image-tag }}"
+      # Rollback instantáneo si algo falla:
+      # az containerapp revision activate
+      #   --name $ACA_NAME_PRD --revision [nombre-revision-anterior]</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — API en cloud con Docker</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Al finalizar la semana tu API debe estar corriendo en producción en Azure Container Apps con todos los servicios de seguridad y observabilidad configurados:</p>
+    <ul>
+        <li>URL pública HTTPS funcionando: <code>https://[app].azurecontainerapps.io/health → Healthy</code></li>
+        <li>Screenshot de ACR mostrando la imagen con el tag del SHA del último commit</li>
+        <li>Screenshot de Key Vault con los secrets creados — sin mostrar los valores</li>
+        <li>Screenshot de Log Analytics con una query KQL real mostrando logs de la app</li>
+        <li>Pipeline completo verde en GitHub Actions: test → build ACR → staging → aprobación → producción</li>
+        <li>Rollback documentado: el comando <code>az containerapp revision activate</code> que usarías si algo falla</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con semanas anteriores:</strong>
+        Con las Semanas 11–14 tienes el stack completo de deploy moderno: infraestructura en Azure (<strong>Sem 11</strong>), pipeline CI/CD automatizado (<strong>Sem 12</strong>), contenedor Docker (<strong>Sem 13</strong>) y deploy a producción con seguridad y observabilidad (<strong>Sem 14</strong>).
+    </div>
 </div>

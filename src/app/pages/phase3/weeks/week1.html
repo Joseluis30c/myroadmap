@@ -123,11 +123,50 @@
         <strong>NUNCA pongas connection strings en el código fuente.</strong> Usa App Settings en Azure (o Azure Key Vault para producción). El App Service inyecta esas variables como environment variables en tiempo de ejecución, que <code>IConfiguration</code> lee automáticamente en .NET.
     </div>
 
-    <div class="flow">
-        PROXIMAMENTE...
+    <div class="rn-table-wrap">
+        <table class="rn-table">
+            <thead>
+                <tr>
+                    <th>Tier</th>
+                    <th>RAM / CPU</th>
+                    <th>Precio</th>
+                    <th>Características clave</th>
+                    <th>¿Para qué?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-success">Free F1</td>
+                    <td>1GB / shared</td>
+                    <td>Gratis</td>
+                    <td>60 min CPU/día, sin custom domain, sin SSL</td>
+                    <td>Solo aprender</td>
+                </tr>
+                <tr>
+                    <td class="text-success">Free B1</td>
+                    <td>1.75GB / 1 core</td>
+                    <td>~$13/mes</td>
+                    <td>Custom domain, SSL, sin auto-scale</td>
+                    <td>Dev/esta semana</td>
+                </tr>
+                <tr>
+                    <td class="text-primary">Standard S1</td>
+                    <td>1.75GB / 1 core</td>
+                    <td>~$73/mes</td>
+                    <td>Deployment slots, auto-scale, VNet</td>
+                    <td>Staging/QA</td>
+                </tr>
+                <tr>
+                    <td class="text-danger">Premium P1v3</td>
+                    <td>8GB / 2 cores</td>
+                    <td>~$138/mes</td>
+                    <td>Mejor CPU, private endpoints, zone redundancy</td>
+                    <td>Producción</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
-    <!--
+    <br>
     <div class="row">
         <div class="col-md-12">
             <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
@@ -135,10 +174,10 @@
                     <div class="resource-icon doc">📖</div>
                 </div>
                 <div class="col d-flex flex-column position-static">
-                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Microsoft Learn — Ruta oficial</strong> 
-                    <h3 class="mb-0">Azure Fundamentals (AZ-900) — Módulo 1: Conceptos de nube</h3>
-                    <div class="mb-1 text-body-secondary">El punto de entrada oficial: qué es IaaS vs PaaS vs SaaS, el modelo de responsabilidad compartida, alta disponibilidad, escalabilidad, elasticidad y los modelos de costo (CapEx vs OpEx). Gratuito con sandbox interactivo.</div>
-                    <a class="link" href="https://learn.microsoft.com/es-es/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/" target="_blank">📘 Microsoft Docs →</a>
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Deploy una aplicación ASP.NET Core a Azure App Service (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial paso a paso: crear un App Service Plan, desplegar con Visual Studio, VS Code o az CLI, configurar App Settings para connection strings, y habilitar Application Insights. El tutorial más directo para .NET developers.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/app-service/quickstart-dotnetcore" target="_blank">📘 Microsoft Docs →</a>
                 </div>
             </div>
         </div>
@@ -149,9 +188,218 @@
                 </div>
                 <div class="col d-flex flex-column position-static">
                     <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
-                    <h3 class="mb-0">Azure Full Course para Principiantes — Portal + CLI + Servicios Core</h3>
-                    <div class="mb-1 text-body-secondary">El mejor curso de Azure para desarrolladores .NET: navegación del portal, Resource Groups, az CLI con demos en vivo, nomenclatura de recursos y los servicios más usados. Orientado a devs, no a sysadmins. ~3h (puedes hacer 2x speed los conceptos básicos).</div>
-                    <a class="link" href="https://www.youtube.com/watch?v=NKEFWyqJ5XA" target="_blank">▶️ Ver en YouTube →</a>
+                    <h3 class="mb-0">Deploy ASP.NET Core API a Azure App Service — Completo con CI/CD</h3>
+                    <div class="mb-1 text-body-secondary">App Service desde az CLI, App Settings con connection strings, deployment slots para blue/green deploy y cómo conectar a Azure SQL sin exponer contraseñas. ~40 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=4BwyqmRTrx8" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Microsoft Learn — Sandbox interactivo</strong> 
+                    <h3 class="mb-0">Hospedar una aplicación web con Azure App Service</h3>
+                    <div class="mb-1 text-body-secondary">Laboratorio oficial con sandbox gratuito: creas un App Service real en una suscripción de Azure temporal de Microsoft, despliegas una app y configuras las settings. Sin necesidad de tarjeta de crédito.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/training/modules/host-a-web-app-with-azure-app-service/" target="_blank">📘 Laboratorio gratuito →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Crear App Service + deploy con az CLI</strong> 
+                    <h3 class="mb-0">De cero a API desplegada en Azure en 10 comandos</h3>
+                    <div class="mb-1 text-body-secondary">deploy_appservice.sh</div>
+                    <pre><code># ─── Crear App Service Plan (las VMs) ───
+az appservice plan create \
+  --name      "plan-miapi-dev" \
+  --resource-group "$RESOURCE_GROUP" \
+  --sku       "B1" \
+  --is-linux  \
+  --location  "$LOCATION"
+
+# ─── Crear la Web App ───
+az webapp create \
+  --name         "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --plan         "plan-miapi-dev" \
+  --runtime      "DOTNETCORE:8.0"
+
+# Verificar URL
+az webapp show \
+  --name "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --query defaultHostName \
+  --output tsv
+# → miapi-XXXXXXX.azurewebsites.net
+
+# ─── Configurar App Settings (variables de entorno) ───
+az webapp config appsettings set \
+  --name "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --settings \
+    "ASPNETCORE_ENVIRONMENT=Production" \
+    "ConnectionStrings__DefaultConnection=Server=...;Database=...;" \
+    "Jwt__Secret=@Microsoft.KeyVault(VaultName=kv-miapi;SecretName=jwt-secret)"
+
+# ─── Deploy desde carpeta publicada (zip deploy) ───
+dotnet publish -c Release -o ./publish
+cd publish
+zip -r ../deploy.zip .
+cd ..
+
+az webapp deployment source config-zip \
+  --name "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --src "deploy.zip"
+
+# ─── Ver logs en tiempo real ───
+az webapp log tail \
+  --name "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP"</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Azure SQL Database — Tu BD en la nube</div>
+        <div class="day-subtitle">Logical server vs database, DTU vs vCore, firewall rules, connection strings para EF Core, backups automáticos y migration deploy</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Azure SQL Database es SQL Server completamente administrado.</strong> Todo tu código T-SQL, tus índices, tus stored procedures, EF Core — todo funciona sin cambiar una línea. La arquitectura tiene dos niveles: el <strong>Logical Server</strong> (punto de conexión, firewall, logins) y las <strong>Databases</strong> (los datos reales, el tier de performance). Para desarrollo usa <code>Basic (5 DTU)</code> a ~$5/mes. Para producción, el modelo <strong>Serverless</strong> es ideal: escala CPU a cero cuando no hay tráfico y se "wake up" automáticamente.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Firewall rules son obligatorias:</strong> Por defecto, Azure SQL no acepta conexiones de nadie. Debes agregar el IP de tu App Service (o habilitar "Allow Azure services") y el IP de tu máquina de desarrollo. Jamás uses <code>0.0.0.0 – 255.255.255.255</code> — eso expone tu BD a internet completo.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Quickstart: Crear Azure SQL Database y conectar EF Core (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial completa: crear el logical server, la database Basic, configurar firewall rules, obtener el connection string, configurar EF Core para Azure SQL y ejecutar migrations desde la CLI. Incluye .NET 8.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/azure-sql/database/single-database-create-quickstart" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Azure SQL Database para .NET Developers — Setup completo con EF Core</h3>
+                    <div class="mb-1 text-body-secondary">Les crea una Azure SQL Database desde cero, configura EF Core con el connection string de Azure, aplica migrations en la nube con <code>dotnet ef database update</code> y conecta la API desplegada en App Service a la BD. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/pZHKS2MS1nU?si=uDjykoR_6FQ8rf5Q" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Azure SQL + EF Core Migrations en la nube</strong> 
+                    <h3 class="mb-0">Crear la BD, configurar EF Core y ejecutar migrations en Azure</h3>
+                    <div class="mb-1 text-body-secondary">azure_sql_setup.sh</div>
+                    <pre><code># ─── Crear SQL Server Lógico ───
+az sql server create \
+  --name           "$SQL_SERVER" \
+  --resource-group "$RESOURCE_GROUP" \
+  --location       "$LOCATION" \
+  --admin-user     "sqladmin" \
+  --admin-password "P@ssw0rd!2024"
+
+# ─── Crear la Database (Basic = 5 DTU = ~$5/mes) ───
+az sql db create \
+  --name           "$SQL_DB" \
+  --resource-group "$RESOURCE_GROUP" \
+  --server         "$SQL_SERVER" \
+  --edition        "Basic"
+
+# ─── Firewall: permitir tu IP actual ───
+MY_IP=$(curl -s https://api.ipify.org)
+az sql server firewall-rule create \
+  --server         "$SQL_SERVER" \
+  --resource-group "$RESOURCE_GROUP" \
+  --name           "AllowMyDev" \
+  --start-ip-address "$MY_IP" \
+  --end-ip-address   "$MY_IP"
+
+# Permitir que App Service se conecte (IPs de Azure)
+az sql server firewall-rule create \
+  --server         "$SQL_SERVER" \
+  --resource-group "$RESOURCE_GROUP" \
+  --name           "AllowAzureServices" \
+  --start-ip-address "0.0.0.0" \
+  --end-ip-address   "0.0.0.0"
+
+# ─── Obtener connection string ───
+az sql db show-connection-string \
+  --server "$SQL_SERVER" \
+  --name   "$SQL_DB" \
+  --client ado.net</code></pre>
+                <div class="mb-1 text-body-secondary">Program.cs</div>
+                <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Azure Blob Storage + Conceptos de Red</div>
+        <div class="day-subtitle">Storage accounts, containers, blobs, SAS tokens, .NET SDK, VNet, NSG, Service Endpoints y configuración de firewall segura</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Blob Storage es el almacenamiento de objetos de Azure — archivos, imágenes, backups, cualquier binario.</strong> La jerarquía es: <em>Storage Account</em> → <em>Container</em> (como una carpeta) → <em>Blob</em> (el archivo). El <strong>SDK de Azure.Storage.Blobs</strong> para .NET hace el upload/download en pocas líneas. Para networking, el concepto clave es que tu App Service y Azure SQL deben comunicarse por la red interna de Azure usando <strong>Service Endpoints</strong> o <strong>Private Endpoints</strong>, no por internet público.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Quickstart: Azure Blob Storage con .NET SDK</h3>
+                    <div class="mb-1 text-body-secondary">Crear Storage Account, container y subir/bajar blobs con el SDK Azure.Storage.Blobs. Incluye autenticación con DefaultAzureCredential (mejor que connection strings), generación de SAS tokens y configuración de acceso público.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/storage/blobs/storage-quickstart-blobs-dotnet" target="_blank">📘 Microsoft Docs →</a>
                 </div>
             </div>
         </div>
@@ -162,9 +410,22 @@
                 </div>
                 <div class="col d-flex flex-column position-static">
                     <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
-                    <h3 class="mb-0">Azure CLI — Referencia completa de comandos</h3>
-                    <div class="mb-1 text-body-secondary">Los comandos que usarás toda la Fase 3: <code>az login</code>, <code>az group create</code>, <code>az webapp create</code>, <code>az sql server create</code>. La CLI es más rápida que el portal para operaciones repetitivas y es la base de los scripts de automatización.</div>
-                    <a class="link" href="https://learn.microsoft.com/es-es/cli/azure/reference-index" target="_blank">📘 Microsoft Docs →</a>
+                    <h3 class="mb-0">Conceptos de red de Azure para desarrolladores — VNet, NSG, Service Endpoints</h3>
+                    <div class="mb-1 text-body-secondary">Qué es una Virtual Network, cómo los Network Security Groups controlan el tráfico con reglas de entrada/salida, y cómo los Service Endpoints permiten que App Service acceda a Azure SQL sin IP pública. El mínimo de networking que todo dev debe saber.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/virtual-network/virtual-networks-overview" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Azure Storage para .NET Developers — Blobs, SAS y SDK completo</h3>
+                    <div class="mb-1 text-body-secondary">Upload/download de archivos desde una ASP.NET Core API, generación de SAS tokens para acceso temporal, configuración de CORS para acceso desde frontend, y configuración de tier Hot vs Cool según el patrón de acceso. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/9ZpMpf9dNDA?si=y5sl6egWRCHgGCtR" target="_blank">▶️ Ver en YouTube →</a>
                 </div>
             </div>
         </div>
@@ -174,12 +435,202 @@
                     <div class="resource-icon code">💻</div>
                 </div>
                 <div class="col d-flex flex-column position-static">
-                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Setup inicial completo con az CLI</strong> 
-                    <h3 class="mb-0">Crear tu Resource Group y configurar el entorno desde la terminal</h3>
-                    <pre><code>{{codeExample2}}</code></pre>
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Blob Storage SDK en ASP.NET Core</strong> 
+                    <h3 class="mb-0">Upload, download y SAS token desde tu API</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
                 </div>
             </div>
         </div>
-    </div>-->
+    </div>
+</div>
 
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Deploy Simple de tu API</div>
+        <div class="day-subtitle">Conectar App Service + Azure SQL + Blob Storage, Application Insights para monitoreo, y el primer deploy completo funcional</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El deploy final conecta todo lo de la semana.</strong> El flujo completo: tu API .NET corre en App Service, lee/escribe en Azure SQL via EF Core, guarda archivos en Blob Storage, y usa App Settings para todas las configuraciones sensibles. <strong>Application Insights</strong> se agrega con dos líneas de código y te da monitoreo completo: requests, errores, dependencias, performance — sin infraestructura adicional.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Regla de Brent Ozar:</strong> "If your query is slow, it's either the query or the indexes." Antes de cambiar el servidor, agregar RAM o acusar a la red — lee el execution plan. El 95% de los problemas de performance se resuelven en el SQL.
+    </div>
+
+    <div class="rn-table-wrap">
+        <table class="rn-table">
+            <tbody>
+                <tr>
+                    <td class="text-light">1</td>
+                    <td><span class="text-white">Crear todos los recursos</span><br>Resource Group → App Service Plan → App Service → SQL Server → SQL Database → Storage Account. Usar los scripts del día 1-4.</td>
+                    <td class="text-center">⚙️<br>az CLI</td>
+                </tr>
+                <tr>
+                    <td class="text-light">2</td>
+                    <td><span class="text-white">Configurar App Settings en App Service</span><br>Agregar <code>ConnectionStrings__DefaultConnection</code>, <code>Storage__ConnectionString</code>, <code>Jwt__Secret</code> y <code>ASPNETCORE_ENVIRONMENT=Production</code> vía portal o az CLI.</td>
+                    <td class="text-center">🔑<br>Secrets</td>
+                </tr>
+                <tr>
+                    <td class="text-light">3</td>
+                    <td><span class="text-white">Configurar firewall de Azure SQL</span><br>Agregar tu IP de desarrollo + regla para "Allow Azure Services" que permite la conexión desde App Service.</td>
+                    <td class="text-center">🔒<br>Firewall</td>
+                </tr>
+                <tr>
+                    <td class="text-light">4</td>
+                    <td><span class="text-white">Ejecutar migrations en la nube</span><br>Desde tu máquina con el connection string de Azure SQL: <code>dotnet ef database update --connection "[conn-string-azure]"</code> para crear el esquema.</td>
+                    <td class="text-center">🗄️<br>EF Core</td>
+                </tr>
+                <tr>
+                    <td class="text-light">5</td>
+                    <td><span class="text-white">Deploy con zip deploy</span><br><code>dotnet publish -c Release</code> → zip la carpeta → <code>az webapp deployment source config-zip</code>. Verificar en <code>https://[app].azurewebsites.net/health</code></td>
+                    <td class="text-center">🚀<br>Deploy</td>
+                </tr>
+                <tr>
+                    <td class="text-light">6</td>
+                    <td><span class="text-white">Verificar con Application Insights</span><br>Agregar <code>builder.Services.AddApplicationInsightsTelemetry()</code>. Ver requests, errores y dependencias en el portal de Azure en tiempo real.</td>
+                    <td class="text-center">📊<br>Monitor</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Deploy completo: ASP.NET Core API + Azure SQL + Blob Storage</h3>
+                    <div class="mb-1 text-body-secondary">Hace el deploy end-to-end de una Clean Architecture API: App Service, Azure SQL con migrations, Blob Storage para imágenes, Application Insights y configuración de CORS. El video más completo para el entregable de esta semana. ~55 min.</div>
+                    <a class="link" href="https://youtu.be/wMaBUwezctk?si=sVAhgP-NnvxL2BUQ" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Application Insights para ASP.NET Core — Monitoreo en 5 minutos</h3>
+                    <div class="mb-1 text-body-secondary">Cómo agregar Application Insights con 2 líneas de código, qué telemetría captura automáticamente (requests, exceptions, dependencies), cómo agregar telemetría custom con ILogger y cómo configurar alertas de errores. ~20 min.</div>
+                    <a class="link" href="https://youtu.be/pHwFtkDR-RQ?si=AXB_h_xoM3Vry8Se" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Application Insights para ASP.NET Core — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Configuración completa de Application Insights: paquete NuGet, configuración en Program.cs, telemetría custom, Live Metrics para ver requests en tiempo real, alertas automáticas y Dashboard en el portal de Azure.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/azure-monitor/app/asp-net-core" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Deploy completo + Application Insights</strong> 
+                    <h3 class="mb-0">El script final que deja tu API corriendo en Azure</h3>
+                    <pre><code>#!/bin/bash
+# ─── Script de deploy completo — Semana 11 ───
+
+set -e  # detener si hay error
+
+RESOURCE_GROUP="rg-miapi-dev"
+APP_NAME="app-miapi-dev"
+SQL_SERVER="sql-miapi-dev"
+SQL_DB="db-miapi"
+STORAGE_ACC="stmiapistg"
+
+# 1. Obtener connection strings
+SQL_CONN=$(az sql db show-connection-string \
+  --server "$SQL_SERVER" --name "$SQL_DB" \
+  --client ado.net --auth-type SqlPassword \
+  --output tsv)
+
+STORAGE_CONN=$(az storage account show-connection-string \
+  --name "$STORAGE_ACC" \
+  --resource-group "$RESOURCE_GROUP" \
+  --output tsv)
+
+APPINS_KEY=$(az monitor app-insights component show \
+  --app "appins-miapi" \
+  --resource-group "$RESOURCE_GROUP" \
+  --query instrumentationKey --output tsv)
+
+# 2. Configurar App Settings
+az webapp config appsettings set \
+  --name "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --settings \
+    "ConnectionStrings__DefaultConnection=$SQL_CONN" \
+    "Storage__ConnectionString=$STORAGE_CONN" \
+    "ApplicationInsights__InstrumentationKey=$APPINS_KEY" \
+    "ASPNETCORE_ENVIRONMENT=Production"
+
+# 3. Publicar y deployar
+dotnet publish ./src/Api -c Release -o ./dist
+
+pushd dist
+zip -r ../release.zip . -x "*.pdb"
+popd
+
+az webapp deployment source config-zip \
+  --name "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --src release.zip
+
+# 4. Verificar health endpoint
+URL=$(az webapp show \
+  --name "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --query defaultHostName --output tsv)
+
+echo "✓ Deploy completo: https://$URL"
+curl -s "https://$URL/health" | jq</code></pre>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Deploy simple de tu API</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Al finalizar la semana tu API .NET debe estar corriendo en Azure con todos los servicios conectados y documentados:</p>
+    <ul>
+        <li>URL pública funcional <code>https://[tuapp].azurewebsites.net</code> con tu API respondiendo requests reales</li>
+        <li>Endpoint <code>/health</code> retornando "Healthy" con Azure SQL y Blob Storage verificados</li>
+        <li>Script <code>az CLI</code> documentado que puede recrear toda la infraestructura desde cero en un solo comando</li>
+        <li>Screenshot de Application Insights mostrando al menos 5 requests exitosos y el mapa de dependencias</li>
+        <li>README con las variables de entorno requeridas, instrucciones de deploy y la arquitectura del sistema</li>
+        <li>Zero secrets en el código fuente — todos en App Settings o Key Vault</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con las fases anteriores:</strong>
+        Tu API de <strong>Fase 1</strong> (Clean Architecture, JWT, validación) se despliega directamente en App Service. La base de datos optimizada en <strong>Fase 2</strong> (índices, queries, transacciones) vive en Azure SQL — todos los execution plans y optimizaciones que hiciste aplican igual en la nube. La <strong>Semana 12</strong> agrega GitHub Actions para automatizar este deploy manual que hiciste hoy.
+    </div>
 </div>

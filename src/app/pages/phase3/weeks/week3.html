@@ -1,3 +1,696 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Conceptos Docker</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Dockerfile .NET</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Variables de Entorno</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Docker Compose</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – API en contenedor</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Empaquetar tu API en una imagen</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">Dockerfile, Docker Compose</div></div>
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Los 5 conceptos de esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">📦</span><div class="pc-title">Image vs Container</div><div class="pc-body">Image = plantilla inmutable. Container = instancia en ejecución. Una imagen puede generar N contenedores.</div></div>
+    <div class="intro-card"><span class="icon">🏗️</span><div class="pc-title">Multi-stage Build</div><div class="pc-body">Build en SDK (grande), copia solo el binario al runtime (pequeño). Imagen final de 100MB en vez de 700MB.</div></div>
+    <div class="intro-card"><span class="icon">🔒</span><div class="pc-title">Env Vars y Secrets</div><div class="pc-body">Nunca en el Dockerfile. Se inyectan en runtime con <code>-e</code>, <code>.env</code> o Docker Secrets. IConfiguration los lee igual.</div></div>
+    <div class="intro-card"><span class="icon">🎼</span><div class="pc-title">Docker Compos</div><div class="pc-body">Orquesta múltiples contenedores (API + SQL Server + Redis) con un solo <code>compose up</code>. Dev environment completo en segundos.</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="pc-title">Layer Cache</div><div class="pc-body">Cada instrucción es una capa. Si no cambia, se usa del caché. Orden correcto = builds de 3s en lugar de 40s.</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Conceptos Docker — Images, Containers, Registry</div>
+        <div class="day-subtitle">Image vs Container, Docker Hub, comandos esenciales, capas, volúmenes, redes y el daemon de Docker</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Docker empaqueta tu aplicación con todo lo que necesita para correr: runtime, librerías, configuración del sistema operativo.</strong> Una <em>image</em> es el paquete inmutable — como una clase. Un <em>container</em> es una instancia corriendo de esa imagen — como un objeto. El <em>registry</em> (Docker Hub, Azure Container Registry) es donde guardas y distribuyes las imágenes. La diferencia fundamental con una VM: los contenedores comparten el kernel del host — arrancan en milisegundos y usan MBs de RAM en lugar de GBs.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Instala Docker Desktop</strong> en tu máquina: incluye Docker Engine, Docker CLI, Docker Compose y un dashboard visual. En Windows requiere WSL2. Gratuito para uso personal y educativo: <strong>docker.com/products/docker-desktop</strong>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial — Docker</strong> 
+                    <h3 class="mb-0">Docker Overview — Conceptos fundamentales</h3>
+                    <div class="mb-1 text-body-secondary">La introducción oficial: qué problema resuelve Docker, arquitectura cliente-daemon, images vs containers vs registries, y los comandos de ciclo de vida. La lectura de 20 minutos antes de escribir el primer Dockerfile.</div>
+                    <a class="link" href="https://docs.docker.com/get-started/docker-overview/" target="_blank">📘 Docker Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Docker Crash Course para Principiantes — Completo con demos</h3>
+                    <div class="mb-1 text-body-secondary">El mejor video introductorio de Docker disponible: qué es un contenedor vs VM, comandos esenciales (<code>pull</code>, <code>run</code>, <code>exec</code>, <code>ps</code>, <code>stop</code>, <code>rm</code>), volúmenes, redes bridge, y el primer Dockerfile. Con demos en vivo de principio a fin. ~1h45min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=pg19Z8LL06w" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Los 20 comandos Docker que usarás todos los días</strong> 
+                    <h3 class="mb-0">Cheatsheet completa: imágenes, contenedores, volúmenes y redes</h3>
+                    <pre ngNonBindable><code># ─── IMÁGENES ──────────────────────────────────────────────────
+docker pull mcr.microsoft.com/dotnet/aspnet:8.0   # descargar imagen
+docker images                                      # listar imágenes locales
+docker build -t miapi:1.0 .                        # construir imagen desde Dockerfile
+docker build -t miapi:1.0 --no-cache .             # forzar rebuild completo
+docker image rm miapi:1.0                          # eliminar imagen
+docker image prune                                 # limpiar imágenes sin usar
+
+# ─── CONTENEDORES ──────────────────────────────────────────────
+docker run -d \
+  --name miapi \
+  -p 8080:80 \                     # host:container port mapping
+  -e ASPNETCORE_ENVIRONMENT=Development \
+  -e ConnectionStrings__Default="..." \
+  --restart unless-stopped \       # reiniciar si el contenedor se cae
+  miapi:1.0
+
+docker ps                          # contenedores corriendo
+docker ps -a                       # todos (incluye detenidos)
+docker logs miapi                  # ver logs
+docker logs -f miapi               # seguir logs en tiempo real
+docker exec -it miapi /bin/bash    # shell interactivo dentro del contenedor
+docker stop miapi                  # detener (graceful)
+docker rm -f miapi                 # forzar eliminación
+docker stats                       # CPU/RAM de contenedores en tiempo real
+docker inspect miapi               # metadatos completos (JSON)
+
+# ─── VOLÚMENES (persistencia de datos) ─────────────────────────
+docker volume create sqldata
+docker run -v sqldata:/var/opt/mssql mcr.microsoft.com/mssql/server:2022-latest
+docker volume ls                   # listar volúmenes
+
+# ─── REDES ─────────────────────────────────────────────────────
+docker network create miapi-net
+docker run --network miapi-net miapi:1.0
+# En la misma red, los contenedores se ven por nombre:
+# connection string: Server=sqlserver;  (nombre del contenedor, no localhost)
+
+# ─── LIMPIEZA ──────────────────────────────────────────────────
+docker system prune -a             # eliminar TODO lo no usado (¡cuidado!)</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Dockerfile para ASP.NET Core — Multi-stage Build</div>
+        <div class="day-subtitle">Instrucciones, orden de capas para caché óptimo, imagen de 100MB en vez de 700MB, .dockerignore y non-root user</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El Dockerfile más importante para .NET usa multi-stage build:</strong> el <em>primer stage</em> usa la imagen SDK completa (~700MB) para compilar y publicar. El <em>segundo stage</em> copia solo el binario publicado a la imagen runtime mínima (~100MB). El SDK no va a producción — solo el resultado. El orden de las instrucciones es crítico: <code>COPY *.csproj</code> y <code>RUN dotnet restore</code> primero, antes de <code>COPY . .</code> — así Docker cachea las dependencias y el restore solo corre cuando el <code>.csproj</code> cambia, no con cada cambio de código.
+    </div>
+
+    <div class="flow">
+        <h3>Dockerfile — Anatomía de capas y caché | multi-stage · .NET 8</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td class="text-primary">FROM</td>
+                        <td>sdk:8.0 AS build</td>
+                        <td>~730MB</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td class="text-warning">WORKDIR</td>
+                        <td>/src</td>
+                        <td>0B</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td class="text-danger">COPY</td>
+                        <td>*.csproj . → (solo el .csproj)</td>
+                        <td><code>CACHE KEY</code> ~3KB</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td class="text-success">RUN</td>
+                        <td>dotnet restore → descarga NuGet packages</td>
+                        <td><code>CACHED si .csproj no cambió</code></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td class="text-danger">COPY</td>
+                        <td>. . → (todo el código fuente)</td>
+                        <td>código</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td class="text-success">RUN</td>
+                        <td>dotnet publish -c Release -o /app/publish</td>
+                        <td>~15MB</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td class="text-primary">FROM</td>
+                        <td>aspnet:8.0 AS final → nueva imagen limpia</td>
+                        <td>~100MB</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td class="text-danger">COPY</td>
+                        <td>--from=build /app/publish . → solo el binario</td>
+                        <td>~15MB</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td class="text-info">ENTRYPOINT</td>
+                        <td>["dotnet", "Api.dll"]</td>
+                        <td>0B</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div><br>
+        <h3>Stage build: ~730MB (desechado) | Imagen final: <span class="text-success">~115MB</span> (lo que se deploya)</h3>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial — Docker</strong> 
+                    <h3 class="mb-0">Dockerize una aplicación ASP.NET Core — Dockerfile oficial de .NET</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial de Microsoft para crear el Dockerfile de una ASP.NET Core API: multi-stage build, imágenes base recomendadas (<code>mcr.microsoft.com/dotnet/aspnet:8.0</code> vs <code>sdk:8.0</code>), configuración de puertos, variables de entorno y el <code>.dockerignore</code>.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/core/docker/build-container" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Dockerize una ASP.NET Core API — Multi-stage build completo</h3>
+                    <div class="mb-1 text-body-secondary">construye el Dockerfile optimizado para una Clean Architecture API: multi-stage build, orden correcto de capas para caché máximo, <code>.dockerignore</code>, non-root user por seguridad, y cómo reducir la imagen de 730MB a 115MB. El video de referencia para .NET + Docker. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/-YERWXpgvf8?si=Ao8lyCwJ9lqepFOO" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static" ngNonBindable>
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Dockerfile production-ready para ASP.NET Core</strong> 
+                    <h3 class="mb-0">Multi-stage build + non-root user + health check + .dockerignore</h3>
+                    <pre><code>Dockerfile
+
+# ─── STAGE 1: BUILD ─────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copiar SOLO los .csproj primero → cachear restore por separado
+COPY ["src/Api/Api.csproj",          "src/Api/"]
+COPY ["src/Application/Application.csproj", "src/Application/"]
+COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
+COPY ["src/Domain/Domain.csproj",      "src/Domain/"]
+
+# Restore: solo corre si algún .csproj cambió
+RUN dotnet restore "src/Api/Api.csproj"
+
+# Ahora copiar el código fuente (invalida caché solo si el código cambia)
+COPY . .
+
+RUN dotnet publish "src/Api/Api.csproj" \
+    -c Release \
+    --no-restore \
+    -o /app/publish \
+    /p:UseAppHost=false
+
+# ─── STAGE 2: FINAL (runtime solamente) ─────────────────────────
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+# Non-root user: nunca correr como root en producción
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
+# Copiar solo el binario publicado del stage anterior
+COPY --from=build /app/publish .
+
+# Cambiar propietario de los archivos
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+# Puerto que expone la app (documentación, no abre el puerto)
+EXPOSE 8080
+EXPOSE 8081  # HTTPS
+
+# Health check: Docker verificará /health cada 30s
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD wget -qO- http://localhost:8080/health || exit 1
+
+ENTRYPOINT ["dotnet", "Api.dll"]</code></pre>
+                    <pre><code>.dockerignore
+
+# Excluir lo que no necesita Docker para el build
+**/.git
+**/.vs
+**/bin
+**/obj
+**/*.user
+**/node_modules
+**/.env                   # NUNCA incluir .env con secrets
+**/docker-compose*.yml    # no necesario en la imagen
+**/README.md
+**/tests                  # tests no van en imagen de producción</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Variables de Entorno y Configuración</div>
+        <div class="day-subtitle">ENV vs ARG, .env files, Docker Secrets, IConfiguration en .NET y cómo connection strings fluyen de Compose a la app</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Las variables de entorno son la única forma correcta de configurar contenedores.</strong> En .NET, <code>IConfiguration</code> lee automáticamente variables de entorno con el prefijo de la jerarquía usando doble guion bajo: <code>ConnectionStrings__DefaultConnection</code> equivale a <code>appsettings.json → ConnectionStrings → DefaultConnection</code>. Nunca hardcodees secrets en el Dockerfile ni los comittees en el repositorio. El archivo <code>.env</code> es para desarrollo local — en producción (Azure, Kubernetes) se inyectan como variables de entorno del contenedor o como Docker Secrets.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ El archivo <code>.env</code> NUNCA va al repositorio.</strong> Agrega <code>.env</code> al <code>.gitignore</code> y al <code>.dockerignore</code> ahora mismo. Si alguien ya committeó secrets, revoca las credenciales y considera el historial de git comprometido.
+    </div>
+
+    <div class="flow">
+        <h3>Variables de entorno para tu API .NET en Docker</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <th>Variable</th>
+                    <th>Ejemplo</th>
+                    <th>Obligatoria</th>
+                    <th>Descripción</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>ASPNETCORE_ENVIRONMENT</code></td>
+                        <td><code>Production</code></td>
+                        <td class="text-danger">Sí</td>
+                        <td>Determina qué appsettings.{{'{'}}env{{'}'}}.json se carga</td>
+                    </tr>
+                    <tr>
+                        <td><code>ASPNETCORE_HTTP_PORTS</code></td>
+                        <td><code>8080</code></td>
+                        <td class="text-danger">Sí</td>
+                        <td>Puerto HTTP interno del contenedor (.NET 8+)</td>
+                    </tr>
+                    <tr>
+                        <td><code>ConnectionStrings__DefaultConnection</code></td>
+                        <td><code>Server=db;Database=...;User Id=sa;</code></td>
+                        <td class="text-danger">Sí</td>
+                        <td><code>__</code> = separador jerárquico que lee IConfiguration</td>
+                    </tr>
+                    <tr>
+                        <td><code>Jwt__Secret</code></td>
+                        <td><code>super-secret-key-32-chars-min</code></td>
+                        <td class="text-danger">Sí</td>
+                        <td>Clave de firma JWT — mínimo 32 caracteres</td>
+                    </tr>
+                    <tr>
+                        <td><code>Storage__ConnectionString</code></td>
+                        <td><code>DefaultEndpointsProtocol=https;...</code></td>
+                        <td class="text-warning">Opcional</td>
+                        <td>Azure Blob Storage connection string</td>
+                    </tr>
+                    <tr>
+                        <td><code>DOTNET_RUNNING_IN_CONTAINER</code></td>
+                        <td><code>true</code></td>
+                        <td class="text-warning">Auto</td>
+                        <td>Seteada automáticamente por las imágenes oficiales de .NET</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial — Docker</strong> 
+                    <h3 class="mb-0">Configuración de ASP.NET Core en contenedores Docker</h3>
+                    <div class="mb-1 text-body-secondary">Cómo <code>IConfiguration</code> lee variables de entorno con doble guion bajo, configuración de puertos en .NET 8 con <code>ASPNETCORE_HTTP_PORTS</code>, y las mejores prácticas para gestión de secrets en contenedores.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/host-and-deploy/docker/building-net-docker-images" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Docker Secrets y Variables de Entorno — La forma correcta</h3>
+                    <div class="mb-1 text-body-secondary">Muestra todos los métodos de inyección de configuración: <code>-e</code> en CLI, <code>env_file</code> en Compose, Docker Secrets para swarm/K8s, y por qué el <code>.env</code> de Compose no es lo mismo que Docker Secrets. Con demos de cada método. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/JEbOSf0diD4?si=368GrOFnTuLMN3Q0" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — .env file + cómo IConfiguration lo lee en .NET</strong> 
+                    <h3 class="mb-0">El flujo completo: .env → docker compose → contenedor → IConfiguration</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Docker Compose — API + SQL Server + Redis</div>
+        <div class="day-subtitle">docker-compose.yml, services, redes, volúmenes, depends_on con healthcheck, override para dev y prod</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Docker Compose orquesta múltiples contenedores como un ambiente completo con un solo comando.</strong> En lugar de levantar manualmente SQL Server, Redis y tu API en tres terminales, <code>docker compose up -d</code> lo hace todo: crea la red interna, levanta los servicios en orden correcto (respetando <code>depends_on</code> con healthchecks), monta los volúmenes para persistir datos. El nombre del servicio es el hostname que usan los otros servicios — tu connection string apunta a <code>Server=db</code>, no a <code>localhost</code>.
+    </div>
+
+    <div class="flow">
+        <h3>docker-compose.yml — Arquitectura de servicios | miapi_default network (bridge)</h3>
+        <div class="flow-steps">
+            <div class="fs fs-req"><div class="fs-name">⚙️ api</div><div class="fs-sub">image: <code>miapi:latest</code><br>ports: <code>8080:8080</code><br>depends: <code>db, redis</code><br>env_file: <code>.env</code></div></div>
+            <span class="fs-arrow">↔</span>
+            <div class="fs fs-valid"><div class="fs-name">🗄️db</div><div class="fs-sub">image: <code>mssql:2022</code><br>ports: <code>1433:1433</code><br>volume: <code>sqldata:/data</code><br>health: <code>sqlcmd SELECT 1</code></div></div>
+            <span class="fs-arrow">↔</span>
+            <div class="fs fs-biz"><div class="fs-name">⚡redis</div><div class="fs-sub">image: <code>redis:7-alpine</code><br>ports: <code>6379:6379</code><br>volume: <code>redisdata:/data</code><br>health: <code>redis-cli ping</code></div></div>
+        </div><br>
+        <h3>Todos los servicios en la misma red → se ven por nombre de servicio | Server=db; no Server=localhost</h3>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Docker Compose Crash Course — Todo lo necesario</h3>
+                    <div class="mb-1 text-body-secondary">Nana explica Docker Compose desde cero: sintaxis del YAML, services, networks, volumes, depends_on con healthchecks, y cómo Compose construye la red interna para que los servicios se comuniquen por nombre. El video más completo sobre Compose. ~50 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=SXwC9fSwct8" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Docker Compose para ASP.NET Core + SQL Server — Setup completo</h3>
+                    <div class="mb-1 text-body-secondary">Les configura Docker Compose para su API con SQL Server, resuelve el problema del connection string apuntando al nombre del servicio, configura depends_on con healthcheck para que la API espere que SQL Server esté listo, y ejecuta migrations al arrancar. ~40 min</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=4V7CwC_4oss" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Docker Compose completo con healthchecks y override</strong> 
+                    <h3 class="mb-0">API + SQL Server + Redis con depends_on correcto y override para dev</h3>
+                    <pre ngNonBindable><code>docker-compose.yml
+
+name: miapi
+
+services:
+
+  # ── SQL Server ─────────────────────────────────────────────────
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD:        ${{SA_PASSWORD}}
+      ACCEPT_EULA:        Y
+      MSSQL_PID:          Developer
+    ports:
+      - "1433:1433"              # expuesto solo para SSMS en dev
+    volumes:
+      - sqldata:/var/opt/mssql  # datos persisten entre compose up/down
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd",
+             "-S", "localhost", "-U", "sa",
+             "-P", "${{SA_PASSWORD}}", "-Q", "SELECT 1", "-No"]
+      interval:     15s
+      timeout:      10s
+      retries:      5
+      start_period: 30s        # SQL Server tarda ~20s en arrancar
+
+  # ── Redis ──────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test:      ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout:  5s
+      retries:  3
+
+  # ── API ────────────────────────────────────────────────────────
+  api:
+    build:
+      context:    .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env                       # .env en .gitignore siempre
+    environment:
+      # Connection string apunta al NOMBRE DEL SERVICIO, no a localhost
+      ConnectionStrings__DefaultConnection:
+        "Server=db;Database=${{DB_NAME}};User Id=sa;Password=${{SA_PASSWORD}};TrustServerCertificate=True"
+      Redis__ConnectionString:
+        "redis:6379"              # nombre del servicio redis
+    depends_on:
+      db:
+        condition: service_healthy  # espera hasta que db pase el healthcheck
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+# Volúmenes nombrados: persisten entre compose down/up
+volumes:
+  sqldata:
+  redisdata:</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">API Corriendo en Contenedor</div>
+        <div class="day-subtitle">Docker + GitHub Actions, push a Azure Container Registry, deploy a Azure Container Apps y el entregable final</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El día 5 conecta Docker con el pipeline de CI/CD de la Semana 12.</strong> En lugar de publicar un binario zip, el pipeline ahora construye una imagen Docker y la empuja a <strong>Azure Container Registry (ACR)</strong>. Desde ahí, <strong>Azure Container Apps</strong> descarga la imagen y la ejecuta como contenedor. Este es el patrón moderno de deploy en cloud — inmutable, reproducible y escalable horizontalmente con un slider.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Docker + GitHub Actions + Azure Container Apps — Pipeline completo</h3>
+                    <div class="mb-1 text-body-secondary">El flujo completo: Dockerfile multi-stage → GitHub Actions build → push a Azure Container Registry → deploy a Azure Container Apps. El pipeline que reemplaza el zip deploy de la Semana 12 con el patrón moderno de contenedores. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/yjbzWq7bvNc?si=zkusJ9mfYyDQbmRy" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial — Docker</strong> 
+                    <h3 class="mb-0">Azure Container Apps — Deploy desde Container Registry (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Crear un Container App desde una imagen en ACR, configurar variables de entorno, Dapr sidecars, auto-scaling por HTTP requests, y revisiones (equivalente a deployment slots). La alternativa moderna al App Service para contenedores.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/container-apps/quickstart-portal" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial — Docker</strong> 
+                    <h3 class="mb-0">Docker Compose Watch — Hot reload de contenedores en desarrollo</h3>
+                    <div class="mb-1 text-body-secondary">La función más útil de Compose para desarrollo: <code>docker compose watch</code> monitorea cambios en el código y reconstruye solo las capas afectadas automáticamente. El equivalente de <code>dotnet watch run</code> pero para contenedores completos.</div>
+                    <a class="link" href="https://docs.docker.com/compose/how-tos/file-watch/" target="_blank">📘 Docker Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — GitHub Actions: build imagen Docker + push a ACR</strong> 
+                    <h3 class="mb-0">Actualizar el pipeline de la Semana 12 para deployar contenedores en vez de binarios</h3>
+                    <pre ngNonBindable><code>.github/workflows/docker-deploy.yml (fragmento)
+                        
+# Agregar estos steps al job de deploy de la Semana 12
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token:  write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      # Login a Azure con OIDC (igual que la Semana 12)
+      - uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Login al Azure Container Registry
+      - name: Login to ACR
+        run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      # Build y push con tag = SHA del commit
+      - name: Build + Push Docker Image
+        run: |
+          IMAGE="${{ secrets.ACR_NAME }}.azurecr.io/miapi"
+          TAG="${{ github.sha }}"
+          docker build -t "$IMAGE:$TAG" -t "$IMAGE:latest" .
+          docker push "$IMAGE:$TAG"
+          docker push "$IMAGE:latest"
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
+
+      # Deploy la nueva imagen a Container Apps (staging)
+      - name: Update Container App
+        run: |
+          az containerapp update \
+            --name      "${{ secrets.CONTAINER_APP_NAME_STG }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --image    "${{ secrets.ACR_NAME }}.azurecr.io/miapi:${{ github.sha }}"</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — API corriendo en contenedor</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Al finalizar la semana tu API debe correr completamente en Docker, sin instalar .NET en la máquina host:</p>
+    <ul>
+        <li><code>docker compose up -d</code> levanta API + SQL Server + Redis sin configuración manual adicional</li>
+        <li>Imagen Docker de la API en menos de 200MB — screenshot de <code>docker images</code> mostrando el tamaño</li>
+        <li><code>curl http://localhost:8080/health</code> retorna <code>{{'{'}}"status":"Healthy"{{'}'}}</code> con DB y Redis verificados</li>
+        <li>Dockerfile multi-stage con non-root user, <code>HEALTHCHECK</code> y <code>.dockerignore</code> configurados</li>
+        <li>Pipeline CI/CD actualizado: build imagen Docker → push a ACR → deploy a Container Apps</li>
+        <li>Zero secrets en el Dockerfile ni en el repositorio — <code>.env.example</code> en el repo con placeholders</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con semanas anteriores:</strong>
+        El <code>/health</code> endpoint de la <strong>Semana 11</strong> (que verifica Azure SQL y Blob Storage) es ahora el <code>HEALTHCHECK</code> del Dockerfile y el smoke test del pipeline. El pipeline de la <strong>Semana 12</strong> evoluciona: en lugar de zip deploy, ahora construye una imagen Docker. Los App Settings de Azure que configuraste en la Semana 11 son ahora variables de entorno del contenedor. La <strong>Semana 14</strong> lleva este contenedor a Kubernetes con Azure AKS.
+    </div>
 </div>

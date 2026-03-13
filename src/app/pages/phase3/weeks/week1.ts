@@ -40,15 +40,93 @@ export SQL_DB="db-miapi"
 # az group delete --name "rg-miapi-dev" --yes --no-wait
 # Elimina TODOS los recursos del grupo en un solo comando`;
 
-  codeExample2 = ``;
+  codeExample2 = `// Connection string en appsettings.json (DEV local)
+// En Azure: App Settings sobreescriben automáticamente
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(
+        builder.Configuration
+            .GetConnectionString("DefaultConnection"),
+        sqlOpt => {
+            // Retry automático para errores transitorios en Azure
+            sqlOpt.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        }));
 
-  codeExample3 = ``;
+// Aplicar migrations al iniciar (dev/staging solamente)
+if (app.Environment.IsDevelopment() ||
+    app.Environment.IsStaging())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider
+        .GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync(); // aplica migrations pendientes
+}`;
 
-  codeExample4 = ``;
+  codeExample3 = `//StorageService.cs
 
-  codeExample5 = ``;
+// NuGet: Azure.Storage.Blobs
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 
-  codeExample6 = ``;
+public class BlobStorageService(BlobServiceClient blobClient)
+{
+    private const string Container = "uploads";
 
-  codeExample7 = ``;
+    public async Task<string> UploadAsync(
+        IFormFile file, CancellationToken ct)
+    {
+        var container = blobClient.GetBlobContainerClient(Container);
+        await container.CreateIfNotExistsAsync(
+            PublicAccessType.None, // sin acceso público directo
+            cancellationToken: ct);
+
+        var blobName  = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        var blobRef   = container.GetBlobClient(blobName);
+
+        await using var stream = file.OpenReadStream();
+        await blobRef.UploadAsync(stream, new BlobUploadOptions
+        {
+            HttpHeaders = new BlobHttpHeaders
+                { ContentType = file.ContentType }
+        }, ct);
+
+        return blobRef.Uri.ToString();
+    }
+
+    public Uri GetSasUrl(string blobName, int expiryMinutes = 60)
+    {
+        var blobRef = blobClient
+            .GetBlobContainerClient(Container)
+            .GetBlobClient(blobName);
+
+        return blobRef.GenerateSasUri(BlobSasPermissions.Read,
+            DateTimeOffset.UtcNow.AddMinutes(expiryMinutes));
+    }
+}
+
+// Program.cs — registrar el cliente
+builder.Services.AddSingleton(new BlobServiceClient(
+    builder.Configuration["Storage:ConnectionString"]));`;
+
+  codeExample4 = `Program.cs
+
+// ─── Application Insights + Health Check ───
+builder.Services.AddApplicationInsightsTelemetry();
+
+builder.Services.AddHealthChecks()
+    .AddSqlServer(
+        builder.Configuration
+            .GetConnectionString("DefaultConnection")!)
+    .AddAzureBlobStorage(
+        builder.Configuration["Storage:ConnectionString"]!);
+
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+// GET /health → { "status":"Healthy","checks":[{"name":"sqlserver"...}]}`;
+
 }

@@ -1,3 +1,482 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Conceptos</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – IDistributedCache</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – StackExchange.Redis</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Invalidación</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Endpoint con Cache</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Memoria en Redis</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">Cache-Aside, Write-Through</div></div>
+</div>
+
+<div class="concept-box">
+    Tu API puede responder en 2ms en lugar de 400ms. Redis guarda los resultados costosos en memoria — lecturas de BD, respuestas de APIs externas, sesiones de usuario. Un endpoint sin cache que recibe 1000 req/s genera 1000 queries. Con cache: 1 query cada 5 minutos.
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Las 3 estrategias de cache de esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">🔍</span><div class="pc-title">Cache-Aside</div><div class="pc-body">La app busca en Redis primero. Si no hay (miss), consulta la BD, guarda el resultado en Redis y retorna. El patrón más común y flexible.<br><code>Lazy loading</code></div></div>
+    <div class="intro-card"><span class="icon">✏️</span><div class="pc-title">Write-Through</div><div class="pc-body">Al escribir en la BD, simultáneamente se actualiza el cache. El cache siempre tiene la versión más reciente. Cero stale data.<br><code>Always fresh</code></div></div>
+    <div class="intro-card"><span class="icon">⏱️</span><div class="pc-title">TTL + Invalidación</div><div class="pc-body">Cada entrada tiene un tiempo de expiración (TTL). Al actualizar datos, se invalida la clave explícitamente. Combina ambos enfoques.<br><code>Best of both</code></div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Conceptos de Caching y Redis</div>
+        <div class="day-subtitle">Por qué cachear, tipos de cache, Redis como in-memory data store, estructuras de datos, persistencia y Redis Cloud</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Cache es una capa de almacenamiento rápido que guarda resultados costosos para reutilizarlos.</strong> Redis es el cache distribuido estándar de la industria: almacena datos en RAM (microsegundos de latencia vs milisegundos de SQL), soporta estructuras como strings, hashes, lists, sets y sorted sets, y puede distribuirse entre múltiples instancias. La diferencia con la memoria del proceso: Redis es <em>compartido entre todas las instancias</em> de tu API — si tienes 3 réplicas del contenedor, todas comparten el mismo cache. Sin Redis, cada réplica tendría su propia caché en memoria, causando inconsistencias.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Para esta semana instala Redis con Docker:</strong> <code>docker run -d --name redis -p 6379:6379 redis:7-alpine</code>. O usa <strong>Redis Cloud</strong> (redis.io/try-free) que ofrece 30MB gratis — suficiente para aprender. Azure Cache for Redis empieza en ~$15/mes (tier C0).
+    </div>
+
+    <div class="flow">
+        <h3>Cache-Aside — Flujo de datos</h3>
+        <div class="flow-steps">
+            <span class="fs-arrow text-success fs-name">CACHE HIT</span>
+            <div class="fs fs-req"><div class="fs-name">Request</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-res"><div class="fs-name">Redis ✓</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-biz"><div class="fs-name">Response</div></div>
+            <span class="fs-arrow text-success fs-name">~1ms</span>
+        </div><br>
+        <div class="flow-steps">
+            <span class="fs-arrow text-danger fs-name">MISS</span>
+            <div class="fs fs-req"><div class="fs-name">Request</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-res"><div class="fs-name">Redis ✗</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-valid"><div class="fs-name">SQL Server</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-res"><div class="fs-name">Redis SET</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-res"><div class="fs-name">Response</div></div>
+            <span class="fs-arrow text-danger fs-name">~300ms</span>
+        </div><br>
+        <div class="flow-steps">
+            <span class="fs-arrow text-warning fs-name">WRITE</span>
+            <div class="fs fs-req"><div class="fs-name">PUT/POST</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-valid"><div class="fs-name">SQL UPDATE</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-valid"><div class="fs-name">Redis DEL</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-req"><div class="fs-name">201 OK</div></div>
+            <span class="fs-arrow text-warning fs-name">invalidar</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Redis Documentation — Introducción y estructuras de datos</h3>
+                    <div class="mb-1 text-body-secondary">La documentación oficial de Redis: qué es un in-memory data store, las 5 estructuras de datos principales (Strings, Hashes, Lists, Sets, Sorted Sets), comandos fundamentales (<code>SET</code>, <code>GET</code>, <code>EXPIRE</code>, <code>DEL</code>, <code>HSET</code>) y cuándo usar cada estructura.</div>
+                    <a class="link" href="https://redis.io/docs/latest/develop/get-started/" target="_blank">📘 Redis Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Redis Crash Course — Todo lo que necesitas saber</h3>
+                    <div class="mb-1 text-body-secondary">El mejor video introductorio de Redis: qué es, cómo funciona en memoria, estructuras de datos con demos en Redis CLI, persistencia (RDB vs AOF), replicación y casos de uso reales. Después de este video entiendes por qué Redis es la elección de empresas como Twitter, GitHub y Airbnb. ~1h.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=jgpVdJB2sKQ" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Comandos esenciales de Redis CLI</strong> 
+                    <h3 class="mb-0">Los comandos que usarás para debuggear el cache desde la terminal</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">IDistributedCache — La Abstracción de .NET</div>
+        <div class="day-subtitle">Configurar Redis con IDistributedCache, serialización con System.Text.Json, extensiones helper y caché en memoria para testing</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong><code>IDistributedCache</code> es la abstracción oficial de .NET para cache distribuido.</strong> Inyectas la interfaz, y la implementación puede ser Redis, SQL Server o memoria — sin cambiar el código de la aplicación. La ventaja: en tests usas <code>AddDistributedMemoryCache()</code> (en memoria, sin Redis). En producción usas <code>AddStackExchangeRedisCache()</code>. Mismo código, diferente implementación. El problema: la interfaz base solo maneja <code>byte[]</code> — necesitas serializar/deserializar manualmente. La solución: extensiones helper que hacen esto transparente.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Distributed caching en ASP.NET Core — IDistributedCache (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial completa: configurar IDistributedCache con Redis, SQL Server y memoria, los métodos de la interfaz (<code>GetAsync</code>, <code>SetAsync</code>, <code>RemoveAsync</code>), opciones de expiración absoluta vs deslizante, y cuándo elegir IDistributedCache vs IMemoryCache.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/performance/caching/distributed" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Redis Caching en ASP.NET Core — IDistributedCache completo</h3>
+                    <div class="mb-1 text-body-secondary">Implementa IDistributedCache con Redis desde cero en una Clean Architecture API: configuración, extensiones para serialización automática con System.Text.Json, manejo de errores cuando Redis no está disponible, y cómo el mismo código usa memoria en tests y Redis en producción. ~38 min.</div>
+                    <a class="link" href="https://youtu.be/UrQWii_kfIE?si=gpClW3Y70dRZQ6I1" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — IDistributedCache con extensiones de serialización</strong> 
+                    <h3 class="mb-0">Setup completo: registrar Redis + extensiones helper + uso en un endpoint</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                    <pre><code>{{codeExample3}}</code></pre>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">StackExchange.Redis — El cliente directo</div>
+        <div class="day-subtitle">ConnectionMultiplexer, operaciones batch con pipelines, Lua scripts atómicos, pub/sub y cuándo ir más allá de IDistributedCache</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>StackExchange.Redis es el cliente oficial de Redis para .NET — más potente que <code>IDistributedCache</code>.</strong> Mientras IDistributedCache solo hace GET/SET/DELETE, StackExchange.Redis expone todas las estructuras de Redis: incrementar contadores atómicamente, operaciones en listas y sorted sets, pipelines para enviar múltiples comandos en un solo round-trip, y Lua scripts para operaciones atómicas complejas. El <code>ConnectionMultiplexer</code> debe ser un singleton — maneja el pool de conexiones internamente.
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+            <div class="card card-bad h-100 w-100">
+                <div class="card-body">
+                    <h4>IDistributedCache</h4>
+                    <pre><code>✗ Solo bytes — serialización manual obligatoria
+✗ Solo strings (GET/SET/DELETE/EXPIRE)
+✗ Sin acceso a estructuras: Hashes, Lists, Sorted Sets
+✗ Sin pipelines ni operaciones batch
+✗ Sin pub/sub ni Lua scripts</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+            <div class="card card-good h-100 w-100">
+                <div class="card-body">
+                    <h4>StackExchange.Redis</h4>
+                    <pre><code>✓ Acceso completo a todas las estructuras de datos
+✓ Pipelines: múltiples comandos en un round-trip
+✓ INCR/DECR atómicos para contadores y rate limiting
+✓ Pub/Sub para notificaciones en tiempo real
+✓ Lua scripts para operaciones complejas atómicas</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">StackExchange.Redis — Documentación oficial del cliente .NET</h3>
+                    <div class="mb-1 text-body-secondary">Documentación completa: configurar ConnectionMultiplexer como singleton, operaciones básicas en todas las estructuras de datos, pipelining, Pub/Sub, Lua scripting, y las mejores prácticas de manejo de conexiones y reintentos.</div>
+                    <a class="link" href="https://stackexchange.github.io/StackExchange.Redis/" target="_blank">📘 SE.Redis Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Redis con StackExchange.Redis en .NET — Patrones avanzado</h3>
+                    <div class="mb-1 text-body-secondary">Usa el cliente directo de Redis para casos que IDistributedCache no puede manejar: rate limiting con INCR atómico, leaderboards con Sorted Sets, pub/sub para invalidación de cache distribuido, y cómo registrar el ConnectionMultiplexer correctamente como singleton con retry automático. ~42 min.</div>
+                    <a class="link" href="https://youtu.be/rsXvpCHdldg?si=iu6gbcN4wl3JBXOe" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — ConnectionMultiplexer + Rate Limiting + Pub/Sub</strong> 
+                    <h3 class="mb-0">Los 3 casos de uso avanzados que justifican ir más allá de IDistributedCache</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Estrategias de Invalidación</div>
+        <div class="day-subtitle">TTL, invalidación por evento, cache tagging, stale-while-revalidate, stampede protection y el problema del thundering herd</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La invalidación de cache es uno de los 2 problemas más difíciles de la computación.</strong> El otro es nombrar variables. Hay tres preguntas que debes responder por cada dato que cacheas: ¿Cuánto tiempo puede estar desactualizado? ¿Qué evento lo hace stale? ¿Qué pasa si 1000 requests llegan en el momento que expira? Esta última es el <em>thundering herd problem</em>: el cache expira, 1000 requests simultáneos ven el miss, todos van a la BD al mismo tiempo, la BD se cae. La solución es el <em>lock distribuido</em> o <em>probabilistic early expiration</em>.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ Thundering Herd:</strong> Cuando un cache popular expira, todas las requests concurrentes que ven el miss corren a la BD al mismo tiempo. Con tráfico alto, esto puede tumbar la BD. La solución más simple: usar <code>SemaphoreSlim</code> por clave para permitir solo una request a la BD mientras las demás esperan el resultado.
+    </div>
+
+    <div class="rn-table-wrap">
+        <table class="rn-table">
+            <thead>
+                <th>Estrategia</th>
+                <th>Cuándo usar</th>
+                <th>Complejidad</th>
+                <th>Consistencia</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-white">TTL fijo</td>
+                    <td>Datos que pueden estar ligeramente desactualizados: catálogos, configuraciones, estadísticas</td>
+                    <td class="text-success">Baja</td>
+                    <td class="text-warning">Eventual (TTL lag)</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Invalidación explícita</td>
+                    <td>Datos críticos: perfil de usuario, precios, inventario. Al escribir, borrar la clave en Redis</td>
+                    <td class="text-warning">Media</td>
+                    <td class="text-success">Alta</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Write-Through</td>
+                    <td>Datos que se escriben frecuentemente y se leen aún más. Siempre consistente, nunca stale</td>
+                    <td class="text-warning">Media</td>
+                    <td class="text-success">Inmediata</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Cache Tags</td>
+                    <td>Invalidar grupos de claves relacionadas. Ej: "todos los productos de la categoría X"</td>
+                    <td class="text-danger">Alta</td>
+                    <td class="text-warning">Alta</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Stale-While-Revalidate</td>
+                    <td>Datos tolerantes a staleness: dashboards, feeds. Retorna el dato viejo inmediatamente mientras actualiza en background</td>
+                    <td class="text-warning">Media</td>
+                    <td class="text-warning">Eventual (ms)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Estrategias de invalidación de cache — Cache-Aside, Write-Through, Write-Behind</h3>
+                    <div class="mb-1 text-body-secondary">ByteByteGo explica con animaciones claras las 5 estrategias principales de caching: cuándo cada una es correcta, las trade-offs de consistencia vs performance, y los anti-patrones más comunes. La explicación más visual y clara disponible del tema. ~12 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=a2rcgzludDU" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Cache-Aside Pattern — Azure Architecture Center</h3>
+                    <div class="mb-1 text-body-secondary">El patrón Cache-Aside documentado en detalle por Microsoft: problema que resuelve, solución paso a paso, consideraciones de consistencia, cuándo NO usarlo (datos que cambian muy frecuentemente), y el código de referencia en C#.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/architecture/patterns/cache-aside" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Thundering Herd Protection + Stale-While-Revalidate</strong> 
+                    <h3 class="mb-0">Los dos patrones avanzados de invalidación que necesitas en producción</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Endpoint Completo con Cache + Azure Cache for Redis</div>
+        <div class="day-subtitle">Cache layer sobre repositorio, Output Cache en .NET 8, Azure Cache for Redis, métricas de hit/miss y el entregable final</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>.NET 8 introduce Output Caching — la forma más simple de cachear endpoints enteros.</strong> Con <code>[OutputCache(Duration = 300)]</code> en el endpoint, el framework serializa la respuesta completa y la guarda en el cache automáticamente. Zero boilerplate. Para lógica más compleja (invalidación por evento, cache by user, queries dinámicas), se usa IDistributedCache o StackExchange.Redis directamente. El día 5 combina ambos enfoques y conecta todo con Azure Cache for Redis en la nube.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Output Caching en ASP.NET Core 8 — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Output Cache: cómo funciona internamente, el atributo <code>[OutputCache]</code>, políticas de cache por ruta, invalidación con tags, VaryBy para cachear por usuario/query string, y la diferencia con Response Caching (HTTP headers) vs Output Caching (server-side). La nueva feature de .NET 8 que simplifica el 80% de los casos.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/performance/caching/output" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Output Cache + Redis en .NET 8 — Completo con invalidación</h3>
+                    <div class="mb-1 text-body-secondary">Implementa Output Cache con Redis en .NET 8: <code>[OutputCache]</code> en minimal APIs y controllers, políticas de cache con tags para invalidación selectiva, VaryByQuery para cache por parámetros, y cómo medir el hit ratio con métricas de Application Insights. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/RYw2pyG74YM?si=JviTed6Sw--9A1nI" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Azure Cache for Redis — Quickstart con .NET (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Crear Azure Cache for Redis (tier C0 Basic para dev), obtener el connection string con SSL, configurar StackExchange.Redis con TLS habilitado, y las mejores prácticas de seguridad: no exponer el puerto 6379, usar Private Endpoints, habilitar autenticación con Microsoft Entra.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/azure-cache-for-redis/cache-dotnet-core-quickstart" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Output Cache + métricas de hit/miss en producción</strong> 
+                    <h3 class="mb-0">El endpoint final de la semana: cache completo con observabilidad</h3>
+                    <pre><code>{{codeExample7}}</code></pre>
+                    <pre><code>{{codeExample8}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Endpoint con Cache Implementado</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Al finalizar la semana debes tener al menos un endpoint con cache completo — desde la primera request lenta hasta el cache hit en menos de 2ms:</p>
+    <ul>
+        <li>Benchmark documentado: tiempo de respuesta con cache vs sin cache. Mínimo 10× de mejora demostrada</li>
+        <li>Log de cache HIT/MISS visible en Application Insights con el hit ratio de las últimas 24h</li>
+        <li>Invalidación correcta: al hacer PUT/POST, el cache del recurso se invalida y la siguiente GET va a SQL</li>
+        <li>TTL elegido con justificación: ¿por qué 5 minutos para productos? ¿Por qué 30 segundos para precios?</li>
+        <li>Tests que corren sin Redis real usando <code>AddDistributedMemoryCache()</code></li>
+        <li>Azure Cache for Redis en producción con TLS — el mismo endpoint del Container App de Sem 14</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con semanas anteriores:</strong>
+        El endpoint con cache que construiste esta semana se despliega automáticamente en el Container App de la <strong>Semana 14</strong> via el pipeline de la <strong>Semana 12</strong>. El <code>docker-compose.yml</code> de la <strong>Semana 13</strong> ya incluía el servicio Redis — ahora tiene uso real. La <strong>Semana 16</strong> cierra la Fase 3 con mensajería asíncrona y RabbitMQ — el cache solo resuelve lecturas frecuentes; para operaciones asíncronas entre servicios necesitas una solución diferente.
+    </div>
 </div>

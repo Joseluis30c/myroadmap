@@ -6,18 +6,4 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   templateUrl: './week2.html',
 })
-export class Week2 {
-  codeExample1 = ``;
-
-  codeExample2 = ``;
-
-  codeExample3 = ``;
-
-  codeExample4 = ``;
-
-  codeExample5 = ``;
-
-  codeExample6 = ``;
-
-  codeExample7 = ``;
-}
+export class Week2 {}
