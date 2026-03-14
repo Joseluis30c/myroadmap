@@ -300,13 +300,15 @@
         <strong>⚠️ Thundering Herd:</strong> Cuando un cache popular expira, todas las requests concurrentes que ven el miss corren a la BD al mismo tiempo. Con tráfico alto, esto puede tumbar la BD. La solución más simple: usar <code>SemaphoreSlim</code> por clave para permitir solo una request a la BD mientras las demás esperan el resultado.
     </div>
 
-    <div class="rn-table-wrap">
+    <div class="rn-table-wrap flow">
         <table class="rn-table">
             <thead>
-                <th>Estrategia</th>
-                <th>Cuándo usar</th>
-                <th>Complejidad</th>
-                <th>Consistencia</th>
+                <tr>
+                    <th>Estrategia</th>
+                    <th>Cuándo usar</th>
+                    <th>Complejidad</th>
+                    <th>Consistencia</th>
+                </tr>
             </thead>
             <tbody>
                 <tr>

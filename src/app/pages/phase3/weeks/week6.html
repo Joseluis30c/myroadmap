@@ -1,3 +1,457 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Conceptos</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – RabbitMQ</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Azure Service Bus</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – MassTransit</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Cola en el proyecto</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Colas en el API</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">RabbitMQ</div></div>
+</div>
+
+<div class="concept-box">
+    Enviar un email, procesar un pago, generar un PDF — ninguna de estas operaciones debería bloquear tu API. Las colas de mensajes desacoplan el productor del consumidor: tu endpoint responde en 10ms y el trabajo pesado ocurre en segundo plano. Esto es el patrón que usan Amazon, Netflix y Stripe.
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Los 4 conceptos clave de esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">📨</span><div class="pc-title">Producer / Consumer</div><div class="pc-body">El producer publica mensajes a la cola sin saber quién los consume. El consumer los procesa independientemente. Desacoplamiento total.</div></div>
+    <div class="intro-card"><span class="icon">🔄</span><div class="pc-title">Procesamiento Async</div><div class="pc-body">El endpoint responde 202 Accepted inmediatamente. El trabajo real (email, PDF, pago) ocurre en background sin bloquear al cliente.</div></div>
+    <div class="intro-card"><span class="icon">☠️</span><div class="pc-title">Dead Letter Queue</div><div class="pc-body">Mensajes que fallan N veces van a la DLQ automáticamente. Sin pérdida de mensajes. Puedes inspeccionar y reintentar manualmente.</div></div>
+    <div class="intro-card"><span class="icon">🏠</span><div class="pc-title">IHostedService</div><div class="pc-body">El consumer corre como background service dentro del mismo proceso de la API. Lee mensajes de la cola en un loop infinito, sin servidor separado.</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Conceptos de Mensajería Asíncrona</div>
+        <div class="day-subtitle">Por qué colas, producer/consumer, exchanges, bindings, patrones Work Queue vs Pub/Sub vs Request/Reply, y diferencias RabbitMQ vs Azure Service Bus</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Una cola de mensajes permite que dos servicios se comuniquen sin estar conectados directamente ni al mismo tiempo.</strong> El <em>producer</em> envía un mensaje a la cola y sigue su camino. El <em>consumer</em> lo lee cuando puede — aunque esté en otro servidor, otro proceso, o inicie 5 minutos después. Esto resuelve tres problemas: <em>desacoplamiento</em> (producer y consumer no se conocen), <em>resiliencia</em> (si el consumer falla, el mensaje espera en la cola), y <em>throttling</em> (el consumer procesa a su ritmo sin importar cuántos mensajes lleguen al mismo tiempo).
+    </div>
+
+    <div class="tip">
+        <strong>💡 Para esta semana instala Redis con Docker:</strong> <code>docker run -d --name redis -p 6379:6379 redis:7-alpine</code>. O usa <strong>Redis Cloud</strong> (redis.io/try-free) que ofrece 30MB gratis — suficiente para aprender. Azure Cache for Redis empieza en ~$15/mes (tier C0).
+    </div>
+
+    <div class="flow">
+        <h3>Los 3 patrones de mensajería que aprenderás</h3>
+        <div class="principles">
+            <div class="pc">
+                <div class="pc-body"><code>Work Queue</code></div>
+                <div class="pc-title">Cola de Trabajo</div>
+                <div class="pc-body">
+                    Un mensaje va a exactamente UN consumer. Si hay 3 workers, cada mensaje lo procesa solo uno. Ideal para distribuir carga.<br>
+                    <code>Ejemplo: <span>procesar pedidos, resize de imágenes, envío de emails en lotes</span></code>
+                </div>
+            </div>
+            <div class="pc">
+                <div class="pc-body"><code>Pub/Sub</code></div>
+                <div class="pc-title">Publicar / Suscribir</div>
+                <div class="pc-body">
+                    Un mensaje llega a TODOS los suscriptores. Si el pedido se creó, lo saben el servicio de email, el de inventario y el de analytics.<br>
+                    <code>Ejemplo: <span>eventos de dominio, notificaciones, sincronización entre microservicios</span></code>
+                </div>
+            </div>
+            <div class="pc">
+                <div class="pc-body"><code>Request/Reply</code></div>
+                <div class="pc-title">Solicitud / Respuesta</div>
+                <div class="pc-body">
+                    El producer envía y espera una respuesta asíncrona. Comunicación bidireccional sin HTTP directo entre servicios.<br>
+                    <code>Ejemplo: <span>consultar precio a otro servicio, validar stock antes de confirmar</span></code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rn-table-wrap flow">
+        <table class="rn-table">
+            <thead>
+                <tr>
+                    <th>Característica</th>
+                    <th>🐰 RabbitMQ</th>
+                    <th>☁ Azure Service Bus</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-white">Tipo</td>
+                    <td class="text-danger">Message Broker (AMQP)</td>
+                    <td class="text-success">Managed Cloud Service</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Setup</td>
+                    <td class="text-success">Docker en segundos</td>
+                    <td class="text-warning">Azure Portal / az CLI</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Costo dev</td>
+                    <td class="text-success">Gratis (self-hosted)</td>
+                    <td class="text-warning">~$10/mes (Basic tier)</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Dead Letter Queue</td>
+                    <td class="text-danger">✓ Nativo</td>
+                    <td class="text-success">✓ Nativo + portal visual</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Mensaje ordering</td>
+                    <td>No garantizado</td>
+                    <td class="text-success">Sessions garantizan orden</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Integración Azure</td>
+                    <td class="text-warning">Manual</td>
+                    <td class="text-success">Managed Identity, AAD</td>
+                </tr>
+                <tr>
+                    <td class="text-white">Cuándo elegirlo</td>
+                    <td class="text-danger">Dev local, on-premise, máxima flexibilidad de routing</td>
+                    <td class="text-success">Proyecto en Azure, enterprise, compliance</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Message Queues — Explicación visual completa</h3>
+                    <div class="mb-1 text-body-secondary">Breve explicación visual de Message Queues y Pub/Sub, con ejemplos de arquitectura y cuándo usar cada patrón en sistemas distribuidos. ~10 min.</div>
+                    <a class="link" href="https://youtu.be/XvnppkWqJbs?si=RCdq33B7PbcS8BF0" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">RabbitMQ vs Kafka vs Azure Service Bus — Cuándo usar cada uno</h3>
+                    <div class="mb-1 text-body-secondary">Explicación clara de las diferencias entre RabbitMQ y Kafka, cómo funcionan los brokers de mensajería y en qué escenarios elegir cada uno en arquitecturas reales y entrevistas de system design. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/tnYP7_gWSSg?si=LSpZ5qdk9h3SUL6l" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">RabbitMQ — Broker local con Docker</div>
+        <div class="day-subtitle">Exchanges, queues, bindings, publicar y consumir con RabbitMQ.Client, Management UI, Dead Letter Exchange y reintentos</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>RabbitMQ implementa AMQP: los mensajes no van directamente a colas, pasan por un <em>exchange</em>.</strong> El exchange decide a qué cola(s) enrutar el mensaje según su tipo: <code>direct</code> (por routing key exacta), <code>fanout</code> (a todas las colas vinculadas — Pub/Sub), <code>topic</code> (por patrón como <code>orders.*.created</code>), y <code>headers</code>. Esta separación es lo que hace a RabbitMQ flexible: cambias el routing sin tocar el código del producer ni del consumer. La Management UI en <code>localhost:15672</code> permite ver mensajes, colas, bindings y el DLQ en tiempo real.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Levanta RabbitMQ con Docker en 10 segundos:</strong><br>
+        <code>docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management</code><br>
+        Management UI: <strong>http://localhost:15672</strong> — usuario/contraseña: <code>guest / guest</code>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">RabbitMQ Tutorials para .NET — Los 6 tutoriales oficiales</h3>
+                    <div class="mb-1 text-body-secondary">Los 6 tutoriales oficiales en C# que van de cero a avanzado: Hello World, Work Queues, Pub/Sub, Routing, Topics y RPC. Cada uno construye sobre el anterior y tiene código funcional completo. El camino oficial de aprendizaje de RabbitMQ.</div>
+                    <a class="link" href="https://www.rabbitmq.com/tutorials" target="_blank">📘 RabbitMQ Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">RabbitMQ en ASP.NET Core — Producer y Consumer completos</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial completo donde se construye una API en ASP.NET Core que publica y consume mensajes con RabbitMQ, explicando producer, consumer, procesamiento en background y arquitectura de microservicios. ~55 min.</div>
+                    <a class="link" href="https://youtu.be/8wZzq28Mg64" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Producer + Consumer completo con RabbitMQ.Client</strong> 
+                    <h3 class="mb-0">Publicar desde un endpoint y consumir con BackgroundService</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Azure Service Bus — La alternativa cloud</div>
+        <div class="day-subtitle">Namespaces, queues vs topics/subscriptions, Sessions para ordering, Managed Identity, Dead Letter y Service Bus Explorer</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Azure Service Bus es el RabbitMQ gestionado de Microsoft, con garantías enterprise.</strong> La diferencia arquitectural clave: en lugar de exchanges con routing, ASB tiene <em>Queues</em> (un consumer) y <em>Topics</em> con <em>Subscriptions</em> (múltiples consumers filtrados). Las <em>Sessions</em> garantizan que todos los mensajes de un mismo <code>SessionId</code> los procese el mismo consumer en orden FIFO — crucial para pedidos de un cliente. El Dead Letter Queue está en el portal de Azure con interfaz visual, sin necesidad de RabbitMQ Management UI.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Azure Service Bus — Quickstart para .NET con Azure.Messaging.ServiceBus</h3>
+                    <div class="mb-1 text-body-secondary">Quickstart oficial: crear namespace y queue con az CLI, enviar y recibir mensajes con el SDK <code>Azure.Messaging.ServiceBus</code>, configurar <code>ServiceBusClient</code> con <code>DefaultAzureCredential</code> (Managed Identity), y el primer consumer con <code>ServiceBusProcessor</code>.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/service-bus-messaging/service-bus-dotnet-get-started-with-queues" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Azure Service Bus para .NET Developers — Completo con Topics y Sessions</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial práctico usando .NET que muestra cómo crear topics, subscriptions, enviar y consumir mensajes, y manejar múltiples subscribers en Azure Service Bus. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/YFKrguSrOAM?si=ssBruNYe8SpfTibF" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Azure Service Bus con SDK oficial y Managed Identity</strong> 
+                    <h3 class="mb-0">Sender + Processor con retry automático y Dead Letter Queue</h3>
+                    <pre><code>ServiceBusSetup.sh — Crear recursos
+
+# Crear namespace y queue con az CLI
+RG="rg-miapi-prod"
+ASB_NS="asb-miapi-prod"
+
+az servicebus namespace create \
+  --resource-group "$RG" \
+  --name           "$ASB_NS" \
+  --location       "eastus" \
+  --sku            Standard   # Basic no tiene Topics/Subscriptions
+
+az servicebus queue create \
+  --resource-group "$RG" \
+  --namespace-name "$ASB_NS" \
+  --name           "orders-queue" \
+  --max-delivery-count 3          # 3 intentos antes del Dead Letter
+
+# Asignar rol al Container App (Managed Identity)
+az role assignment create \
+  --assignee  "$APP_PRINCIPAL_ID" \
+  --role      "Azure Service Bus Data Owner" \
+  --scope     "$(az servicebus namespace show --name $ASB_NS --query id -o tsv)"</code></pre>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">MassTransit — La abstracción sobre ambos brokers</div>
+        <div class="day-subtitle">Configurar MassTransit con RabbitMQ o ASB, Consumers, Sagas básicas, Outbox Pattern y tests sin broker real</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>MassTransit es a la mensajería lo que Entity Framework es a las bases de datos: una abstracción que funciona sobre múltiples brokers.</strong> El mismo código de consumer funciona con RabbitMQ local en desarrollo y Azure Service Bus en producción — solo cambia la configuración en <code>Program.cs</code>. MassTransit agrega lo que los SDKs nativos no tienen de serie: retry policies con backoff exponencial, circuit breaker, outbox pattern para consistencia transaccional, y consumidores tipados sin boilerplate de serialización.
+    </div>
+
+    <div class="tip">
+        <strong>💡 MassTransit + Outbox Pattern = el combo definitivo.</strong> El Outbox Pattern resuelve el problema de consistencia: al crear un pedido en la BD, también guardas el mensaje en una tabla <code>OutboxMessages</code> dentro de la misma transacción. Un proceso en background lee la tabla y publica los mensajes. Así, si la BD falla, el mensaje no se pierde. Si el broker falla, el mensaje espera en la BD hasta que el broker vuelva.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">MassTransit Docs — Getting Started con .NET</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial: configurar MassTransit con RabbitMQ y Azure Service Bus, crear consumers tipados, publish vs send, retry policies, fault consumers para el Dead Letter, y el Outbox Pattern con EF Core para garantizar consistencia transaccional.</div>
+                    <a class="link" href="https://masstransit.io/documentation/concepts" target="_blank">📘 MassTransit Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">MassTransit en .NET — Completo: RabbitMQ, Consumers, Retry y Outbox</h3>
+                    <div class="mb-1 text-body-secondary">Explicación práctica de cómo usar MassTransit con RabbitMQ en .NET, mostrando cómo configurar el broker, crear consumers, manejar la topología de exchanges/queues y entender cómo funciona el flujo de mensajes en aplicaciones reales. ~55 min.</div>
+                    <a class="link" href="https://youtu.be/zKppEQIzvcU?si=7-souyabrODtfTfn" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — MassTransit con switch RabbitMQ ↔ Azure Service Bus</strong> 
+                    <h3 class="mb-0">La configuración que hace que el mismo código funcione en dev y producción</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Cola Simple en tu Proyecto</div>
+        <div class="day-subtitle">Integrar mensajería en la API existente, pruebas del consumer, monitoreo del queue.</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El día 5 conecta la mensajería con todo lo construido en la Fase 3.</strong> El caso concreto: cuando se crea un pedido, el endpoint responde 202 Accepted en &lt;10ms, y en background el consumer procesa la orden, envía el email de confirmación y actualiza el inventario. Si el email falla, el mensaje se reintenta 3 veces con backoff exponencial. Si sigue fallando, va al Dead Letter Queue donde puedes inspeccionarlo y procesarlo manualmente sin perder el pedido. El pipeline de CI/CD de la Semana 12 despliega todo automáticamente.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Procesamiento asíncrono end-to-end — API + RabbitMQ + Worker</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial práctico donde se construye comunicación asíncrona entre microservicios usando ASP.NET Core, RabbitMQ y MassTransit, explicando producers, consumers, procesamiento en background y arquitectura basada en eventos.</div>
+                    <a class="link" href="https://youtu.be/1IF4uu0ptk4?si=yamQfgAce2Dz0bND" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Asynchronous Messaging Primer — Azure Architecture Center</h3>
+                    <div class="mb-1 text-body-secondary">Guía de patrones de mensajería de Microsoft: Competing Consumers, Message Filter, Dead Letter Channel, Claim Check (para mensajes grandes), y Priority Queue. La referencia de arquitectura que respalda las decisiones de diseño de esta semana.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/architecture/patterns/category/messaging" target="_blank">📘 Architecture Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Tests del consumer sin broker real + docker-compose</strong> 
+                    <h3 class="mb-0">Probar consumers con MassTransit.Testing y el compose con RabbitMQ integrado</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                    <pre><code>{{codeExample7}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Cola Simple en tu Proyecto</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">El entregable final de la Semana 16 cierra la Fase 3 completa. Debes tener al menos un flujo asíncrono real funcionando end-to-end:</p>
+    <ul>
+        <li>Endpoint <code>POST /api/orders</code> que responde <code>202 Accepted</code> en &lt;15ms y publica un mensaje al broker</li>
+        <li>Consumer que procesa el mensaje en background: envía email, actualiza estado, o genera un documento</li>
+        <li>Screenshot de la RabbitMQ Management UI mostrando la queue con mensajes procesados y la DLQ</li>
+        <li>Al menos un mensaje en la DLQ provocado intencionalmente — demostrar que el circuit breaker funciona</li>
+        <li>Tests del consumer verde en el pipeline CI sin RabbitMQ real usando <code>ITestHarness</code></li>
+        <li><code>docker compose up</code> levanta API + SQL Server + Redis + RabbitMQ completo — el ambiente de la Fase 3 terminado</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Cierre de la Fase 3 — Cloud + DevOps:</strong>
+        El endpoint con cache que construiste esta semana se despliega automáticamente en el Container App de la <strong>Semana 14</strong> via el pipeline de la <strong>Semana 12</strong>. El <code>docker-compose.yml</code> de la <strong>Semana 13</strong> ya incluía el servicio Redis — ahora tiene uso real. La <strong>Semana 16</strong> cierra la Fase 3 con mensajería asíncrona y RabbitMQ — el cache solo resuelve lecturas frecuentes; para operaciones asíncronas entre servicios necesitas una solución diferente.
+    </div>
 </div>

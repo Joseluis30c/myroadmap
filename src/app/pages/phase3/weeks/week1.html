@@ -123,7 +123,7 @@
         <strong>NUNCA pongas connection strings en el código fuente.</strong> Usa App Settings en Azure (o Azure Key Vault para producción). El App Service inyecta esas variables como environment variables en tiempo de ejecución, que <code>IConfiguration</code> lee automáticamente en .NET.
     </div>
 
-    <div class="rn-table-wrap">
+    <div class="rn-table-wrap flow">
         <table class="rn-table">
             <thead>
                 <tr>
@@ -465,7 +465,7 @@ az sql db show-connection-string \
         <strong>💡 Regla de Brent Ozar:</strong> "If your query is slow, it's either the query or the indexes." Antes de cambiar el servidor, agregar RAM o acusar a la red — lee el execution plan. El 95% de los problemas de performance se resuelven en el SQL.
     </div>
 
-    <div class="rn-table-wrap">
+    <div class="rn-table-wrap flow">
         <table class="rn-table">
             <tbody>
                 <tr>

@@ -1,3 +1,506 @@
-<div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Monolito vs Microservicios</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Cuándo sí / cuándo no</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Comunicación HTTP</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Bounded Contexts</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Proyecto práctico</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Descomponer por Bounded Context</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">HTTP/REST, RabbitMQ Events, gRPC (interno)</div></div>
+</div>
+
+<div class="concept-box">
+    Los microservicios no son la solución a todos los problemas — son una <strong>solución al problema de escalar equipos grandes</strong>. Esta semana aprenderás a distinguir cuándo tienen sentido, cómo divides responsabilidades correctamente usando Bounded Contexts, y cómo los servicios se comunican via HTTP.
+</div>
+
+<div class="rn-table-wrap flow">
+    <h3>La pregunta más importante de esta semanas</h3>
+    <table class="rn-table">
+        <thead>
+            <tr>
+                <th>Situación</th>
+                <th>¿Microservicios?</th>
+                <th>Razón</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Startup / MVP / equipo de 1–3 personas</td>
+                <td class="text-danger">NO</td>
+                <td>La complejidad operacional mata la velocidad de iteración</td>
+            </tr>
+            <tr>
+                <td>Equipo grande con múltiples squads trabajando en paralelo</td>
+                <td class="text-success">SÍ</td>
+                <td>Cada squad hace deploy independiente sin bloquear a los demás</td>
+            </tr>
+            <tr>
+                <td>Una parte de la app escala mucho más que el resto</td>
+                <td class="text-success">SÍ</td>
+                <td>Escalar solo el servicio que lo necesita en lugar de toda la app</td>
+            </tr>
+            <tr>
+                <td>Monolito bien estructurado con módulos claros</td>
+                <td class="text-warning">QUIZÁS</td>
+                <td>Un "modular monolith" puede dar los beneficios sin la complejidad</td>
+            </tr>
+            <tr>
+                <td>Aprender arquitectura / proyecto de estudio</td>
+                <td class="text-success">SÍ</td>
+                <td>El objetivo es aprender los patrones, no producción real</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Monolito vs Microservicios — El debate real</div>
+        <div class="day-subtitle">Qué son realmente, historia, el Modular Monolith como término medio, y por qué Amazon, Netflix y Uber empezaron con monolitos</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Los microservicios son una solución organizacional antes que técnica.</strong> El paper de Conway (1968) lo dice: "las organizaciones producen diseños que copian su estructura de comunicación". Amazon no creó microservicios porque era más eficiente técnicamente — los creó porque tenía 200+ equipos que no podían coordinar deploys en un monolito compartido. Si tu equipo es de 3 personas, un microservicio te da complejidad de Amazon sin el beneficio de Amazon. El <em>Modular Monolith</em> — un monolito con módulos bien separados con interfaces explícitas entre ellos — es frecuentemente la arquitectura correcta para equipos pequeños y medianos.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ El error más común:</strong> empezar un proyecto nuevo directamente con microservicios. Martin Fowler lo llama "Microservices Premium" — pagas el costo de la distribución (latencia de red, consistencia eventual, observabilidad compleja) antes de haber validado el negocio. La regla: empieza con monolito modular, extrae microservicios cuando tengas un problema concreto que resolver.
+    </div>
+
+    <div class="flow">
+        <div class="row g-3">
+            <div class="col-sm-6 d-flex">
+                <div class="card card-good h-100 w-100">
+                    <div class="card-body">
+                        <h4>✓ Ventajas reales</h4>
+                        <p class="pc-body mt-2 mb-0"> ✓ Deploy independiente: el equipo de Orders puede deployar sin que Users esté listo</p>
+                        <p class="pc-body mt-2 mb-0"> ✓ Escalado granular: si Catalog recibe 100× más tráfico, solo escalas Catalog</p>
+                        <p class="pc-body mt-2 mb-0"> ✓ Aislamiento de fallos: si Billing cae, Orders sigue funcionando</p>
+                        <p class="pc-body mt-2 mb-0"> ✓ Autonomía tecnológica: cada servicio puede usar el lenguaje/BD que mejor le conviene</p>
+                        <p class="pc-body mt-2 mb-0"> ✓ Equipos pequeños con ownership total de su servicio</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 d-flex">
+                <div class="card card-bad h-100 w-100">
+                    <div class="card-body">
+                        <h4>✗ Costos reales</h4>
+                        <p class="pc-body mt-2 mb-0"> ✗ Latencia de red entre servicios: una request puede hacer 5 llamadas HTTP en cadena</p>
+                        <p class="pc-body mt-2 mb-0"> ✗ Consistencia eventual: no hay transacciones ACID entre servicios</p>
+                        <p class="pc-body mt-2 mb-0"> ✗ Observabilidad compleja: necesitas distributed tracing para seguir una request</p>
+                        <p class="pc-body mt-2 mb-0"> ✗ Overhead operacional: 10 servicios = 10 pipelines, 10 repos, 10 deployments</p>
+                        <p class="pc-body mt-2 mb-0"> ✗ Testing de integración difícil: mockear 5 servicios dependientes es costoso</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Artículo Fundamental</strong> 
+                    <h3 class="mb-0">Microservices — El artículo original de Martin Fowler</h3>
+                    <div class="mb-1 text-body-secondary">El artículo que definió el término "microservices" para la industria. Fowler describe los 9 características de los microservicios, la historia de cómo surgieron en Amazon y Netflix, y en qué se diferencian de SOA. Lectura obligatoria — todos en la industria lo han leído. ~40 min de lectura.</div>
+                    <a class="link" href="https://martinfowler.com/articles/microservices.html" target="_blank">📘 martinfowler.com →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Artículo Fundamental</strong> 
+                    <h3 class="mb-0">MonolithFirst — Por qué debes empezar con monolito</h3>
+                    <div class="mb-1 text-body-secondary">El mismo Fowler argumenta que casi siempre debes empezar con un monolito y extraer microservicios gradualmente. Explica por qué es difícil definir los límites de servicios hasta que entiendes bien el dominio, y cómo la extracción tardía es más limpia que el diseño prematuro.</div>
+                    <a class="link" href="https://martinfowler.com/bliki/MonolithFirst.html" target="_blank">📘 martinfowler.com →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Microservices explained — El debate honesto</h3>
+                    <div class="mb-1 text-body-secondary">Nana explica microservicios sin el hype habitual: qué problema resuelven de verdad, la historia real de cómo Amazon y Netflix llegaron a ellos (y por qué sus contextos no son los tuyos), el Modular Monolith como alternativa válida, y cuándo tiene sentido el salto. ~25 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=rv4LlmLmVWk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Microservices vs Monolith — ¿Cuál elegir?</h3>
+                    <div class="mb-1 text-body-secondary">Visualiza las diferencias con animaciones: estructura, deploy, escalado, aislamiento de fallos, y la tabla de decisión de cuándo usar cada arquitectura. La explicación más visual y concisa del tema. ~8 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=NdeTGlZ__Do" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Cuándo Sí y Cuándo No — Decisiones reales</div>
+        <div class="day-subtitle">La Ley de Conway, Strangler Fig Pattern para migrar monolitos, el costo del distributed system, y el Modular Monolith como término medio</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La Ley de Conway es la mejor guía para decidir los límites de tus servicios.</strong> Si tu organización tiene un equipo de "Pagos" y un equipo de "Catálogo" que rara vez coordinan, esos son tus dos servicios. Si tienes un solo equipo de 5 personas que trabaja en toda la app, un monolito es tu arquitectura natural. El <em>Strangler Fig Pattern</em> de Fowler describe cómo migrar: en lugar de un gran bang rewrite, vas extrayendo funcionalidad del monolito pieza a pieza, como una higuera estranguladora que crece alrededor del árbol original hasta reemplazarlo. El monolito sigue funcionando durante toda la migración.
+    </div>
+
+    <div class="tip">
+        <strong>💡 El Modular Monolith es la arquitectura más subestimada.</strong> Un monolito con módulos bien separados — cada módulo tiene su propio namespace, su interfaz pública, y no accede directamente a las tablas de otro módulo — te da el 80% de los beneficios de los microservicios (independencia de equipos, cambios localizados) sin el 100% de la complejidad operacional. Si hoy tienes un monolito mal estructurado, el primer paso no es microservicios: es un Modular Monolith.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Cuándo usar Microservicios — La decisión honesta</h3>
+                    <div class="mb-1 text-body-secondary">Hace la pregunta que nadie quiere hacerse: ¿realmente necesito microservicios? Analiza los criterios concretos (tamaño del equipo, escala del tráfico, independencia de deploy), explica el Modular Monolith con código en .NET, y muestra cuándo el salto a microservicios tiene sentido económico y organizacional. ~40 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=GBTdnfD6s5Q" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Artículo Fundamental</strong> 
+                    <h3 class="mb-0">Strangler Fig Pattern — Migrar un monolito a microservicios gradualmente</h3>
+                    <div class="mb-1 text-body-secondary">El patrón oficial de Microsoft para migrar monolitos: cómo identificar los primeros candidatos a extraer, configurar un API Gateway que enruta parte del tráfico al servicio nuevo y parte al monolito, y el criterio para saber cuándo el monolito original puede ser dado de baja.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/architecture/patterns/strangler-fig" target="_blank">📘 Architecture Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📚</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📚 Libro — Referencia</strong> 
+                    <h3 class="mb-0">Building Microservices (2ª ed.) — Sam Newman</h3>
+                    <div class="mb-1 text-body-secondary">El libro de referencia definitivo de microservicios. Los capítulos 1 "What Are Microservices?", 2 "How to Model Microservices" y 12 "Resiliency" son los más relevantes para esta semana. Newman trabajó con los equipos de Amazon y Netflix que inventaron el patrón — sus ejemplos son reales, no académicos.</div>
+                    <a class="link" href="https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/" target="_blank">📘 O'Reilly →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Comunicación HTTP entre Servicios</div>
+        <div class="day-subtitle">HttpClient con typed clients, Polly para resiliencia, retry con backoff exponencial, circuit breaker y service discovery básico</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La comunicación HTTP entre microservicios requiere resiliencia que las llamadas a BD no necesitan.</strong> Una llamada a la BD falla raramente y rápido. Una llamada HTTP a otro servicio puede fallar por saturación, timeout, despliegue en progreso, o problemas de red. Los patrones esenciales: <em>Retry</em> con backoff exponencial (esperar más entre cada intento), <em>Circuit Breaker</em> (después de N fallos, dejar de intentar durante X segundos para no saturar el servicio caído), y <em>Timeout</em> explícito (nunca confíes en el timeout por defecto de HttpClient — es infinito). La librería <strong>Polly</strong> implementa todos estos patrones en .NET.
+    </div>
+
+    <div class="flow">
+        <h3>Comunicación HTTP entre servicios con resiliencia Polly</h3>
+        <div class="flow-steps">
+            <div class="fs fs-valid"><div class="fs-name">Client App</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-biz"><div class="fs-name">API Gateway (YARP)</div></div>            
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-req"><div class="fs-name">Orders.API :8001</div></div>
+            <span class="fs-arrow">authn + routing</span>
+        </div><br>
+        <div class="flow-steps">
+            <div class="fs fs-req"><div class="fs-name">Orders.API</div></div>
+            <span class="fs-arrow">→ HTTP+Polly →</span>
+            <div class="fs fs-req"><div class="fs-name">Catalog.API :8002</div></div>            
+            <span class="fs-arrow">retry 3× + circuit breaker</span>
+        </div><br>
+        <div class="flow-steps">
+            <div class="fs fs-req"><div class="fs-name">Orders.API</div></div>
+            <span class="fs-arrow">→ HTTP+Polly →</span>
+            <div class="fs fs-req"><div class="fs-name">Users.API :8003</div></div>            
+            <span class="fs-arrow">typed HttpClient</span>
+        </div><br>
+        <div class="flow-steps">
+            <div class="fs fs-req"><div class="fs-name">Orders.API</div></div>
+            <span class="fs-arrow">→</span>
+            <div class="fs fs-res"><div class="fs-name">orders_db (SQL)</div></div>            
+            <span class="fs-arrow">solo su propia BD</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">IHttpClientFactory y Typed Clients en ASP.NET Core (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial: por qué no hacer <code>new HttpClient()</code> directamente (socket exhaustion), cómo configurar Typed Clients con <code>AddHttpClient&lt;T&gt;</code>, inyección de dependencias correcta, y cómo el pool de sockets se gestiona automáticamente con IHttpClientFactory.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/core/extensions/httpclient-factory" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Polly v8 en .NET — Retry, Circuit Breaker y Timeout completo</h3>
+                    <div class="mb-1 text-body-secondary">Demostración práctica de resiliencia en .NET con Polly mostrando retry, timeout y circuit breaker funcionando en vivo dentro de un proyecto real.</div>
+                    <a class="link" href="https://youtu.be/lc7-80HnNWk?si=6emosWdHN_7yTLmb" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Typed HttpClient + Polly v8 completo</strong> 
+                    <h3 class="mb-0">El patrón correcto de comunicación HTTP entre microservicios en .NET 8</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Bounded Contexts y Separación de Responsabilidades</div>
+        <div class="day-subtitle">Domain-Driven Design básico, cómo identificar los límites correctos, database-per-service, el problema del shared database y la regla del "Product" duplicado</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un Bounded Context define qué significa un concepto dentro de un servicio — y ese significado puede ser distinto en otros servicios.</strong> El ejemplo clásico: "Product" en el servicio de Catalog tiene nombre, descripción, imágenes, categorías, SEO metadata. "Product" en el servicio de Orders solo necesita <code>productId</code>, <code>name</code> y <code>price</code> al momento de la compra. Son el mismo concepto del mundo real pero dos objetos distintos en dos contextos distintos. Si compartes la entidad Product entre servicios, los acoplas. La regla es simple: <em>cada servicio es el dueño de sus datos</em> — si Orders necesita saber el nombre del producto, lo pide a Catalog via HTTP (o guarda una copia desnormalizada).
+    </div>
+
+    <div class="pf-grid" style="margin-bottom: 8px;">
+        <div class="pf">
+            <div class="pf-key" style="font-size: 1rem;">Orders Context</div>
+            <div class="layer-items">
+                <span class="layer-tag">Order</span><span class="layer-tag">OrderItem</span><span class="layer-tag">OrderStatus</span>
+            </div>
+            <div class="pf-val">BD propia: <code>orders_db</code></div>
+            <div class="pf-val">Responsabilidad: <code>ciclo de vida del pedido</code></div>
+        </div>
+        <div class="pf">
+            <div class="pf-key" style="font-size: 1rem;">Catalog Context</div>
+            <div class="layer-items">
+                <span class="layer-tag">Product</span><span class="layer-tag">Category</span><span class="layer-tag">Inventory</span>
+            </div>
+            <div class="pf-val">BD propia: <code>catalog_db</code></div>
+            <div class="pf-val">Responsabilidad: <code>catálogo y stock</code></div>
+        </div>
+    </div>
+    <div class="pf-grid">
+        <div class="pf">
+            <div class="pf-key" style="font-size: 1rem;">Users Context</div>
+            <div class="layer-items">
+                <span class="layer-tag">User</span><span class="layer-tag">Address</span><span class="layer-tag">Preferences</span>
+            </div>
+            <div class="pf-val">BD propia: <code>users_db</code></div>
+            <div class="pf-val">Responsabilidad: <code>identidad y perfil</code></div>
+        </div>
+        <div class="pf">
+            <div class="pf-key" style="font-size: 1rem;">Billing Context</div>
+            <div class="layer-items">
+                <span class="layer-tag">Invoice</span><span class="layer-tag">Payment</span><span class="layer-tag">Refund</span>
+            </div>
+            <div class="pf-val">BD propia: <code>billing_db</code></div>
+            <div class="pf-val">Responsabilidad: <code>transacciones financieras</code></div>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Domain-Driven Design — Bounded Contexts explicados</h3>
+                    <div class="mb-1 text-body-secondary">Explicación visual clara de Bounded Contexts en Domain-Driven Design, mostrando cómo separar dominios, evitar ambigüedad en el lenguaje y cómo se relaciona con microservicios. ~5 min.</div>
+                    <a class="link" href="https://youtu.be/NvBsEnDgA4o?si=l2rSKHNgV9ZKH7Tn" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Bounded Contexts en microservicios .NET — Con código real</h3>
+                    <div class="mb-1 text-body-secondary">Explicación completa de microservicios con Domain-Driven Design, incluyendo Bounded Contexts, separación de dominios, context maps y cómo estructurar servicios independientes en sistemas reales. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/oB5ctmEwzG8?si=HfYfrriPKzz0jSq-" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Microservices Architecture Guide — .NET (Microsoft Docs)</h3>
+                    <div class="mb-1 text-body-secondary">La guía completa de Microsoft para microservicios con .NET: Bounded Contexts, database-per-service, comunicación sincrónica vs asincrónica, API Gateway, y el eShopOnContainers como aplicación de referencia. Incluye código fuente en GitHub con ejemplos reales.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/dotnet/architecture/microservices/" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Proyecto Práctico — Descomponer la API de las fases anteriores</div>
+        <div class="day-subtitle">Identificar los Bounded Contexts propios, crear dos microservicios que se comunican via HTTP, y configurar YARP como API Gateway</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El día 5 convierte la teoría en código.</strong> Tomarás la API de las Fases 1–3 y extraerás dos servicios independientes que se comunican via HTTP con Polly. El objetivo no es tener un sistema de producción perfecto — es vivir los problemas reales: dos bases de datos separadas, un Typed Client con circuit breaker, y un API Gateway con YARP que enruta las requests al servicio correcto. <em>YARP (Yet Another Reverse Proxy)</em> es el reverse proxy de Microsoft integrado con ASP.NET Core — ideal para API Gateway sin infraestructura externa.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Microservicios .NET desde cero — 2 servicios + API Gateway</h3>
+                    <div class="mb-1 text-body-secondary">Construye un sistema de microservicios real en .NET desde cero: dos APIs independientes con sus propias BDs, comunicación HTTP con Typed Clients y Polly, y un API Gateway con YARP. El código es el punto de partida exacto del proyecto de esta semana. ~1h 20min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=DgVjEo3OGBI" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">YARP — Yet Another Reverse Proxy como API Gateway</h3>
+                    <div class="mb-1 text-body-secondary">Documentación de YARP: configuración como reverse proxy y API Gateway en ASP.NET Core, routing por prefijo de ruta, transformaciones de headers, load balancing entre instancias del mismo servicio, y health checks de los servicios upstream. El API Gateway nativo de .NET.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/fundamentals/servers/yarp/getting-started?view=aspnetcore-10.0" target="_blank">📘 YARP Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Estructura de solución + YARP + docker-compose</strong> 
+                    <h3 class="mb-0">La estructura completa del proyecto de microservicios de la semana</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                    <pre><code>{{codeExample4}}</code></pre>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Microservicios comunicándose via HTTP</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Al finalizar la semana debes tener un sistema con al menos dos microservicios reales que se comunican, cada uno con su propia base de datos:</p>
+    <ul>
+        <li>Dos APIs independientes corriendo en puertos distintos, cada una con su propia instancia de SQL Server</li>
+        <li>API Gateway con YARP enrutando desde <code>:8000/api/orders</code> a <code>orders-api:8001</code> y desde <code>/api/products</code> a <code>catalog-api:8002</code></li>
+        <li>Orders Service llama a Catalog Service via Typed HttpClient con Polly — retry 3× y circuit breaker configurados</li>
+        <li>Demostrar el circuit breaker abriendo: bajar Catalog Service y mostrar que Orders responde con degraded response en lugar de error 500</li>
+        <li>Documento de decisión: cuáles son los Bounded Contexts identificados y qué datos pertenecen a cada uno</li>
+        <li><code>docker compose up</code> levanta todo el sistema — screenshot de todos los contenedores healthy</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con la Fase 3 y lo que viene:</strong>
+        El <code>docker-compose.yml</code> de la <strong>Semana 13</strong> escala — ahora tienes múltiples servicios con múltiples BDs. El pipeline de CI/CD de la <strong>Semana 12</strong> se multiplica: cada servicio tiene su propio pipeline independiente. El Redis de la <strong>Semana 15</strong> ahora es compartido entre servicios para cache distribuido. La mensajería de la <strong>Semana 16</strong> aparece en la <strong>Semana 18</strong> como comunicación asíncrona entre microservicios cuando HTTP síncrono no es suficiente.
+    </div>
 </div>

@@ -1,3 +1,490 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – API Versioning</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Asp.Versioning</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Swagger / OpenAPI</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Documentación real</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Gateway + Docs</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Documentación de tu API</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">URL Versioning, Asp.Versioning</div></div>
+</div>
+
+<div class="concept-box">
+    Una API sin versionado rompe todos sus clientes al primer cambio. Una API sin documentación no existe para quien la consume. Esta semana aprendes a evolucionar tu API sin romper contratos, generar una <strong>documentación de nivel Stripe</strong> con Swagger/OpenAPI, y configurar YARP para gestionar múltiples versiones en el gateway.
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Las 4 estrategias de versionado — cuándo usar cada una</h3>
+    <div class="principles">
+        <div class="pc">
+            <div class="pc-title">URL Segment</div>
+            <div class="layer-items"><span class="layer-tag text-warning">/api/v2/orders</span></div>
+            <div class="pc-title text-light">Más visible</div>
+            <div class="pc-body">La versión está en la URL. Todo el mundo la ve, es fácil de testear con el browser y cURL. El estándar de facto para APIs públicas.</div>
+            <div class="layer-items"><span class="layer-tag text-success"><strong>Recomendado</strong></span></div>
+        </div>
+        <div class="pc">
+            <div class="pc-title">Query String</div>
+            <div class="layer-items"><span class="layer-tag text-warning">?api-version=2.0</span></div>
+            <div class="pc-title text-light">Más flexible</div>
+            <div class="pc-body">La versión va en el query string. Útil cuando no puedes cambiar la estructura de la URL. Menos limpio pero funcional.</div>
+            <div class="layer-items"><span class="layer-tag text-info"><strong>Opcional</strong></span></div>
+        </div>
+        <div class="pc">
+            <div class="pc-title">HTTP Header</div>
+            <div class="layer-items"><span class="layer-tag text-warning">api-version: 2.0</span></div>
+            <div class="pc-title text-light">Más limpio</div>
+            <div class="pc-body">La versión va en el header. Las URLs son inmutables entre versiones. Difícil de testear con el browser sin herramientas.</div>
+            <div class="layer-items"><span class="layer-tag text-info"><strong>APIs internas</strong></span></div>
+        </div>
+        <div class="pc">
+            <div class="pc-title">Media Type</div>
+            <div class="layer-items"><span class="layer-tag text-warning">Accept: application/vnd.v2+json</span></div>
+            <div class="pc-title text-light">Más puro</div>
+            <div class="pc-body">La versión está en el Accept header usando content negotiation. Correcto en teoría REST, pero complejo en práctica. GitHub lo usa.</div>
+            <div class="layer-items"><span class="layer-tag text-danger"><strong>Avanzado</strong></span></div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">API Versioning — Por qué y cómo</div>
+        <div class="day-subtitle">El problema del breaking change, las 4 estrategias de versionado, semver para APIs, política de deprecación y sunset headers</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un breaking change es cualquier cambio que rompe el código de un cliente existente.</strong> Renombrar un campo JSON, eliminar un campo, cambiar el tipo de un parámetro — todos rompen a los clientes que ya están en producción. El versionado no es para ti: es para tus clientes. Les da tiempo de migrar mientras siguen usando la versión anterior. La regla de oro: <em>nunca elimines ni renombres campos en una versión existente</em>. Agrega nuevos campos (backward compatible), y cuando necesites breaking changes, crea una versión nueva.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ Breaking changes más comunes que olvidan versionar:</strong> cambiar el nombre de un campo JSON (<code>userId</code> → <code>user_id</code>), cambiar un campo de string a object, eliminar un endpoint, cambiar el significado de un código HTTP (de 200 a 204), y cambiar la estructura de los errores. <em>Agregar</em> campos opcionales generalmente no es breaking — pero <em>eliminar</em> o <em>renombrar</em> siempre lo es.
+    </div>
+
+    <div class="flow">
+        <div class="rn-table-wrap">
+        <table class="rn-table">
+            <thead>
+                <tr>
+                    <th>Tipo de cambio</th>
+                    <th>¿Breaking?</th>
+                    <th>¿Requiere nueva versión?</th>
+                    <th>Ejemplo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-light">Agregar campo opcional</td>
+                    <td class="text-success">NO</td>
+                    <td class="text-success">No necesario</td>
+                    <td><code>+ "discount": 0.1</code></td>
+                </tr>
+                <tr>
+                    <td class="text-light">Renombrar campo</td>
+                    <td class="text-danger">SÍ</td>
+                    <td class="text-danger">Obligatorio</td>
+                    <td><code>userId → user_id</code></td>
+                </tr>
+                <tr>
+                    <td class="text-light">Eliminar campo</td>
+                    <td class="text-danger">SÍ</td>
+                    <td class="text-danger">Obligatorio</td>
+                    <td><code>- "legacyCode"</code></td>
+                </tr>
+                <tr>
+                    <td class="text-light">Cambiar tipo de campo</td>
+                    <td class="text-danger">SÍ</td>
+                    <td class="text-danger">Obligatorio</td>
+                    <td><code>string → number</code></td>
+                </tr>
+                <tr>
+                    <td class="text-light">Agregar campo requerido en request</td>
+                    <td class="text-danger">SÍ</td>
+                    <td class="text-danger">Obligatorio</td>
+                    <td><code>+ required: "taxId"</code></td>
+                </tr>
+                <tr>
+                    <td class="text-light">Nuevo endpoint</td>
+                    <td class="text-success">NO</td>
+                    <td class="text-success">No necesario</td>
+                    <td><code>GET /orders/{{'{'}}id{{'}'}}/timeline</code></td>
+                </tr>
+                <tr>
+                    <td class="text-light">Cambiar código HTTP</td>
+                    <td class="text-danger">SÍ</td>
+                    <td class="text-danger">Obligatorio</td>
+                    <td><code>200 → 204 en DELETE</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Artículo Fundamental</strong> 
+                    <h3 class="mb-0">Your API versioning is wrong — Las 3 formas de versionar y por qué no hay una correcta</h3>
+                    <div class="mb-1 text-body-secondary">Troy Hunt (fundador de HaveIBeenPwned) analiza las 3 estrategias de versionado con sus ventajas y desventajas reales, por qué cada una tiene defensores válidos, y cuál elige él para sus APIs. Uno de los artículos más citados sobre el tema. Lectura obligatoria. ~15 min.</div>
+                    <a class="link" href="https://www.troyhunt.com/your-api-versioning-is-wrong-which-is/" target="_blank">📘 troyhunt.com →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">API Versioning — Las mejores prácticas</h3>
+                    <div class="mb-1 text-body-secondary">Explica por qué el versionado de APIs es importante, las estrategias principales (URL, headers, query params), y cómo mantener compatibilidad hacia atrás en APIs modernas. ~10 min.</div>
+                    <a class="link" href="https://youtu.be/w0kQMB1iVnM?si=B1FC9ESTonTTrLge" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Asp.Versioning — Implementación en .NET 8</div>
+        <div class="day-subtitle">Configurar Asp.Versioning, versionar controllers y minimal APIs, múltiples estrategias simultáneas, deprecar versiones y sunset headers automáticos</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong><code>Asp.Versioning</code> es el paquete oficial de Microsoft para versionar APIs en ASP.NET Core.</strong> Reemplaza al antiguo <code>Microsoft.AspNetCore.Mvc.Versioning</code> que quedó obsoleto. Con una sola configuración en <code>Program.cs</code> soporta simultáneamente URL segment (<code>/v1/</code>), query string (<code>?api-version=1.0</code>) y header (<code>api-version: 1.0</code>). El atributo <code>[ApiVersion]</code> en el controller declara qué versiones maneja, y <code>[MapToApiVersion]</code> permite que un mismo controller tenga distintas implementaciones por versión.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Sunset headers — notifica a los clientes antes de eliminar una versión.</strong> El header <code>Sunset: Sat, 31 Dec 2025 23:59:59 GMT</code> le dice al cliente que esta versión va a dejar de funcionar en esa fecha. Asp.Versioning los agrega automáticamente cuando marcas una versión como deprecated. Los clientes bien construidos loggean una advertencia cuando reciben este header — es la forma profesional de gestionar el ciclo de vida de una API.
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Asp.Versioning — Wiki oficial con todos los escenarios</h3>
+                    <div class="mb-1 text-body-secondary">La wiki oficial del paquete: configuración básica y avanzada, versionar Controllers MVC vs Minimal APIs, API explorer para Swagger, sunset y deprecation, convenciones de versionado, y los ejemplos de código para cada caso. La referencia completa del paquete.</div>
+                    <a class="link" href="https://github.com/dotnet/aspnet-api-versioning/wiki" target="_blank">📘 GitHub Wiki →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">API Versioning en .NET 8 con Asp.Versioning</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial práctico que muestra cómo implementar versionado moderno en APIs .NET, incluyendo configuración, manejo de versiones y buenas prácticas aplicables a Web API y Minimal APIs. ~40 min.</div>
+                    <a class="link" href="https://youtu.be/8Asq7ymF1R8" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Asp.Versioning completo: config + controllers + deprecation</strong> 
+                    <h3 class="mb-0">Setup completo de versionado con múltiples estrategias y sunset headers</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Swagger / OpenAPI 3.1 Profesional</div>
+        <div class="day-subtitle">Scalar vs Swagger UI, múltiples documentos por versión, XML comments, ejemplos de requests/responses, autenticación JWT en Swagger y filtros de operación</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Swagger es la interfaz visual de tu contrato OpenAPI — si está mal configurado, tus clientes no pueden entender tu API.</strong> El nivel mínimo aceptable: cada endpoint tiene descripción, cada parámetro está documentado, los posibles códigos HTTP están listados, y los ejemplos de request/response son reales (no solo tipos genéricos). El nivel profesional: XML comments generados desde el código, ejemplos múltiples por endpoint, autenticación JWT funcional desde la UI, y un documento separado por versión. <strong>Scalar</strong> es la alternativa moderna a Swagger UI — más limpio, sin dependencias de jQuery, con mejor UX.
+    </div>
+
+    <div class="rn-swagger">
+        <!-- Header bar -->
+        <div class="rn-sw-header">
+            <div class="rn-sw-header-left">
+                <span class="rn-sw-title">MiApp API</span>
+                <span class="rn-sw-ver">v3 - Documentation</span>
+            </div>
+            <span class="rn-sw-spec">OpenAPI 3.1</span>
+        </div>
+        <!-- Body -->
+        <div class="rn-sw-body">
+            <!-- Auth info -->
+            <div class="rn-sw-auth">
+                <span class="rn-sw-auth-icon">🔐</span>
+                <span>Autenticación: <strong>Bearer Token (JWT)</strong></span>
+                <code>Authorization: Bearer {{'{'}}token{{'}'}}</code>
+            </div>
+            <!-- Tag: Orders -->
+            <div class="rn-sw-tag">Orders</div>
+            <div class="rn-sw-ep">
+                <span class="rn-sw-method rn-m-get">GET</span>
+                <span class="rn-sw-path">/api/v3/orders/<em>{{'{'}}id{{'}'}}</em></span>
+                <span class="rn-sw-summary">Get order by ID — includes items and tracking</span>
+            </div>
+            <div class="rn-sw-ep">
+                <span class="rn-sw-method rn-m-post">POST</span>
+                <span class="rn-sw-path">/api/v3/orders</span>
+                <span class="rn-sw-summary">Create a new order — returns 201 with Location header</span>
+            </div>
+            <div class="rn-sw-ep">
+                <span class="rn-sw-method rn-m-put">PUT</span>
+                <span class="rn-sw-path">/api/v3/orders/<em>{{'{'}}id{{'}'}}</em>/status</span>
+                <span class="rn-sw-summary">Update order status — triggers async notifications</span>
+            </div>
+            <div class="rn-sw-ep">
+                <span class="rn-sw-method rn-m-delete">DELETE</span>
+                <span class="rn-sw-path">/api/v3/orders/<em>{{'{'}}id{{'}'}}</em></span>
+                <span class="rn-sw-summary">Cancel order — only if status is Pending</span>
+            </div>
+            <!-- Tag: Catalog -->
+            <div class="rn-sw-tag" style="margin-top:.9rem;">Catalog</div>
+            <div class="rn-sw-ep">
+                <span class="rn-sw-method rn-m-get">GET</span>
+                <span class="rn-sw-path">/api/v3/products</span>
+                <span class="rn-sw-summary">List products — supports pagination, filtering and sorting</span>
+            </div>
+            <div class="rn-sw-ep">
+                <span class="rn-sw-method rn-m-get">GET</span>
+                <span class="rn-sw-path">/api/v3/products/<em>{{'{'}}id{{'}'}}</em></span>
+                <span class="rn-sw-summary">Get product details — includes inventory count</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Swagger / OpenAPI en .NET 8 nivel profesional — Con versioning</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial práctico donde se configura API Versioning en .NET 8 y se integra Swagger/OpenAPI para generar múltiples documentos por versión y mejorar la documentación de la API. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/9tapvVOHYS8?si=mH0yJaNwutEpmXUY" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Documentación de ASP.NET Core Web API con Swagger/OpenAPI</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial de Microsoft: habilitar OpenAPI con Swashbuckle, XML comments desde el IDE, filtros de operación para personalizar el documento, configurar autenticación en la UI, y la diferencia entre Swashbuckle (clásico) y el nuevo <code>Microsoft.AspNetCore.OpenApi</code> de .NET 9.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/tutorials/web-api-help-pages-using-swagger" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Asp.Versioning completo: config + controllers + deprecation</strong> 
+                    <h3 class="mb-0">Setup completo de versionado con múltiples estrategias y sunset headers</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Documentación Real — El nivel Stripe</div>
+        <div class="day-subtitle">Problem Details RFC 7807, errores consistentes y documentados, changelogs, guías de migración entre versiones, README de API y generación de SDKs con NSwag</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La documentación real va más allá del Swagger automático.</strong> Stripe tiene la mejor documentación de API del mundo no porque use herramientas mejores, sino porque invierte en tres cosas: <em>errores consistentes y descriptos</em> (todos los errores tienen el mismo formato con un código de error específico y una descripción accionable), <em>guías de migración</em> (un documento por cada versión mayor que explica exactamente qué cambió y cómo migrar), y <em>ejemplos reales</em> en múltiples lenguajes. El estándar para errores es RFC 7807 — Problem Details — que ASP.NET Core implementa con <code>ProblemDetails</code>.
+    </div>
+
+    <div class="tip">
+        <strong>💡 Problem Details (RFC 7807)</strong> es el estándar para errores de API. En lugar de retornar un JSON ad-hoc o solo el código HTTP, retornas un objeto con <code>type</code> (URL que documenta el error), <code>title</code> (descripción legible), <code>status</code> (código HTTP), <code>detail</code> (descripción específica del caso) y opcionalmente <code>instance</code> (URL de esta ocurrencia específica). ASP.NET Core lo implementa con <code>AddProblemDetails()</code>.
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Problem Details (RFC 7807) en ASP.NET Core 8 — Errores profesionales</h3>
+                    <div class="mb-1 text-body-secondary">Implementa Problem Details en una API ASP.NET Core 8: configurar <code>AddProblemDetails()</code>, crear tipos de error personalizados (campos de validación con detalles, códigos de error de negocio), middleware global de manejo de excepciones que nunca expone el stack trace, y la documentación de errores en Swagger. ~38 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=4NfflZilTvk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Stripe API Docs — El estándar de oro de documentación de APIs</h3>
+                    <div class="mb-1 text-body-secondary">Leer la documentación de Stripe no para usar Stripe, sino para entender cómo se documenta una API al nivel más alto: formato de errores (con <code>error.code</code> específico y <code>error.message</code> accionable), changelogs por versión, guías de migración, exemplos de código en 8 lenguajes, y webhook documentation. El modelo a imitar.</div>
+                    <a class="link" href="https://stripe.com/docs/api/errors" target="_blank">📘 Stripe Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Problem Details + middleware de errores + NSwag SDK generation</strong> 
+                    <h3 class="mb-0">Errores consistentes y generación automática de cliente TypeScript/C#</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">YARP Gateway con Versionado</div>
+        <div class="day-subtitle">Configurar YARP para enrutar versiones, Swagger agregado en el Gateway que combina todos los microservicios, y el entregable completo de la semana</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El API Gateway de la Semana 17 ahora gestiona el versionado y agrega la documentación de todos los microservicios.</strong> Con YARP puedes enrutar <code>/api/v1/orders</code> al cluster de Orders y <code>/api/v2/orders</code> al mismo cluster — o a una versión diferente del servicio si necesitas deployment blue/green por versión. El Swagger en el Gateway puede agregar los documentos de todos los microservicios en una sola UI usando <code>Swashbuckle.AspNetCore.ReDoc</code> con documentos múltiples — los consumers de tu API ven <em>una</em> documentación, no seis.
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">API Gateway con Swagger agregado en .NET — Todos los microservicios en una UI</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial donde se construye un API Gateway con YARP en .NET, explicando autenticación JWT centralizada y cómo enrutar peticiones hacia múltiples microservicios desde un único punto de entrada. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/gk1uQrWDMjk?si=QiZfAQjbbZVmkKzW" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Scalar para ASP.NET Core — La alternativa moderna a Swagger UI</h3>
+                    <div class="mb-1 text-body-secondary">Scalar es la nueva UI para OpenAPI: sin jQuery ni Bootstrap, diseño limpio que recuerda a la documentación de Stripe, soporte para múltiples versiones con selector integrado, modo oscuro, y generación de código en 20+ lenguajes. Se instala con un solo paquete NuGet y reemplaza Swagger UI.</div>
+                    <a class="link" href="https://scalar.com/products/api-references/integrations/aspnetcore/integration" target="_blank">📘 Scalar Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Gateway con Swagger agregado + versionado en YARP</strong> 
+                    <h3 class="mb-0">El Gateway final: enruta versiones y sirve documentación unificada</h3>
+                    <pre><code>{{codeExample7}}</code></pre>
+                    <pre><code>{{codeExample8}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — API versionada con documentación profesional</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">El entregable de la semana es una API con al menos dos versiones activas, documentación completa y errores estandarizados:</p>
+    <ul>
+        <li>Al menos un endpoint con dos versiones: <code>GET /api/v1/orders/{{'{'}}id{{'}'}}</code> y <code>GET /api/v2/orders/{{'{'}}id{{'}'}}</code> retornando modelos distintos</li>
+        <li>v1 marcada como deprecated con <code>X-Api-Deprecated-Versions</code> y <code>Sunset</code> en los response headers</li>
+        <li>Swagger UI con selector de versión — al cambiar de v1 a v2 se ven documentos distintos con los endpoints correspondientes</li>
+        <li>Botón Authorize funcional — ejecutar un endpoint autenticado desde Swagger sin Postman</li>
+        <li>Errores siguen Problem Details — un 404, un 422 y un 401 tienen el mismo formato consistente</li>
+        <li>Screenshot del Swagger en el Gateway mostrando los documentos de todos los microservicios en el dropdown</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con la Fase 4:</strong> El versionado y la documentación de esta semana se construyen sobre la separación de microservicios de la <strong>Semana 17</strong>. Cada servicio tiene su propia versión y su propio Swagger — el Gateway los agrega en una sola UI. La <strong>Semana 19</strong> introduce CQRS con MediatR dentro de cada servicio, y la <strong>Semana 20</strong> cierra con el Outbox Pattern y Domain Events — donde el versionado del contrato de eventos (no solo HTTP) también será relevante.
+    </div>
 </div>
