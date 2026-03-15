@@ -1,3 +1,436 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Code Smells</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Técnicas de refactoring</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Arquitectura evolutiva</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – ADRs + Docs técnicas</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Pull Request profesional</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Mejorar Código</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">Code Smells, ADRs</div></div>
+</div>
+
+<div class="concept-box">
+    Refactorizar no es reescribir. Es <strong>cambiar la estructura interna del código sin cambiar su comportamiento observable</strong> — con tests como red de seguridad, técnicas precisas como bisturí, y documentación que explica el <em>por qué</em>, no el qué.
+</div>
+
+<div class="row flow">
+    <h3>// OrderService.cs — CreateOrder</h3>
+    <div class="col-sm-6 mb-3 mb-sm-0 d-flex">
+        <div class="card card-bad h-100 w-100">
+            <div class="card-body">
+                <h4>✗ Antes — con smells</h4>
+                <pre><code>{{codeExample1}}</code></pre>
+                <h4>God Class · Magic Numbers · Feature Envy</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 d-flex">
+        <div class="card card-good h-100 w-100">
+            <div class="card-body">
+                <h4>✓ Después — limpio</h4>
+                <pre><code>{{codeExample2}}</code></pre>
+                <h4>Single Responsibility · Domain Model · Clean</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>El catálogo de code smells que más aparecen en código real</h3>
+    <div class="principles">
+        <div class="intro-card"><span class="icon">🦩</span><div class="pc-title">God Class</div><div class="pc-body">Una clase que lo hace todo: valida, persiste, envía emails, calcula precios. Tiene 800 líneas y 40 métodos.<br><code>Extract Class</code></div></div>
+        <div class="intro-card"><span class="icon">📏</span><div class="pc-title">Long Method</div><div class="pc-body">Métodos de más de 20 líneas que hacen múltiples cosas. Difícil de testear, nombrar y entender.<br><code>Extract Method</code></div></div>
+        <div class="intro-card"><span class="icon">🏗️</span><div class="pc-title">Primitive Obsession</div><div class="pc-body">Usar <code>string email</code>, <code>int amount</code> en lugar de <code>Email</code>, <code>Money</code>. Sin validación ni dominio.<br><code>Value Object</code></div></div>
+        <div class="intro-card"><span class="icon">👀</span><div class="pc-title">Feature Envy</div><div class="pc-body">Un método que usa más datos de otra clase que de la suya propia. La lógica está en el lugar equivocado.<br><code>Move Method</code></div></div>
+        <div class="intro-card"><span class="icon">💀</span><div class="pc-title">Dead Code</div><div class="pc-body">Código comentado, métodos que nadie llama, parámetros ignorados. Ruido que dificulta la lectura.<br><code>Delete it</code></div></div>
+        <div class="intro-card"><span class="icon">🔢</span><div class="pc-title">Magic Numbers</div><div class="pc-body"><code>total *= 1.16m</code>, <code>if (count > 50)</code>. Sin nombre, sin contexto, sin posibilidad de cambiar en un lugar.<br><code>Named Constant</code></div></div>
+        <div class="intro-card"><span class="icon">🔀</span><div class="pc-title">Shotgun Surgery</div><div class="pc-body">Un cambio de negocio requiere modificar 7 clases distintas. Alta cohesión rota, bajo acoplamiento roto.<br><code>Move + Inline</code></div></div>
+        <div class="intro-card"><span class="icon">👯</span><div class="pc-title">Duplicate Code</div><div class="pc-body">La misma lógica en dos o tres lugares. Cuando cambia el negocio, ¿actualizaste los tres sitios?<br><code>Extract + Reuse</code></div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Code Smells — Reconocer el problema antes de tocarlo</div>
+        <div class="day-subtitle">El catálogo de Martin Fowler, los 8 smells más comunes en código .NET, cómo identificarlos con análisis estático (SonarQube, Roslyn analyzers), y métricas de código objetivas</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un code smell no es un bug — es una señal de que algo en el diseño puede mejorarse.</strong> Martin Fowler definió el término en su libro "Refactoring" (1999, 2018): son indicios en el código de que probablemente hay un problema de diseño más profundo. El procedimiento correcto antes de refactorizar tiene tres pasos: primero <em>identificar</em> el smell (¿qué huele mal y por qué?), luego <em>asegurar cobertura de tests</em> (sin tests, refactorizar es cambiar el comportamiento a ciegas), y finalmente <em>aplicar la técnica específica</em> que Fowler recomienda para ese smell. Sin ese orden, "refactorizar" es solo reescribir código que funciona y romper cosas.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ La regla de oro del refactoring: los tests tienen que pasar antes y después.</strong> Si no tienes tests antes de empezar, la primera tarea no es refactorizar — es escribir tests de caracterización que documenten el comportamiento actual. Luego refactorizas. Si los tests pasan antes y fallan después, revertiste un comportamiento. Si los tests pasan en ambos lados, refactorizaste correctamente.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Refactoring.guru — El catálogo visual de smells y técnicas de Fowler</h3>
+                    <div class="mb-1 text-body-secondary">La versión online e ilustrada del catálogo de Martin Fowler: cada code smell con una descripción visual, el motivo por el que es problemático, y las técnicas de refactoring específicas que lo resuelven. Ejemplos en múltiples lenguajes incluyendo C#. Marcarlo como bookmark permanente — es la referencia que consultarás durante años.</div>
+                    <a class="link" href="https://refactoring.guru/refactoring/smells" target="_blank">📘 refactoring.guru →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Code Smells en C# — Los 10 más comunes con ejemplos reales</h3>
+                    <div class="mb-1 text-body-secondary">Explica los code smells más comunes y cómo identificarlos y refactorizarlos, mostrando ejemplos reales de código y técnicas prácticas de refactoring para mejorar mantenibilidad. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/MM6_tyvBRXE?si=5wN__AOAHvazm1Ho" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Herramienta — Análisis estático</strong> 
+                    <h3 class="mb-0">SonarLint para Visual Studio / Rider — Smells detectados en tiempo real</h3>
+                    <div class="mb-1 text-body-secondary">Plugin gratuito que analiza tu código mientras escribes y señala code smells, bugs potenciales, y violaciones de reglas con explicaciones y sugerencias de corrección. Es el par de ojos extra que detecta lo que el compilador no ve. Instalar en el IDE y activar en el proyecto del entregable de la semana.</div>
+                    <a class="link" href="https://www.sonarsource.com/products/sonarlint/" target="_blank">🔧 SonarLint →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Técnicas de Refactoring de Fowler</div>
+        <div class="day-subtitle">Extract Method, Extract Class, Replace Conditional with Polymorphism, Introduce Parameter Object, Replace Primitive with Value Object, y Strangler Fig a nivel de clase</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Fowler cataloga 66 técnicas de refactoring en su libro — estas 6 resuelven el 80% de los smells que encontrarás en código .NET real.</strong> Cada técnica tiene una mecánica concreta y reproducible: no son opiniones de diseño, son operaciones con pasos definidos. <em>Extract Method</em> toma un fragmento de código, le da nombre, y lo convierte en un método propio. <em>Replace Primitive with Value Object</em> toma un <code>string email</code> y lo convierte en una clase <code>Email</code> con su propia validación. La clave: hacer una técnica a la vez, ejecutar los tests entre cada paso, y hacer commit después de cada técnica exitosa. Commits pequeños y frecuentes — si algo falla, el revert es trivial.
+    </div>
+
+    <div class="flow">
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Técnica</th>
+                        <th>Cuándo aplicarla</th>
+                        <th>Resultado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-light">Extract Method</td>
+                        <td>Fragmento de código con un comentario encima que explica qué hace — el comentario es el nombre del método.</td>
+                        <td class="text-success">Método con nombre expresivo, testeable de forma independiente</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Extract Class</td>
+                        <td>Una clase con dos grupos de datos y métodos que no se relacionan entre sí — tiene dos responsabilidades.</td>
+                        <td class="text-success">Dos clases cohesivas, cada una con una única responsabilidad</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Replace Primitive with Value Object</td>
+                        <td><code>string email</code> o <code>decimal amount</code> viajando por la app sin validación. La validación se duplica en cada uso.</td>
+                        <td class="text-success">Clase <code>Email</code> o <code>Money</code> que valida en el constructor — imposible crear inválidos</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Replace Conditional with Polymorphism</td>
+                        <td><code>switch (order.Type) {{'{'}} case "Premium": ... {{'}'}}</code> repetido en 5 métodos diferentes del servicio.</td>
+                        <td class="text-success">Clase base <code>Order</code> con subclases — cada tipo implementa su propia lógica sin condicionales</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Introduce Parameter Object</td>
+                        <td>Método con 5+ parámetros, especialmente si siempre van juntos en múltiples llamadas.</td>
+                        <td class="text-success">Record o clase <code>CreateOrderRequest</code> con los parámetros agrupados</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Move Method / Move Field</td>
+                        <td>Un método que usa más datos de otra clase que de la suya propia (Feature Envy).</td>
+                        <td class="text-success">La lógica vive donde están los datos — elimina dependencia y acoplamiento</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Refactoring: Improving the Design of Existing Code — Martin Fowler (2ª edición)</h3>
+                    <div class="mb-1 text-body-secondary">El libro que definió la disciplina. La segunda edición (2018) tiene todos los ejemplos en JavaScript pero las técnicas son universales y directamente aplicables en C#. Si vas a leer un libro de ingeniería de software en tu carrera, es este. No requiere leerlo de corrido — es una referencia que consultarás técnica por técnica cuando encuentres el smell correspondiente.</div>
+                    <a class="link" href="https://martinfowler.com/books/refactoring.html" target="_blank">📘 martinfowler.com →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">From God Service to Clean Domain: A Step-by-Step DDD Refactor in C#</h3>
+                    <div class="mb-1 text-body-secondary">Refactorización paso a paso de un servicio tipo God Class hacia un diseño más limpio, aplicando técnicas reales de refactoring en .NET y mejorando la arquitectura sin cambiar el comportamiento del sistema. ~55 min.</div>
+                    <a class="link" href="https://youtu.be/B5oQ0lMjkrI?si=4Pkj4b931yXNQaMd" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Value Objects en C# + Replace Primitive</strong> 
+                    <h3 class="mb-0">La técnica más impactante: convertir primitivos en objetos de dominio con validación incorporada</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Mejora de Arquitectura — Evolucionar sin romper</div>
+        <div class="day-subtitle">Anti-patrones arquitecturales comunes en .NET, Strangler Fig a nivel de módulo, Feature Flags para refactorings progresivos, separar la capa de datos del dominio</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Los anti-patrones arquitecturales son code smells a escala de sistema — más costosos y más difíciles de revertir.</strong> Los tres más comunes en proyectos .NET: el <em>Anemic Domain Model</em> (entidades que son solo bolsas de datos con getters/setters, toda la lógica en los Services — viola el principio de objeto), el <em>Big Ball of Mud</em> (sin capas claras, todo llama a todo, imposible de testear), y la <em>Shared Database</em> en microservicios (dos servicios que comparten la misma tabla — acoplamiento máximo disfrazado de practicidad). El patrón de migración arquitectural por excelencia es el <strong>Strangler Fig</strong>: envolver gradualmente el código viejo con el nuevo, redirigir tráfico progresivamente, hasta que el código viejo muere solo.
+    </div>
+
+    <div class="tip">
+        <strong>✅ Feature Flags para refactorings de alto riesgo.</strong> Cuando refactorizas un componente crítico, en lugar de hacer un big-bang release, usa un feature flag: el 5% del tráfico va a la nueva implementación, el 95% sigue con la vieja. Si la nueva falla, apagas el flag en 30 segundos sin deploy. Azure App Configuration y la librería <code>Microsoft.FeatureManagement</code> dan este patrón en minutos.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Anemic Domain Model — El anti-patrón más extendido en .NET</h3>
+                    <div class="mb-1 text-body-secondary">Explica qué es el Anemic Domain Model, por qué es considerado un anti-patrón en DDD y cómo mover la lógica de negocio desde servicios hacia entidades con comportamiento (Rich Domain Model). ~28 min.</div>
+                    <a class="link" href="https://youtu.be/yM5L9Xp1-LY?si=yGeJ6HLHavV-RUwL" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Strangler Fig Application — El patrón de migración arquitectural</h3>
+                    <div class="mb-1 text-body-secondary">El artículo original de Fowler que describe el patrón Strangler Fig: cómo migrar gradualmente un sistema legado envolviendo su funcionalidad con nuevo código, redirigiendo peticiones progresivamente hasta que el sistema viejo "muere" solo. La estrategia recomendada para cualquier refactoring arquitectural de alto riesgo.</div>
+                    <a class="link" href="https://martinfowler.com/bliki/StranglerFigApplication.html" target="_blank">📘 martinfowler.com →</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Rich Domain Model vs Anemic + Feature Flags</strong> 
+                    <h3 class="mb-0">Entidades con comportamiento real y cómo activar un refactoring gradualmente</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">ADRs y Documentación Técnica Profesional</div>
+        <div class="day-subtitle">Architecture Decision Records, README técnicos que añaden valor real, diagramas C4 con Mermaid, comentarios de código que explican el porqué — no el qué</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La documentación técnica más valiosa no explica <em>qué</em> hace el código — eso lo hace el código mismo. Explica <em>por qué</em> se tomó cada decisión.</strong> El Architecture Decision Record (ADR) es el documento que responde "¿por qué usamos YARP y no Ocelot?", "¿por qué SQL Server y no PostgreSQL?", "¿por qué RabbitMQ y no Azure Service Bus?". Sin ADRs, ese conocimiento vive solo en la cabeza de quien tomó la decisión — y cuando esa persona deja el proyecto, se pierde. Un ADR tiene cinco secciones: contexto, decisión, estado (proposed/accepted/deprecated), consecuencias positivas, y consecuencias negativas. Se escribe en el momento de la decisión y se versiona en Git junto al código.
+    </div>
+
+    <div class="tip">
+        <span class="text-light">ADR-007: Usar YARP como API Gateway en lugar de Ocelot</span><br>
+        <span class="text-warning">Contexto</span><br>
+        Necesitamos un API Gateway para enrutar tráfico a 4 microservicios, agregar autenticación JWT, y servir documentación Swagger unificada. Los candidatos evaluados fueron YARP, Ocelot, y Azure API Management.<br>
+        <span class="text-warning">Decisión</span><br>
+        Usamos YARP (Yet Another Reverse Proxy) de Microsoft. Es el único mantenido activamente por Microsoft en .NET 8+, integra nativamente con el ecosistema ASP.NET Core (middlewares, DI, configuration), y tiene soporte de primera clase en Azure Container Apps.<br>
+        <span class="text-warning">Consecuencias</span><br>
+        <span class="text-success">Positivo:</span> configuración via appsettings.json, actualizaciones de rutas sin rebuild, soporte completo de OpenTelemetry. <strong style="color:var(--red)">Negativo:</strong> menos plugins out-of-the-box que Ocelot para throttling avanzado — implementamos rate limiting con el middleware nativo de .NET en su lugar.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Plantilla — ADR</strong> 
+                    <h3 class="mb-0">adr.github.io — El formato estándar de Architecture Decision Records</h3>
+                    <div class="mb-1 text-body-secondary">El sitio oficial del formato ADR con la plantilla de Michael Nygard (el creador del concepto), herramientas de CLI para crear ADRs automáticamente, y ejemplos reales de repositorios open source que usan ADRs. La plantilla básica en Markdown cabe en 20 líneas y se guarda en <code>/docs/adr/</code> junto al código.</div>
+                    <a class="link" href="https://adr.github.io/" target="_blank">📘 adr.github.io →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Diagramas C4 con Mermaid en el README — Arquitectura viva que no se desactualiza</h3>
+                    <div class="mb-1 text-body-secondary">El modelo C4 de Simon Brown (Context, Containers, Components, Code) para documentar arquitectura con diagramas que viven en el repositorio como texto Mermaid — no en Confluence ni en Visio, sino en el README donde se actualiza con el código. GitHub renderiza Mermaid directamente. Aprenderás los 4 niveles de diagrama y cuándo usar cada uno. ~30 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=x2-rSnhpw0g" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>        
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — ADR en Markdown + diagrama C4 en Mermaid</strong> 
+                    <h3 class="mb-0">La documentación que vive en Git y nunca se desactualiza</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Pull Request Profesional — Comunicar el cambio</div>
+        <div class="day-subtitle">Anatomía de un PR que se aprueba rápido, descripción de cambios con contexto, checklist de revisión, convenciones de commit (Conventional Commits), y el entregable final</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Un Pull Request es un documento de comunicación, no solo una lista de cambios de código.</strong> El PR ideal responde tres preguntas en los primeros 30 segundos: <em>¿qué problema resuelve?</em>, <em>¿cómo lo resuelve?</em>, y <em>¿cómo verificar que funciona?</em>. Un PR con título "fix stuff" y sin descripción es una señal de que el autor no respeta el tiempo del revisor. Las convenciones de <strong>Conventional Commits</strong> hacen que el historial de Git sea legible como un changelog: <code>feat(orders): add order cancellation with reason</code>, <code>refactor(domain): extract Email value object</code>, <code>fix(auth): token revocation not persisting in Redis</code>. Herramientas como <code>semantic-release</code> generan changelogs automáticos desde el historial de commits.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Referencia — Conventional Commits</strong> 
+                    <h3 class="mb-0">conventionalcommits.org — El estándar de mensajes de commit</h3>
+                    <div class="mb-1 text-body-secondary">La especificación oficial de Conventional Commits: el formato <code>tipo(scope): descripción</code>, los tipos permitidos (<code>feat</code>, <code>fix</code>, <code>refactor</code>, <code>docs</code>, <code>test</code>, <code>chore</code>), cómo marcar breaking changes con <code>!</code> o <code>BREAKING CHANGE:</code>, y las herramientas que lo soportan (commitlint, semantic-release, GitHub Actions que generan changelogs automáticos).</div>
+                    <a class="link" href="https://www.conventionalcommits.org/es/v1.0.0/" target="_blank">📘 conventionalcommits.org →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Code Review best practices — Cómo revisar y cómo ser revisado</h3>
+                    <div class="mb-1 text-body-secondary">El talk de Trisha Gee (JetBrains) sobre code reviews efectivos: cómo escribir PRs que la gente quiere revisar (descripción con contexto, PRs pequeños y enfocados, tests incluidos), cómo dar feedback constructivo como revisor, cómo recibir feedback sin ponerse defensivo, y las automatizaciones que hacen el review process más eficiente (linters, formatters, tests en CI). ~45 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=a9_0UUUNt-Y" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>        
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — PR description + checklist de revisión de código</strong> 
+                    <h3 class="mb-0">La plantilla de PR que hace que los reviews sean 3 veces más rápidos</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Codebase refactorizado con documentación viva</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">El entregable es el proyecto del roadmap con mejoras concretas de calidad, documentado de forma que un nuevo desarrollador pueda entenderlo en un día:</p>
+    <ul>
+        <li>Al menos 3 smells eliminados: uno con Extract Method, uno con Value Object, y uno con Extract Class o Move Method</li>
+        <li>Carpeta <code>/docs/adr/</code> con mínimo 2 ADRs — una decisión de tecnología y una decisión de arquitectura</li>
+        <li>README con diagrama C4 Container en Mermaid que muestre todos los servicios del roadmap y sus relaciones</li>
+        <li>Historial de commits de la semana en formato Conventional Commits — <code>refactor</code>, <code>feat</code>, <code>docs</code>, <code>test</code></li>
+        <li>Un PR real (aunque sea en un fork propio) con la plantilla completa — descripción, cambios, verificación y checklist</li>
+        <li>Screenshot de SonarLint o Roslyn Analyzers mostrando 0 issues Critical en el código refactorizado</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 La semana que cierra la fase 4:</strong> Esta semana aplica el criterio de calidad a todo el trabajo anterior. Los Value Objects mejoran el dominio de la <strong>Semana 17</strong>. Los ADRs documentan las decisiones de seguridad de la <strong>Semana 19</strong> y observabilidad de la <strong>Semana 20</strong>. El diagrama C4 unifica visualmente toda la arquitectura construida. La semana 21 no agrega tecnología nueva — agrega <em>intención</em>, <em>claridad</em> y <em>sostenibilidad</em> al código que ya existe.
+    </div>
 </div>

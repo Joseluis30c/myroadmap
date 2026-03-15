@@ -1,3 +1,110 @@
-<div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Bullets con impacto</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – CV técnico</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – GitHub profesional</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – LinkedIn optimizado</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Perfil completo</button>
+    </nav>
 </div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Convertir experiencia en oportunidades</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">Market Readiness · Personal Branding</div></div>
+</div>
+
+<div class="flow">
+    <h3>// CV Bullet Transformer - antes → después con métricas</h3>
+    <div class="rn-table-wrap">
+        <table class="rn-table">
+            <thead>
+                <tr>
+                    <th>✗ Antes</th>
+                    <th>✓ Después</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-danger">Trabajé con microservicios y Docker en un proyecto backend.</td>
+                    <td class="text-success">Designed and deployed a <code>6-service</code> microservices architecture using .NET 8 and Docker, containerized with Azure Container Apps — reducing deployment time from <code>45 min to 8 min</code> via GitHub Actions CI/CD.</td>
+                </tr>
+                <tr>
+                    <td class="text-danger">Implementé autenticación y seguridad en la API.</td>
+                    <td class="text-success">Implemented OAuth 2.0 + OIDC authentication with JWT token revocation (Redis), rate limiting (<code>429 with Retry-After</code>), and OWASP Top 10 protections — blocking <code>100% of SQL injection and IDOR</code> test vectors.</td>
+                </tr>
+                <tr>
+                    <td class="text-danger">Mejoré el rendimiento de la API con Redis.</td>
+                    <td class="text-success">Reduced database load by <code>~70%</code> implementing Cache-Aside pattern with Redis, cutting P99 latency from <code>820ms to 142ms</code> on high-traffic endpoints.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="flow">
+    <h3>Las 3 fórmulas de bullet points que funcionan para roles técnicos</h3>
+    <div class="principles">
+        <div class="pc"><span class="pc-title">Fórmula XYZ — Google</span><div class="pc-title text-light">Accomplished <code>[X]</code> as measured by <code>[Y]</code>, by doing <code>[Z]</code></div><div class="pc-body">Accomplished <strong>42% reduction in API latency</strong> as measured by <strong>P99 response time in App Insights</strong>, by implementing <strong>Redis Cache-Aside pattern with 15-min TTL</strong>.</div></div>
+        <div class="pc"><span class="pc-title">Fórmula Acción + Tecnología + Impacto</span><div class="pc-title text-light"><code>Verbo fuerte</code> + qué + con qué + resultado</div><div class="pc-body"><strong>Designed</strong> a 6-service microservices architecture <strong>using .NET 8, YARP, and Azure Container Apps</strong>, cutting deployment time from 45 to <strong>8 minutes</strong>.</div></div>
+        <div class="pc"><span class="pc-title">Fórmula Problema → Solución → Resultado</span><div class="pc-title text-light">Identified <code>[problema]</code>, implemented <code>[solución]</code>, resulting in <code>[resultado]</code></div><div class="pc-body">Identified security gaps (IDOR, Mass Assignment), implemented resource-level authorization and immutable DTOs, resulting in <strong>zero vulnerabilities</strong> in penetration test.</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Escribir bullets de impacto — La habilidad central del CV</div>
+        <div class="day-subtitle">Las 3 fórmulas de Laszlo Bock (ex VP Google), verbos de acción para roles técnicos, cómo encontrar métricas reales en tu propio trabajo, y los errores que hacen que los CVs sean descartados en 10 segundos</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El 90% de los CVs técnicos tienen bullets que describen responsabilidades, no logros.</strong> "Responsible for maintaining the API" describe un rol. "Reduced API error rate from 3.2% to 0.4% by implementing structured exception handling and circuit breakers" describe un logro. La diferencia es una métrica y un verbo de acción fuerte. Si nunca has medido el impacto de tu trabajo, este es el momento: Application Insights tiene los datos de las últimas semanas del roadmap — latencia P99 antes/después del cache, tasa de errores, tiempo de deployment. Esos números reales son tu materia prima.
+    </div>
+
+    <div class="tip">
+        <strong class="text-danger">⚠️ Los 5 errores que hacen que un CV técnico sea descartado en 10 segundos:</strong> (1) Lista de tecnologías sin contexto — "Skills: C#, .NET, SQL, Azure" sin explicar cómo las usaste. (2) Bullets en primera persona: "I developed..." — nunca se usa "I" en un CV. (3) Soft skills sin evidencia: "Team player, fast learner" — no dice nada. (4) Responsabilidades sin resultados: "Maintained REST APIs" vs "Optimized 3 high-traffic endpoints, reducing p99 latency by 65%". (5) CV de más de 2 páginas para menos de 7 años de experiencia.
+    </div>
+
+    <div class="tip">
+        <strong class="text-warning">💡 Si no tienes métricas, créalas hoy.</strong> Abre Application Insights del proyecto del roadmap y documenta: latencia P99 del endpoint más usado, tasa de errores, tiempo de build/deploy en GitHub Actions, número de servicios desplegados, cobertura de tests. Estos números reales — aunque vengan de un proyecto personal — son 10 veces más persuasivos que una descripción genérica.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Recurso principal</strong> 
+                    <h3 class="mb-0">"The formula for a winning resume bullet point"</h3>
+                    <div class="mb-1 text-body-secondary">El artículo explica la fórmula de Laszlo Bock para escribir bullets de CV: “Accomplished [X] as measured by [Y] by doing [Z]”, que convierte responsabilidades en logros medibles. ~10 min de lectura.</div>
+                    <a class="link" href="https://souqjet.com/the-ultimate-resume-writing-guide-for-2026/" target="_blank">📘 Leer Article →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video — YouTube</strong> 
+                    <h3 class="mb-0">Tech Resume Review: What Got Me Interviews at Google, Facebook, Amazon</h3>
+                    <div class="mb-1 text-body-secondary">Revisión detallada de CVs de ingenieros de software, explicando qué funciona para conseguir entrevistas, cómo describir proyectos con métricas y errores comunes en resumes de developers. ~30 min.</div>
+                    <a class="link" href="https://youtu.be/BYUy1yvjHxE?si=lCkJPcvbtQBaisur" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>

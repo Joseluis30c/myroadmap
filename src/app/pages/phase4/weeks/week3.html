@@ -1,3 +1,462 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – OAuth 2.0 + OIDC</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – JWT avanzado</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – OWASP Top 10</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Rate Limiting</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Hardening completo</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Seguridad a tu API</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">OAuth 2.0, Keycloak, Rate Limiting</div></div>
+</div>
+
+<div class="concept-box">
+    Una API insegura no es un problema técnico — es una responsabilidad legal y reputacional. Esta semana aprendes OAuth 2.0 con OpenID Connect, los 8 ataques más comunes que explotan APIs .NET, y cómo el rate limiting evita que una sola IP derribe tu servicio.
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Los 4 ataques más frecuentes en APIs .NET — que cubrirás esta semana</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">💉</span><div class="pc-title">SQL Injection</div><div class="pc-body">El atacante inyecta SQL en parámetros. EF Core con consultas parametrizadas es tu primera defensa.<br><code>Critical</code></div></div>
+    <div class="intro-card"><span class="icon">🔑</span><div class="pc-title">IDOR</div><div class="pc-body">Insecure Direct Object Reference: el usuario accede a recursos de otros cambiando el ID. Validar ownership en cada request.<br><code>Critical</code></div></div>
+    <div class="intro-card"><span class="icon">🌐</span><div class="pc-title">XSS / CSRF</div><div class="pc-body">Cross-Site Scripting y Request Forgery. Sanitización de inputs, Content-Security-Policy headers y tokens CSRF.<br><code>High</code></div></div>
+    <div class="intro-card"><span class="icon">⚙️</span><div class="pc-title">Misconfiguration</div><div class="pc-body">Swagger en producción, stack traces expuestos, CORS * en producción, HTTP sin HTTPS redirect. El más silencioso.<br><code>Medium</code></div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">OAuth 2.0 y OpenID Connect</div>
+        <div class="day-subtitle">Flows: Authorization Code, Client Credentials, Device. Diferencia OAuth vs OIDC. Scopes, claims, tokens. Keycloak local con Docker</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>OAuth 2.0 es un protocolo de autorización — OIDC (OpenID Connect) es la capa de autenticación encima de OAuth.</strong> OAuth responde "¿qué puede hacer esta app?", OIDC responde "¿quién es este usuario?". La confusión más común: OAuth no fue diseñado para autenticación — fue diseñado para que una app acceda a recursos en nombre del usuario <em>sin</em> que el usuario le entregue su contraseña. OIDC agrega el concepto de <em>identity token</em> (JWT con info del usuario) sobre el <em>access token</em> de OAuth. Los <strong>scopes</strong> definen qué puede acceder el token (<code>orders:read</code>, <code>orders:write</code>), y los <strong>claims</strong> son los datos del usuario dentro del JWT (<code>sub</code>, <code>email</code>, <code>role</code>).
+    </div>
+
+    <div class="flow">
+        <h3>Authorization Code Flow — El más seguro para apps web</h3>
+        <div class="flow-steps">
+            <div class="fs fs-req"><div class="fs-name">Usuario</div></div>
+            <span class="fs-arrow">→ click "Login" →</span>
+            <div class="fs fs-err"><div class="fs-name">Tu App</div></div>            
+            <span class="fs-arrow">→ redirect →</span>
+            <div class="fs fs-res"><div class="fs-name">Auth Server (Keycloak)</div></div>
+        </div><br>
+        <div class="flow-steps">
+            <div class="fs fs-req"><div class="fs-name">Usuario</div></div>
+            <span class="fs-arrow">→ ingresa credenciales →</span>
+            <div class="fs fs-res"><div class="fs-name">Auth Server</div></div>            
+            <span class="fs-arrow">→ authorization code →</span>
+            <div class="fs fs-err"><div class="fs-name">Tu App</div></div>            
+        </div><br>
+        <div class="flow-steps">
+            <div class="fs fs-err"><div class="fs-name">Tu App</div></div>
+            <span class="fs-arrow">→ code + client_secret →</span>
+            <div class="fs fs-res"><div class="fs-name">Auth Server</div></div>            
+            <span class="fs-arrow">→ access_token + id_token →</span>
+            <div class="fs fs-err"><div class="fs-name">Tu App</div></div>
+        </div><br>
+        <div class="flow-steps">
+            <div class="fs fs-err"><div class="fs-name">Tu App</div></div>
+            <span class="fs-arrow">→ Bearer {{'{'}}access_token{{'}'}} →</span>
+            <div class="fs fs-biz"><div class="fs-name">Tu API (.NET)</div></div>            
+            <span class="fs-arrow">→ 200 OK →</span>
+            <div class="fs fs-err"><div class="fs-name">Tu App</div></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">📄 Recurso visual — OAuth 2.0 y OpenID Connect</strong> 
+                    <h3 class="mb-0">An Illustrated Guide to OAuth and OpenID Connect</h3>
+                    <div class="mb-1 text-body-secondary">La explicación visual más clara de OAuth y OIDC: con ilustraciones de cada flow (Authorization Code, Implicit, Client Credentials, Device), la diferencia entre access token e identity token, cómo funcionan los scopes y claims, y por qué PKCE es obligatorio para SPAs. Sin código — solo conceptos sólidos. ~20 min de lectura.</div>
+                    <a class="link" href="https://developer.okta.com/blog/2019/10/21/illustrated-guide-to-oauth-and-oidc" target="_blank">📘 Okta Dev →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">OAuth 2.0 y OpenID Connect explicados — Con animaciones</h3>
+                    <div class="mb-1 text-body-secondary">El video de referencia de Okta para entender OAuth y OIDC: por qué OAuth no es autenticación, cómo funciona cada flow con animaciones, cuándo usar Authorization Code vs Client Credentials, y los errores de seguridad más comunes al implementar OAuth. Subtitulado. ~25 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=t18YB3xDfXI" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Keycloak local + validar JWT en ASP.NET Core 8</strong> 
+                    <h3 class="mb-0">Auth Server gratuito con Docker + proteger tu API con scopes específicos</h3>
+                    <pre><code>keycloak.sh
+
+— Levantar auth server local
+# Keycloak: auth server open-source compatible con OAuth 2.0 + OIDC
+# En producción: Azure Entra ID (ex Azure AD), Okta, Auth0
+docker run -d --name keycloak \
+  -p 8080:8080 \
+  -e KEYCLOAK_ADMIN=admin \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:24.0.0 start-dev
+
+# Admin UI: http://localhost:8080
+# 1. Crear Realm: "miapp"
+# 2. Crear Client: "orders-api" (confidential, service accounts enabled)
+# 3. Crear Roles: "orders:read", "orders:write"
+# 4. Asignar roles al client
+# OIDC Discovery: http://localhost:8080/realms/miapp/.well-known/openid-configuration</code></pre>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">JWT Avanzado — Lo que falla en producción</div>
+        <div class="day-subtitle">Rotación de claves, token refresh, revocación con Redis, almacenamiento seguro en cliente, el algoritmo RS256 vs HS256 y JWT best practices</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El 90% de las implementaciones JWT tienen al menos uno de estos tres errores.</strong> Primero: <code>algorithm: none</code> — algunos servidores aceptan tokens sin firma si el header dice <code>"alg":"none"</code>; siempre validar el algoritmo explícitamente. Segundo: secret demasiado corto — con HS256 y un secret de 8 caracteres, un atacante puede crackearlo offline en minutos; mínimo 256 bits. Tercero: no hay revocación — una vez emitido un JWT, es válido hasta que expira aunque el usuario cierre sesión; necesitas una lista de tokens revocados en Redis o tokens de corta duración con refresh tokens. La recomendación actual: <strong>RS256</strong> (asimétrico, par de claves pública/privada) en lugar de HS256 para APIs públicas.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ Nunca stores el access token en localStorage.</strong> localStorage es accesible por cualquier script JavaScript en la página — un ataque XSS lo roba en una línea. La alternativa segura: <em>httpOnly cookies</em> para el refresh token (inaccesible para JS), y access tokens de corta duración (15 min) en memoria del cliente. Si necesitas un SPA, investiga el BFF (Backend for Frontend) pattern.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">JWT Best Practices en 2024 — Lo que nadie te dice</h3>
+                    <div class="mb-1 text-body-secondary">Cubre los errores más comunes con JWT: el ataque <code>alg:none</code>, por qué HS256 es peligroso con secrets cortos, cómo funciona la revocación con una blocklist en Redis, refresh token rotation, y el patrón BFF para SPAs. Denso y directo al grano. ~12 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=7Q17ubqLfaM" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Token revocación con Redis + refresh token rotation</strong> 
+                    <h3 class="mb-0">Revocar tokens sin esperar a que expiren — la implementación correcta</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">OWASP Top 10 API Security — Ataques y defensas en .NET</div>
+        <div class="day-subtitle">SQL Injection con EF Core, IDOR, Mass Assignment, Security Misconfiguration, CORS correcto, headers de seguridad y validación de input con FluentValidation</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>OWASP API Security Top 10 es distinto al OWASP Web Top 10.</strong> Las APIs tienen ataques específicos: <em>Broken Object Level Authorization</em> (IDOR) es el #1 — el usuario 42 cambia el ID en la URL y accede al pedido del usuario 43. <em>Broken Object Property Level Authorization</em> es el #3 — Mass Assignment: el cliente envía <code>isAdmin: true</code> en el body del POST y el objeto lo mapea sin filtrar. <em>Unrestricted Resource Consumption</em> es el #4 — sin rate limiting ni límites de paginación, alguien puede pedir <code>?pageSize=99999</code>. En ASP.NET Core, el mayor aliado es <strong>FluentValidation</strong> para inputs, <code>[JsonIgnore]</code> o records inmutables para Mass Assignment, y <code>ResourceOwnershipFilter</code> personalizado para IDOR.
+    </div>
+
+    <div class="flow">
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Vulnerabilidad</th>
+                        <th>Severidad</th>
+                        <th>Defensa en .NET</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="text-light">IDOR — Acceso a recursos ajenos</span><br>GET /orders/123 cuando el usuario tiene el 456</td>
+                        <td class="text-danger">CRÍTICO</td>
+                        <td class="text-success">Validar userId del JWT == userId del recurso en cada query</td>
+                    </tr>
+                    <tr>
+                        <td><span class="text-light">Mass Assignment</span><br>POST /users con <code>"isAdmin": true</code> en el body</td>
+                        <td class="text-danger">CRÍTICO</td>
+                        <td class="text-success">DTOs inmutables — nunca mapear directamente la entidad de BD</td>
+                    </tr>
+                    <tr>
+                        <td><span class="text-light">SQL Injection</span><br><code>?name='; DROP TABLE Orders;--</code></td>
+                        <td class="text-danger">CRÍTICO</td>
+                        <td class="text-success">EF Core parametriza automáticamente. Nunca <code>FromSqlRaw</code> con interpolación</td>
+                    </tr>
+                    <tr>
+                        <td><span class="text-light">Security Misconfiguration</span><br>Swagger en producción, CORS <code>*</code>, HTTP sin HTTPS</td>
+                        <td class="text-warning">ALTO</td>
+                        <td class="text-success"><code>app.UseHttpsRedirection()</code>, deshabilitar Swagger en producción, CORS explícito</td>
+                    </tr>
+                    <tr>
+                        <td><span class="text-light">Sensitive Data Exposure</span><br>Logs con passwords, stack traces en respuestas</td>
+                        <td class="text-warning">ALTO</td>
+                        <td class="text-success">Problem Details sin stack trace en prod, Serilog con destructuring filters</td>
+                    </tr>
+                    <tr>
+                        <td><span class="text-light">Unrestricted Resource Consumption</span><br><code>?pageSize=99999</code> o requests masivos sin límite</td>
+                        <td class="text-warning">ALTO</td>
+                        <td class="text-success">Max page size en FluentValidation + Rate Limiting + límite de body size</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Referencia Oficial — OWASP</strong> 
+                    <h3 class="mb-0">OWASP API Security Top 10 — 2023 Edition</h3>
+                    <div class="mb-1 text-body-secondary">El top 10 oficial de OWASP para APIs: cada vulnerabilidad con descripción técnica, escenario de ataque real, cómo prevenir, y ejemplos de código vulnerable vs seguro. La referencia que debes conocer de memoria si trabajas en APIs públicas.</div>
+                    <a class="link" href="https://owasp.org/API-Security/editions/2023/en/0x00-header/" target="_blank">📘 OWASP →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">OWASP Top 10 para APIs .NET — Con demos de ataque y defensa</h3>
+                    <div class="mb-1 text-body-secondary">Conferencia técnica donde se analizan las vulnerabilidades del OWASP Top 10 en aplicaciones ASP.NET Core y cómo mitigarlas usando las herramientas de seguridad del framework.</div>
+                    <a class="link" href="https://youtu.be/hJh3q6uTV9U?si=yvTjSOvkfsQn34Bq" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — IDOR + Mass Assignment + Security Headers en un endpoint</strong> 
+                    <h3 class="mb-0">Las 3 defensas más importantes y cómo implementarlas correctamente</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Rate Limiting — Protección contra abuso y DoS</div>
+        <div class="day-subtitle">Fixed window, sliding window y token bucket, RateLimiter nativo de .NET 7+, rate limiting por IP/usuario/endpoint, y Azure API Management como alternativa cloud</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>.NET 7 introdujo <code>System.Threading.RateLimiting</code> — rate limiting nativo sin librerías externas.</strong> Hay cuatro algoritmos: <em>Fixed Window</em> (100 requests por minuto, el contador se reinicia al minuto), <em>Sliding Window</em> (100 requests en los últimos 60 segundos móviles — más justo, evita ráfagas en el límite de ventana), <em>Token Bucket</em> (tokens que se recargan gradualmente — permite ráfagas cortas), y <em>Concurrency Limiter</em> (máximo N requests simultáneas, no por tiempo). Para APIs públicas el estándar es sliding window por IP. Para APIs autenticadas, por <code>userId</code> del JWT para que un usuario abusador no afecte a otros.
+    </div>
+
+    <div class="flow">
+        <div class="principles">
+            <div class="pc">
+                <div class="pc-title">Fixed Window</div>
+                <div class="pc-title text-light">Ventana fija</div>
+                <div class="pc-body">El contador se reinicia cada ventana. Permite ráfagas justo en el límite. Más simple de implementar.</div>
+                <div class="layer-items"><span class="layer-tag text-danger"><strong>riesgo de burst</strong></span></div>
+            </div>
+            <div class="pc">
+                <div class="pc-title">Sliding Window</div>
+                <div class="pc-title text-light">Ventana deslizante</div>
+                <div class="pc-body">Considera los últimos N segundos móviles. Sin ráfagas en límites de ventana. Más justo y uniforme.</div>
+                <div class="layer-items"><span class="layer-tag text-warning"><strong>recomendado</strong></span></div>
+            </div>
+            <div class="pc">
+                <div class="pc-title">Token Bucket</div>
+                <div class="pc-title text-light">Cubo de tokens</div>
+                <div class="pc-body">Tokens que se recargan a un ritmo fijo. Permite ráfagas cortas legítimas. Ideal para APIs de terceros.</div>
+                <div class="layer-items"><span class="layer-tag text-success"><strong>permite bursts</strong></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Rate limiting middleware en ASP.NET Core — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial completa: los cuatro algoritmos nativos de .NET 7+, configurar Rate Limiting middleware, políticas por ruta/endpoint, respuesta 429 con <code>Retry-After</code> header, y cómo combinar múltiples limitadores (IP + usuario + endpoint global) en una sola configuración.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/performance/rate-limit" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Rate Limiting en .NET 7+ — Nativo sin librerías</h3>
+                    <div class="mb-1 text-body-secondary">Breve explicación práctica de Rate Limiting en ASP.NET Core con los algoritmos Fixed Window, Sliding Window, Token Bucket y Concurrency Limiter, mostrando cómo configurarlos en APIs .NET. ~38 min.</div>
+                    <a class="link" href="https://youtu.be/1tPVVDEDGtE?si=5XFenuaN6ITw2Mcz" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Rate limiting por IP y por usuario autenticado</strong> 
+                    <h3 class="mb-0">Políticas diferenciadas: usuarios autenticados tienen más cuota que anónimos</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Hardening Completo — Audit, HTTPS, CORS y checklist de producción</div>
+        <div class="day-subtitle">Audit log de operaciones sensibles, HTTPS enforce, CORS correcto para microservicios, Data Protection API para cookies y el entregable final</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El hardening es la diferencia entre una API que funciona y una API que es segura en producción.</strong> Cinco cambios de alta prioridad que se olvidan frecuentemente: activar <code>UseHttpsRedirection</code> y <code>UseHsts</code>, configurar CORS con orígenes explícitos (nunca <code>AllowAnyOrigin</code> con <code>AllowCredentials</code>), deshabilitar Swagger en producción con <code>if (app.Environment.IsDevelopment())</code>, activar el Audit Log para operaciones sensibles (quién creó/borró un pedido, con qué IP y cuándo), y configurar Data Protection API para que las claves de cifrado persistan entre reinicios del container.
+    </div>
+
+    <div class="tip">
+        <strong>✅ Checklist de seguridad antes de cada deploy a producción:</strong> HTTPS + HSTS activados, Swagger deshabilitado, CORS con lista blanca de orígenes, stack traces ocultos en errores, secrets en Key Vault (no en appsettings.json), Rate Limiting activado, security headers presentes, logs sin datos sensibles (passwords, tokens, PII), y validación de input en todos los endpoints con FluentValidation.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">ASP.NET Core Security Hardening — Checklist completo de producción</h3>
+                    <div class="mb-1 text-body-secondary">Implementación práctica de security headers en ASP.NET Core como HSTS, Content Security Policy (CSP), X-Frame-Options, X-Content-Type-Options y otras configuraciones de hardening para producción. ~45 min.</div>
+                    <a class="link" href="https://youtu.be/sG2qyEaMBX4?si=3jqMKtU5L2O-QSig" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Herramienta — Análisis automático</strong> 
+                    <h3 class="mb-0">Mozilla Observatory — Escanear los security headers de tu API</h3>
+                    <div class="mb-1 text-body-secondary">Herramienta gratuita de Mozilla que escanea tu API/web y te da una puntuación A-F según los security headers configurados: HSTS, CSP, X-Frame-Options, Referrer-Policy, etc. Con recomendaciones específicas de cómo mejorar cada uno. Útil para verificar el hardening antes de ir a producción.</div>
+                    <a class="link" href="https://observatory.mozilla.org/" target="_blank">🔧 Observatory →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Audit Log + CORS correcto + Data Protection para containers</strong> 
+                    <h3 class="mb-0">Los 3 items de hardening que más se olvidan antes de ir a producción</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — API con hardening completo de producción</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">El entregable de esta semana es una API que supera el checklist de seguridad antes de ir a producción real:</p>
+    <ul>
+        <li>OAuth 2.0 funcional: endpoint protegido que solo acepta tokens con el scope correcto emitidos por el auth server</li>
+        <li>Demostrar IDOR bloqueado: request con JWT del usuario A intentando acceder al recurso del usuario B retorna 403</li>
+        <li>Rate limiting en acción: screenshot de la respuesta 429 con el header <code>Retry-After</code> en el cuerpo Problem Details</li>
+        <li>Logout que revoca el token: petición con el token revocado retorna 401 aunque el token aún no haya expirado</li>
+        <li>Security headers verificados con Mozilla Observatory — puntuación mínima B+</li>
+        <li>Audit Log en Application Insights: query KQL que muestra quién borró qué recurso y desde qué IP</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con la Fase 4:</strong> La seguridad de esta semana se aplica a los microservicios de la <strong>Semana 17</strong>: el API Gateway centraliza la autenticación (un solo punto de validación JWT) y el rate limiting global, mientras cada microservicio sigue validando autorización a nivel de recurso (IDOR). El OAuth configurado aquí es la base de la <strong>Semana 20</strong> donde los eventos de dominio también necesitan autenticación service-to-service con Client Credentials flow.
+    </div>
 </div>

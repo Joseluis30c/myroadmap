@@ -1,3 +1,400 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Serilog</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Structured Logging</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Azure Monitor + KQL</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Health Checks + Alertas</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Error Handling prod</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">¿qué?, ¿cuándo? y ¿a quién?</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">Serilog, Azure Monitor, KQL</div></div>
+</div>
+
+<div class="concept-box">
+    Un sistema que no puedes observar no puedes operar. Esta semana construyes la capacidad de responder tres preguntas en producción en menos de 5 minutos: <strong>¿qué falló?</strong>, <strong>¿cuándo empezó?</strong> y <strong>¿a quién afectó?</strong> Con Serilog, Application Insights y KQL.
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Los 3 pilares de la observabilidad — qué es cada uno</h3>
+    <div class="principles">
+    <div class="intro-card"><span class="icon">📋</span><div class="pc-title">Logging</div><div class="pc-body"><code>Serilog + Seq</code><br>Registro de eventos discretos con contexto estructurado. No es <code>Console.WriteLine</code> — es un evento JSON con campos indexables: <code>OrderId</code>, <code>UserId</code>, <code>Duration</code>. Permite filtrar y correlacionar.</div></div>
+    <div class="intro-card"><span class="icon">📊</span><div class="pc-title">Metrics</div><div class="pc-body"><code>App Insights + Azure Monitor</code><br>Series temporales numéricas: requests por segundo, latencia P99, tasa de errores, uso de CPU/memoria. Permiten alertas basadas en umbrales y dashboards en tiempo real.</div></div>
+    <div class="intro-card"><span class="icon">🔍</span><div class="pc-title">Tracing</div><div class="pc-body"><code>Distributed Tracing</code><br>Seguir una request a través de múltiples microservicios usando un <code>TraceId</code> común. Un request que pasa por Gateway → Orders → Catalog → BD queda trazado de inicio a fin.</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Serilog — Setup completo desde cero</div>
+        <div class="day-subtitle">Instalar y configurar Serilog en ASP.NET Core 8, sinks (Console, File, Application Insights), enrichers, mínimum level por namespace y appsettings.json driven config</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Serilog es el estándar de facto para logging en .NET — la diferencia clave es que escribe <em>objetos</em>, no strings.</strong> El logging tradicional hace <code>logger.Log($"Order {{'{'}}order.Id{{'}'}} created for {{'{'}}order.UserId{{'}'}}")</code> — eso produce texto plano que no puedes filtrar. Serilog con structured logging hace <code>logger.Information("Order {{'{'}}OrderId{{'}'}} created for {{'{'}}UserId{{'}'}}", order.Id, order.UserId)</code> — eso produce un JSON con campos <code>OrderId</code> y <code>UserId</code> que Application Insights indexa y hace queryable con KQL. La diferencia en producción: con texto plano tardas 30 minutos buscando un bug; con logging estructurado tardas 30 segundos con un filtro.
+    </div>
+
+    <div class="flow">
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Cuándo usarlo</th>
+                        <th>Entornos recomendados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Verbose</td>
+                        <td>Cada detalle: entrada y salida de métodos, valores de variables. Solo para debugging profundo.</td>
+                        <td>development (opcional)</td>
+                    </tr>
+                    <tr>
+                        <td class="text-success">Debug</td>
+                        <td>Estado de la aplicación que ayuda a diagnosticar problemas. Cache hits/misses, queries SQL, decisiones de routing.</td>
+                        <td>development + staging</td>
+                    </tr>
+                    <tr>
+                        <td class="text-success">Information</td>
+                        <td>El flujo normal del negocio: orden creada, usuario autenticado, mensaje publicado. Lo que importa en producción.</td>
+                        <td>todos</td>
+                    </tr>
+                    <tr>
+                        <td class="text-warning">Warning</td>
+                        <td>Algo inesperado que no falló, pero podría causar problemas: query lenta, retry exitoso, configuración inusual.</td>
+                        <td>todos</td>
+                    </tr>
+                    <tr>
+                        <td class="text-danger">Error</td>
+                        <td>Operación fallida que el sistema pudo manejar: excepción capturada, request rechazada, recurso no encontrado.</td>
+                        <td>todos → alerta</td>
+                    </tr>
+                    <tr>
+                        <td class="text-danger">Fatal</td>
+                        <td>Error que hace caer la aplicación. El sistema no puede continuar operando. Siempre genera alerta urgente.</td>
+                        <td>todos → alerta crítica</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Serilog.net — Getting Started + Configuration</h3>
+                    <div class="mb-1 text-body-secondary">La documentación oficial de Serilog: setup en ASP.NET Core, la diferencia entre WriteTo (sinks) y Enrich (enrichers), configuración desde <code>appsettings.json</code> sin cambiar código al desplegar, mínimum level por namespace para no ahogarse en logs de EF Core, y la lista completa de sinks disponibles.</div>
+                    <a class="link" href="https://serilog.net/" target="_blank">📘 serilog.net →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Serilog en ASP.NET Core 8 — Setup completo con App Insights</h3>
+                    <div class="mb-1 text-body-secondary">Configura Serilog desde cero: instalar paquetes, <code>UseSerilog()</code> en el bootstrap, configurar el sink de Application Insights para producción y Console para desarrollo, enrichers de contexto (RequestId, MachineName, Environment), minimum level por namespace, y la diferencia crítica entre logging estructurado y string formatting. ~40 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=nVAkSBpsuTk" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Setup completo de Serilog en ASP.NET Core 8</strong> 
+                    <h3 class="mb-0">La configuración que vas a copiar a cada proyecto nuevo</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Structured Logging — Contexto que hace útil cada log</div>
+        <div class="day-subtitle">Correlation ID entre microservicios, LogContext para enriquecer scopes, destructuring de objetos, evitar logging de datos sensibles y el patrón de logging en Clean Architecture</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El structured logging vale cero si no agregas el contexto correcto.</strong> El principio: cada log de negocio debe responder <em>qué pasó</em>, <em>con qué entidad</em> y <em>para qué usuario</em>. Cuando llega una excepción en producción, la pregunta es: "¿qué estaba haciendo el usuario en ese momento?" — si el log dice <code>Error: NullReferenceException</code> sin contexto, no puedes responderla. Si dice <code>Error: NullReferenceException | OrderId=a1b2 | UserId=user_42 | TraceId=abc123</code>, puedes reconstruir exactamente qué pasó en 2 minutos. El <strong>Correlation ID</strong> es el hilo que une todos los logs de un mismo request a través de múltiples microservicios.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ Nunca loggees datos sensibles.</strong> Passwords, tokens JWT, números de tarjeta de crédito, o cualquier PII (Personally Identifiable Information) en los logs es un problema de compliance (GDPR) y de seguridad. Serilog tiene <em>destructuring policies</em> para enmascarar campos automáticamente. Si loggas una entidad <code>User</code>, asegúrate de que el <code>PasswordHash</code> y <code>RefreshToken</code> estén excluidos con <code>[LogMasked]</code> o una política personalizada.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Structured Logging — Correlation IDs y contexto entre microservicios</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial práctico que muestra structured logging con Serilog en ASP.NET Core, incluyendo Correlation ID, enriquecimiento de logs con contexto y trazabilidad de requests en aplicaciones distribuidas. ~35 min.</div>
+                    <a class="link" href="https://youtu.be/gI_8N8WbFqI?si=FEZatnGIje4z9pIE" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Correlation ID middleware + LogContext enriquecido</strong> 
+                    <h3 class="mb-0">El contexto que hace que cada log sea útil cuando algo falla a las 3am</h3>
+                    <pre><code>{{codeExample3}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Azure Monitor + Application Insights + KQL</div>
+        <div class="day-subtitle">Configurar Application Insights en .NET 8, las 5 tablas más importantes, queries KQL esenciales para responder preguntas de producción, Live Metrics y Application Map</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Application Insights es la herramienta de observabilidad de Azure — el backend donde van a parar todos tus logs de Serilog, métricas de ASP.NET Core y trazas de excepciones.</strong> Su lenguaje de consulta es KQL (Kusto Query Language) — SQL pero para datos de telemetría. Las 5 tablas que usarás el 90% del tiempo: <code>requests</code> (todas las peticiones HTTP con latencia y status code), <code>exceptions</code> (todas las excepciones con stack trace), <code>traces</code> (tus logs de Serilog), <code>dependencies</code> (llamadas a SQL Server, Redis, servicios externos) y <code>customMetrics</code> (métricas de negocio que defines tú). <strong>Application Map</strong> muestra visualmente cómo fluyen las llamadas entre tus microservicios — indispensable para identificar cuellos de botella.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video – YouTube</strong> 
+                    <h3 class="mb-0">Application Insights en ASP.NET Core — Desde setup hasta KQL</h3>
+                    <div class="mb-1 text-body-secondary">Tutorial completo donde se muestra cómo configurar Application Insights en una app .NET, monitorear en tiempo real, visualizar logs y ejecutar consultas KQL para analizar problemas de producción. ~50 min.</div>
+                    <a class="link" href="https://youtu.be/zwPlWpvIIRc" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Application Insights para aplicaciones ASP.NET Core — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial: habilitar App Insights con el nuevo método <code>AddApplicationInsightsTelemetry()</code>, configurar el sampling para controlar el costo en producción (no necesitas el 100% de los requests), telemetría personalizada con <code>TelemetryClient</code> para métricas de negocio, y los filtros para excluir health checks del telemetry stream.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/azure-monitor/app/asp-net-core" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Las 6 queries KQL que resuelven el 90% de los problemas en producción</strong> 
+                    <h3 class="mb-0">El cheat sheet de KQL que vas a tener pegado en el escritorio</h3>
+                    <pre><code>{{codeExample4}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Health Checks + Alertas en Azure</div>
+        <div class="day-subtitle">ASP.NET Core Health Checks para SQL Server, Redis y servicios externos, endpoint /health, Azure Monitor Alerts con condiciones KQL y notificaciones por email/Teams</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Los health checks son el sistema nervioso de tus microservicios en producción.</strong> El endpoint <code>/health</code> responde si el servicio está listo para recibir tráfico — Azure Container Apps lo usa para reiniciar pods que fallan (liveness probe) y para no enviar tráfico a pods que todavía están iniciando (readiness probe). Un health check completo verifica: conexión a la base de datos, conexión a Redis, espacio en disco, y dependencias críticas. El estándar: devolver <code>200 Healthy</code>, <code>200 Degraded</code> (funciona pero con problemas), o <code>503 Unhealthy</code> (no apto para recibir tráfico).
+    </div>
+
+    <div class="flow">
+        <div class="principles">
+            <div class="pc">
+                <div class="pc-title">Liveness Probe</div>
+                <div class="pc-title text-light">¿Está vivo?</div>
+                <div class="pc-body">Si falla, el orchestrador (Container Apps, Kubernetes) reinicia el pod. Solo chequea que el proceso responde, no sus dependencias.</div>
+                <div class="layer-items"><span class="layer-tag text-success"><strong>GET /health/live</strong></span></div>
+            </div>
+            <div class="pc">
+                <div class="pc-title">Readiness Probe</div>
+                <div class="pc-title text-light">¿Listo para tráfico?</div>
+                <div class="pc-body">Si falla, el load balancer deja de enviarle tráfico pero no reinicia el pod. Chequea BD, Redis y dependencias externas.</div>
+                <div class="layer-items"><span class="layer-tag text-warning"><strong>GET /health/ready</strong></span></div>
+            </div>
+            <div class="pc">
+                <div class="pc-title">Startup Probe</div>
+                <div class="pc-title text-light">¿Terminó de iniciar?</div>
+                <div class="pc-body">Da tiempo al servicio para ejecutar migraciones o cargar caché antes de empezar a recibir tráfico. Temporal durante el startup.</div>
+                <div class="layer-items"><span class="layer-tag text-info"><strong>GET /health/startup</strong></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Health checks en ASP.NET Core — Microsoft Docs</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial completa: el middleware de health checks, health checks incluidos para SQL Server (<code>AddSqlServer()</code>), DbContext EF Core, y URLs externas. Crear health checks personalizados implementando <code>IHealthCheck</code>, el endpoint <code>/health</code> con formato JSON detallado, y separar liveness de readiness con tags.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/aspnet/core/host-and-deploy/health-checks" target="_blank">📘 Microsoft Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Health Checks + Azure Monitor Alert con KQL</strong> 
+                    <h3 class="mb-0">El endpoint /health que Azure usa para saber si reiniciarte el pod</h3>
+                    <pre><code>{{codeExample5}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Manejo de Errores en Producción</div>
+        <div class="day-subtitle">Exception middleware global, exception filters, IExceptionHandler (.NET 8), runbooks de incidentes, alertas en Azure Monitor, y el entregable final de la semana</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>.NET 8 introduce <code>IExceptionHandler</code> — la forma moderna de centralizar el manejo de excepciones en una API.</strong> El patrón correcto: cada tipo de excepción de dominio (<code>NotFoundException</code>, <code>ValidationException</code>, <code>UnauthorizedException</code>) tiene su handler que la convierte en la respuesta HTTP y Problem Details correctos. Las excepciones no capturadas llegan a un handler de último recurso que loggea con toda la información disponible (TraceId, UserId, request path, request body si es seguro) y devuelve un 500 genérico sin stack trace. El objetivo: <em>nunca</em> mostrar información interna al cliente, pero <em>siempre</em> tener suficiente contexto en los logs para diagnosticar.
+    </div>
+
+    <div class="tip">
+        <strong>✅ El runbook de incidentes es el documento que defines HOY para usar a las 3am.</strong> Para cada tipo de alerta (error rate &gt; 5%, latencia P99 &gt; 2s, health check unhealthy), escribe: 1) qué significa, 2) cómo verificar el impacto con KQL, 3) los pasos de mitigación inmediata (roll back, scale out, restart), y 4) cómo encontrar la causa raíz. Un runbook bien escrito reduce el MTTR (Mean Time to Recover) de horas a minutos.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video — YouTube</strong> 
+                    <h3 class="mb-0">Global Exception Handling en .NET 8 — IExceptionHandler</h3>
+                    <div class="mb-1 text-body-secondary">Implementa el nuevo <code>IExceptionHandler</code> de .NET 8: crear handlers específicos por tipo de excepción de dominio, el handler de fallback para excepciones inesperadas, loggear con el contexto completo sin exponer el stack trace al cliente, y la integración con Problem Details para respuestas consistentes. Incluye la comparación con el middleware de excepción clásico. ~30 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=4NfflZilTvk" target="_blank">📘 Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Documentación Oficial</strong> 
+                    <h3 class="mb-0">Azure Monitor Alerts — Crear alertas basadas en KQL queries</h3>
+                    <div class="mb-1 text-body-secondary">Guía oficial de Azure para crear alertas que disparan automáticamente cuando una query KQL supera un umbral: error rate mayor a 5%, latencia P99 mayor a 2 segundos, excepciones críticas específicas. Configurar los Action Groups para notificaciones por email, Microsoft Teams webhook, o PagerDuty. El circuito completo: log → App Insights → alerta → notificación en Slack/Teams.</div>
+                    <a class="link" href="https://learn.microsoft.com/es-es/azure/azure-monitor/alerts/alerts-create-log-alert-rule" target="_blank">📘 Azure Docs →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">💻</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">💻 Código — Health Checks + Azure Monitor Alert con KQL</strong> 
+                    <h3 class="mb-0">El endpoint /health que Azure usa para saber si reiniciarte el pod</h3>
+                    <pre><code>{{codeExample6}}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — API completamente observable en producción</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">El entregable es una API que puedes operar con confianza en producción — donde cada incidente tiene respuesta en minutos:</p>
+    <ul>
+        <li>Screenshot de Application Insights con logs de Serilog que muestran el Correlation ID propagado a través de 2 microservicios</li>
+        <li>3 queries KQL ejecutadas en el portal de Azure: excepciones por tipo, latencia P99 por endpoint, y trazado de un request específico</li>
+        <li>Endpoint <code>/health</code> con respuesta JSON mostrando el estado de SQL Server, Redis y la API dependiente</li>
+        <li>Alerta en Azure Monitor configurada: dispara cuando error rate &gt; 5% en los últimos 5 minutos — notificación visible</li>
+        <li>Demostrar que una excepción no manejada devuelve Problem Details sin stack trace y el <code>requestId</code> aparece en los logs de App Insights</li>
+        <li>Application Map en App Insights mostrando las dependencias de tu API (SQL Server, Redis, microservicio externo)</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Conexión con semanas anteriores:</strong> La observabilidad conecta todo lo anterior: los logs de Serilog capturan los eventos del dominio (Sem 17-18), las excepciones manejan los errores de seguridad con Problem Details (Sem 19), y Application Insights da visibilidad de los mensajes de RabbitMQ/Service Bus (Sem 16) y las respuestas del cache Redis (Sem 15). Un sistema observable es un sistema que puedes operar con confianza.
+    </div>
 </div>

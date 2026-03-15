@@ -76,61 +76,61 @@
 
     <div class="flow">
         <div class="rn-table-wrap">
-        <table class="rn-table">
-            <thead>
-                <tr>
-                    <th>Tipo de cambio</th>
-                    <th>¿Breaking?</th>
-                    <th>¿Requiere nueva versión?</th>
-                    <th>Ejemplo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-light">Agregar campo opcional</td>
-                    <td class="text-success">NO</td>
-                    <td class="text-success">No necesario</td>
-                    <td><code>+ "discount": 0.1</code></td>
-                </tr>
-                <tr>
-                    <td class="text-light">Renombrar campo</td>
-                    <td class="text-danger">SÍ</td>
-                    <td class="text-danger">Obligatorio</td>
-                    <td><code>userId → user_id</code></td>
-                </tr>
-                <tr>
-                    <td class="text-light">Eliminar campo</td>
-                    <td class="text-danger">SÍ</td>
-                    <td class="text-danger">Obligatorio</td>
-                    <td><code>- "legacyCode"</code></td>
-                </tr>
-                <tr>
-                    <td class="text-light">Cambiar tipo de campo</td>
-                    <td class="text-danger">SÍ</td>
-                    <td class="text-danger">Obligatorio</td>
-                    <td><code>string → number</code></td>
-                </tr>
-                <tr>
-                    <td class="text-light">Agregar campo requerido en request</td>
-                    <td class="text-danger">SÍ</td>
-                    <td class="text-danger">Obligatorio</td>
-                    <td><code>+ required: "taxId"</code></td>
-                </tr>
-                <tr>
-                    <td class="text-light">Nuevo endpoint</td>
-                    <td class="text-success">NO</td>
-                    <td class="text-success">No necesario</td>
-                    <td><code>GET /orders/{{'{'}}id{{'}'}}/timeline</code></td>
-                </tr>
-                <tr>
-                    <td class="text-light">Cambiar código HTTP</td>
-                    <td class="text-danger">SÍ</td>
-                    <td class="text-danger">Obligatorio</td>
-                    <td><code>200 → 204 en DELETE</code></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Tipo de cambio</th>
+                        <th>¿Breaking?</th>
+                        <th>¿Requiere nueva versión?</th>
+                        <th>Ejemplo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-light">Agregar campo opcional</td>
+                        <td class="text-success">NO</td>
+                        <td class="text-success">No necesario</td>
+                        <td><code>+ "discount": 0.1</code></td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Renombrar campo</td>
+                        <td class="text-danger">SÍ</td>
+                        <td class="text-danger">Obligatorio</td>
+                        <td><code>userId → user_id</code></td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Eliminar campo</td>
+                        <td class="text-danger">SÍ</td>
+                        <td class="text-danger">Obligatorio</td>
+                        <td><code>- "legacyCode"</code></td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Cambiar tipo de campo</td>
+                        <td class="text-danger">SÍ</td>
+                        <td class="text-danger">Obligatorio</td>
+                        <td><code>string → number</code></td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Agregar campo requerido en request</td>
+                        <td class="text-danger">SÍ</td>
+                        <td class="text-danger">Obligatorio</td>
+                        <td><code>+ required: "taxId"</code></td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Nuevo endpoint</td>
+                        <td class="text-success">NO</td>
+                        <td class="text-success">No necesario</td>
+                        <td><code>GET /orders/{{'{'}}id{{'}'}}/timeline</code></td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Cambiar código HTTP</td>
+                        <td class="text-danger">SÍ</td>
+                        <td class="text-danger">Obligatorio</td>
+                        <td><code>200 → 204 en DELETE</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="row">

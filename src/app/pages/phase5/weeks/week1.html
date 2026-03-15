@@ -1,3 +1,484 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Leer docs</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – Contenido técnico</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – Explicar código</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Escribir en inglés</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Conversación técnica</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Mejorar tu Inglés</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">Code explanation, Technical writing</div></div>
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Core Vocabulary — 10 términos esenciales</h3>
+    <div class="rn-table-wrap">
+        <table class="rn-table">
+            <tbody>
+                <tr>
+                    <td><span class="text-info">throughput</span><br> // performance</td>
+                    <td>Cantidad de trabajo procesado por unidad de tiempo. "We need higher throughput on the orders endpoint."</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">bottleneck</span><br> // architecture</td>
+                    <td>El punto más lento del sistema que limita todo lo demás. "The database is the bottleneck."</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">idempotent</span><br> // API design</td>
+                    <td>Una operación que produce el mismo resultado sin importar cuántas veces se ejecute.</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">trade-off</span><br> // design decisions</td>
+                    <td>Equilibrio entre dos opciones donde ganar en una implica ceder en otra. Omnipresente en tech.</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">leverage</span><br> // como verbo</td>
+                    <td>"We can leverage the existing cache layer." Aprovechar, usar estratégicamente.</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">downstream / upstream</span><br> // microservices</td>
+                    <td>Downstream = servicios que dependen de ti. Upstream = servicios de los que tú dependes.</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">opinionated</span><br> // frameworks</td>
+                    <td>"Angular is more opinionated than React." Tiene decisiones de diseño fuertes por defecto.</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">backwards compatible</span><br> // versioning</td>
+                    <td>Un cambio que no rompe el código existente que usa la versión anterior.</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">stale</span><br> // caching</td>
+                    <td>"Stale data in the cache." Datos que ya no son frescos, desactualizados.</td>
+                </tr>
+                <tr>
+                    <td><span class="text-info">graceful degradation</span><br> // resilience</td>
+                    <td>El sistema falla de forma elegante mostrando funcionalidad reducida en vez de caerse por completo.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="flow">
+    <h3>Las 3 habilidades de la semana</h3>
+    <div class="principles">
+        <div class="intro-card"><span class="icon">📖</span><div class="pc-title">Reading</div><div class="pc-body">Leer la documentación oficial de Microsoft, GitHub issues, Stack Overflow y PRs reales en inglés. No traducir — entender directamente.<br><code>Documentación diaria - 15 min / día</code></div></div>
+        <div class="intro-card"><span class="icon">🎧</span><div class="pc-title">Listening</div><div class="pc-body">Ver videos de Nick Chapsas, ByteByteGo y otros sin subtítulos en español. El vocabulario técnico es predecible y se aprende rápido.<br><code>Contenido técnico en inglés - 30 min / día</code></div></div>
+        <div class="intro-card"><span class="icon">🗣️</span><div class="pc-title">Speaking / Writing</div><div class="pc-body">Escribir commits, comentarios y PRs en inglés. Explicar en voz alta una decisión técnica como si fuera una entrevista.<br><code>Explicar código en inglés - 20 min / día</code></div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Leer Documentación Técnica en Inglés</div>
+        <div class="day-subtitle">Estrategias para leer docs sin diccionario, los patrones de redacción técnica de Microsoft, cómo leer un GitHub issue y entender el contexto, y construir el hábito de 15 minutos diarios</div>
+        </div>
+        <span class="day-tag">⏱ ~3h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Leer documentación técnica en inglés es diferente a leer inglés general — es más fácil, no más difícil.</strong> El vocabulario técnico es limitado y predecible: los mismos 500 términos aparecen en el 90% de toda la documentación de software. Microsoft Docs, el blog de Fowler, los RFCs — todos siguen un patrón de escritura directo y estructurado que hace la comprensión más sencilla que leer una novela. La estrategia correcta: no traducir cada palabra, leer en bloques para captar el significado general, y cuando encuentras un término desconocido, buscar la definición técnica en inglés (no la traducción). Entender <em>throughput</em> como concepto es más valioso que saber que se traduce como "rendimiento".
+    </div>
+
+    <div class="tip">
+        "The best programmers I know learned English not because they had to — but because they realized that 97% of technical knowledge is written in English first, and translated (imperfectly) later, if ever."<br>
+        <code>— Principio práctico del desarrollo de software moderno</code>
+    </div>
+
+    <div class="flow">
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Cuándo</th>
+                        <th>Actividad</th>
+                        <th>Objetivo de la semana</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>08:00</td>
+                        <td>
+                            <span class="text-light">Leer 1 página de Microsoft Docs</span><br>
+                            La doc del tema que estudiaste esa semana — sin traducción, con tolerancia a la ambigüedad
+                        </td>
+                        <td>7 páginas completadas</td>
+                        <td><code>Reading</code></td>
+                    </tr>
+                    <tr>
+                        <td>Almuerzo</td>
+                        <td>
+                            <span class="text-light">1 video técnico en inglés</span><br>
+                            Nick Chapsas, ByteByteGo o Fireship — subtítulos en inglés, no en español
+                        </td>
+                        <td>5 videos en inglés</td>
+                        <td><code>Listening</code></td>
+                    </tr>
+                    <tr>
+                        <td>Mientras codeas</td>
+                        <td>
+                            <span class="text-light">Commits y comentarios en inglés</span><br>
+                            Todo lo que escribas en el IDE esta semana: en inglés. Sin excepción.
+                        </td>
+                        <td>100% commits en inglés</td>
+                        <td><code>Writing</code></td>
+                    </tr>
+                    <tr>
+                        <td>21:00</td>
+                        <td>
+                            <span class="text-light">Leer 1 GitHub issue o PR de proyecto open source</span><br>
+                            Cualquier repo que uses: ASP.NET Core, EF Core, Serilog. Leer la discusión.
+                        </td>
+                        <td>5 issues leídos</td>
+                        <td><code>Reading</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Recurso principal — Microsoft Docs en inglés</strong> 
+                    <h3 class="mb-0">learn.microsoft.com — La documentación en inglés como texto de lectura diaria</h3>
+                    <div class="mb-1 text-body-secondary">Esta semana lees la documentación de los temas que ya conoces — en inglés. Empieza por los temas de las últimas semanas (Serilog, Rate Limiting, Health Checks) donde ya sabes el contenido. El objetivo no es aprender tecnología nueva — es entrenar tu lectura en el vocabulario técnico que ya usas. 15 minutos al día es suficiente para construir el hábito.</div>
+                    <a class="link" href="https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core" target="_blank">📘 Microsoft Docs (EN) →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📰</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📰 Blog técnico — Lectura diaria recomendada</strong> 
+                    <h3 class="mb-0">martinfowler.com — Artículos técnicos con el inglés más claro del sector</h3>
+                    <div class="mb-1 text-body-secondary">Martin Fowler escribe con un inglés técnico excepcionalmente claro — frases cortas, vocabulario preciso, sin jerga innecesaria. Sus artículos sobre patrones, arquitectura y buenas prácticas son el texto ideal para practicar lectura técnica. Empieza con los artículos de temas que ya conoces: Strangler Fig, Microservices, Event Sourcing.</div>
+                    <a class="link" href="https://martinfowler.com/" target="_blank">📘 martinfowler.com →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">Consumir Contenido Técnico en Inglés</div>
+        <div class="day-subtitle">Los mejores canales para desarrolladores .NET en inglés, podcasts técnicos para el transporte, cómo entrenar el oído con el vocabulario técnico, y la diferencia entre comprensión activa y pasiva</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El vocabulario técnico en inglés es el más fácil de aprender porque gran parte ya lo usas en español.</strong> <em>Dependency Injection</em>, <em>middleware</em>, <em>throughput</em>, <em>refactoring</em>, <em>deployment</em> — estas palabras son iguales o casi iguales en ambos idiomas. El desafío real es la pronunciación y el ritmo del habla técnica. La estrategia más efectiva: ver los videos de Nick Chapsas, ByteByteGo y Fireship que ya conoces el contenido, pero esta vez con subtítulos en inglés (no en español) o sin subtítulos. Como ya sabes de qué hablan, tu cerebro conecta el sonido con el significado sin necesidad de traducir.
+    </div>
+
+    <div class="tip">
+        <strong>✅ El truco del "contenido conocido":</strong> la primera vez que ves un video técnico, lo ves con subtítulos en español para entender el contenido. La segunda vez — que es el repaso de lo que ya aprendiste — lo ves en inglés sin subtítulos. Tu cerebro ya sabe de qué se trata y puede enfocarse en el idioma. Aplica esto a todos los videos de las semanas anteriores.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Canal YouTube — Inglés técnico .NET</strong> 
+                    <h3 class="mb-0">Nick Chapsas — El canal de .NET en inglés más claro para developers</h3>
+                    <div class="mb-1 text-body-secondary">Nick Chapsas habla con un inglés claro, velocidad moderada y vocabulario técnico preciso. Sus videos sobre los temas que ya conoces (Serilog, Rate Limiting, Asp.Versioning) son el material ideal para practicar comprensión auditiva técnica. Activa los subtítulos en inglés (no en español) para reforzar lectura simultánea. Ver al menos 1 video de 20–40 min por día esta semana.</div>
+                    <a class="link" href="https://www.youtube.com/@nickchapsas" target="_blank">▶️ Nick Chapsas →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Canal YouTube — Conceptos sistémicos en inglés visual</strong> 
+                    <h3 class="mb-0">ByteByteGo — Animaciones de arquitectura con vocabulario técnico esencial</h3>
+                    <div class="mb-1 text-body-secondary">ByteByteGo explica conceptos de system design con animaciones claras y un inglés muy accesible. Cada video de 5–10 minutos introduce docenas de términos técnicos en contexto real. Ideal para practicar listening con vocabulario del tipo que aparece en entrevistas técnicas de empresas internacionales.</div>
+                    <a class="link" href="https://www.youtube.com/@ByteByteGo" target="_blank">▶️ ByteByteGo →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🎙️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🎙️ Podcast — Inglés técnico para el transporte</strong> 
+                    <h3 class="mb-0">NET Rocks! — El podcast de .NET más longevo, en inglés, conversacional</h3>
+                    <div class="mb-1 text-body-secondary">El podcast más antiguo y respetado de .NET. Conversaciones entre desarrolladores sobre arquitectura, herramientas y buenas prácticas — inglés conversacional técnico, el más cercano a una entrevista o a una reunión con un equipo internacional. Escucharlo en el transporte o mientras caminas. No es necesario entender el 100% — el 60-70% es suficiente al principio.</div>
+                    <a class="link" href="https://dotnetrocks.com/" target="_blank">🎙️ dotnetrocks.com →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🎙️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🎙️ Podcast — Arquitectura y mejores prácticas</strong> 
+                    <h3 class="mb-0">Software Engineering Daily — Entrevistas en profundidad con ingenieros de empresas top</h3>
+                    <div class="mb-1 text-body-secondary">Entrevistas con ingenieros de Google, Stripe, Cloudflare, Netflix sobre cómo resuelven problemas de escala real. Inglés más rápido y variado que .NET Rocks — ideal para el nivel intermedio-avanzado. Los episodios sobre microservicios, caching, y distributed systems son directamente aplicables a lo que estudiaste en el roadmap.</div>
+                    <a class="link" href="https://softwareengineeringdaily.com/" target="_blank">🎙️ SE Daily →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">Explicar Código en Inglés</div>
+        <div class="day-subtitle">Las frases exactas para explicar decisiones técnicas en entrevistas, cómo describir tu arquitectura, el vocabulario para hablar de trade-offs, y la técnica de "rubber duck debugging en inglés"</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Explicar código en inglés es la habilidad más directamente relacionada con conseguir trabajo en empresas internacionales.</strong> En una entrevista técnica, no basta con saber implementar un Circuit Breaker — hay que explicar por qué lo elegiste, qué problemas resuelve, y qué trade-offs implica. Todo eso en inglés, en tiempo real, sin preparación. La buena noticia: las frases son predecibles y repetibles. "I decided to use X because...", "The trade-off here is...", "One concern I had with this approach was..." — estas estructuras cubren el 80% de lo que necesitas en cualquier conversación técnica.
+    </div>
+
+    <div class="flow">
+        <h3>Frases técnicas esenciales — para usar desde hoy - memorizar estas estructuras, no palabras sueltas</h3>
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <tbody>
+                    <tr>
+                        <td>
+                            <span class="text-light">Justificar una decisión</span><br>
+                            "I chose [X] over [Y] because [reason]. The trade-off is [downside], but in our context that's acceptable."
+                        </td>
+                        <td>Para explicar por qué elegiste una tecnología o patrón. La estructura "chose X over Y because" es exactamente lo que buscan los entrevistadores.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="text-light">Describir un problema</span><br>
+                            "The issue we were running into was [problem]. This was causing [symptom] which impacted [business metric]."
+                        </td>
+                        <td>Conectar un problema técnico con su impacto en el negocio. "Running into" es más natural que "having a problem with".</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="text-light">Explicar arquitectura</span><br>
+                            "This service is responsible for [X]. It communicates with [Y] via [protocol] and persists data to [Z]."
+                        </td>
+                        <td>Describe cualquier microservicio de tu arquitectura con esta estructura. "Is responsible for" es más preciso que "does".</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="text-light">Admitir una limitación</span><br>
+                            "One thing I'd improve if I had more time is [X]. Right now [current limitation], which could be a concern at scale."
+                        </td>
+                        <td>Los entrevistadores aprecian honestidad sobre limitaciones. "At scale" es la frase más usada en conversaciones técnicas avanzadas.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="text-light">Cuando no sabes algo</span><br>
+                            "I'm not deeply familiar with [X], but based on what I know about [related concept], I'd approach it by [reasoning]."
+                        </td>
+                        <td>Nunca digas "I don't know" y te quedes en silencio. Muestra tu proceso de razonamiento aunque no tengas la respuesta exacta.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="text-light">Code review / PR comments</span><br>
+                            "Consider extracting this into [X] — it would make it easier to [benefit]. What do you think?"
+                        </td>
+                        <td>"Consider" es más amable que "you should". Terminar con "what do you think?" convierte una crítica en una conversación.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">🤖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">🤖 Herramienta — Práctica con IA</strong> 
+                    <h3 class="mb-0">Usar Claude (o ChatGPT) como interviewer técnico en inglés</h3>
+                    <div class="mb-1 text-body-secondary">El ejercicio más práctico de la semana: pedirle a Claude que simule una entrevista técnica en inglés para un rol de .NET Backend Developer. Responder en inglés explicando las decisiones de arquitectura del roadmap. Claude puede corregir el inglés técnico, sugerir vocabulario más apropiado, y hacer preguntas de follow-up. 20-30 minutos diarios de este ejercicio equivalen a semanas de estudio tradicional.</div>
+                    <code>Prompt: "Act as a senior .NET technical interviewer. Ask me about my microservices architecture decisions. Correct my English if it sounds unnatural."</code>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Canal YouTube — Conceptos sistémicos en inglés visual</strong> 
+                    <h3 class="mb-0">How to explain your code in a technical interview — Thinking out loud</h3>
+                    <div class="mb-1 text-body-secondary">Técnica del "think-aloud protocol": cómo explicar tu proceso de pensamiento en inglés mientras resuelves un problema técnico. El vocabulario específico para hablar de complejidad algorítmica, trade-offs de diseño, y decisiones de arquitectura en voz alta. Incluye frases reales de entrevistas en empresas como Google y Amazon. ~25 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=1qw5ITr3k9E" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Escribir en Inglés Técnico</div>
+        <div class="day-subtitle">Commits, PRs, comentarios de código, y documentación técnica en inglés — el estándar de escritura que esperan los equipos internacionales, errores comunes de hispanohablantes y cómo evitarlos</div>
+        </div>
+        <span class="day-tag">⏱ ~3h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>La escritura técnica en inglés tiene reglas muy concretas que la hacen diferente al inglés general.</strong> Tres principios fundamentales: usa el <em>imperativo presente</em> en commits y documentación (<code>Add rate limiting middleware</code>, no <code>Added</code> ni <code>Adding</code>), sé específico en lugar de vago (<code>Fix NullReferenceException in OrderService.CreateAsync</code> en vez de <code>Fix bug</code>), y elimina el ruido (no escribas "I think that maybe we could consider" cuando "Consider" dice lo mismo en una palabra). El inglés técnico escrito valora la precisión sobre la elaboración — al contrario del inglés formal o académico.
+    </div>
+
+    <div class="tip">
+        <strong>⚠️ Los 3 errores de escritura técnica más comunes en hispanohablantes:</strong> Primero, usar el passado en commits: <code>Fixed the bug</code> — lo correcto es <code>Fix the bug</code> (imperativo). Segundo, traducir literalmente: <code>Make a refactoring</code> — lo correcto es <code>Refactor the service</code>. Tercero, ser demasiado formal: <code>I would like to suggest that perhaps we should</code> — lo correcto es <code>Consider extracting this into a service</code>.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">✍️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">✍️ Guía de escritura — Google</strong> 
+                    <h3 class="mb-0">Google Technical Writing Course — El estándar de escritura técnica profesional</h3>
+                    <div class="mb-1 text-body-secondary">El curso gratuito de Google sobre escritura técnica profesional: cómo escribir documentación clara, frases activas vs pasivas en el contexto técnico, cómo estructurar instrucciones paso a paso, y los principios de claridad que usan los equipos de Google. Es la referencia que todos los equipos de documentación técnica usan internamente. Leer los módulos 1 y 2 esta semana.</div>
+                    <a class="link" href="https://developers.google.com/tech-writing/one" target="_blank">✍️ Google Tech Writing →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Herramienta — Revisión de inglés técnico</strong> 
+                    <h3 class="mb-0">LanguageTool — Corrección de inglés técnico en tiempo real</h3>
+                    <div class="mb-1 text-body-secondary">Plugin gratuito para VS Code, JetBrains y el navegador que corrige inglés técnico en tiempo real: gramática, estilo de escritura técnica, y errores comunes de no-nativos. Más útil que Grammarly para contexto técnico porque reconoce términos de programación. Instalar como extensión del IDE para corregir comentarios y PRs mientras escribes.</div>
+                    <a class="link" href="https://languagetool.org/" target="_blank">🔧 LanguageTool →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Conversación Técnica Simulada</div>
+        <div class="day-subtitle">Simulación de entrevista técnica completa en inglés, práctica de stand-up diario, cómo manejar el silencio incómodo en inglés, y el entregable de la semana</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Una entrevista técnica en inglés se puede preparar con un script de 10 preguntas — porque el 80% de las preguntas son predecibles.</strong> "Tell me about your architecture", "Why did you choose X over Y?", "What would you do differently?", "How do you handle errors in production?", "What's your experience with microservices?" — estas preguntas aparecen en prácticamente todas las entrevistas de backend. Si tienes una respuesta ensayada (no memorizada, sino <em>ensayada</em> — entendida y apropiable) para estas 10 preguntas, llegas al 80% de cualquier entrevista técnica con confianza. El otro 20% son preguntas específicas donde mostrar el proceso de razonamiento vale más que la respuesta correcta.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Recurso — Las 10 preguntas más frecuentes en entrevistas .NET</strong> 
+                    <h3 class="mb-0">Senior Backend Developer Mock Interview – System Design & Backend Questions</h3>
+                    <div class="mb-1 text-body-secondary">Simulación de entrevista para backend developer, cubriendo preguntas típicas sobre arquitectura de microservicios, seguridad, bases de datos, caching, testing y diseño de sistemas.</div>
+                    <a class="link" href="https://youtu.be/e_i2RETG0yo?si=FmWiPw-yc1LkZFGZ" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🤖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🤖 Herramienta — Práctica estructurada</strong> 
+                    <h3 class="mb-0">Pramp.com — Entrevistas técnicas en inglés con otros desarrolladores</h3>
+                    <div class="mb-1 text-body-secondary">Plataforma gratuita donde practicas entrevistas técnicas en pares con otros desarrolladores de todo el mundo — completamente en inglés. Cada sesión de 30 minutos incluye turno como entrevistado y turno como entrevistador. El feedback mutuo es más valioso que practicar solo. La exposición a distintos acentos del inglés técnico también prepara para equipos internacionales reales.</div>
+                    <a class="link" href="https://www.pramp.com/" target="_blank">🤖 pramp.com →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Recurso — Vocabulario para stands-up diarios</strong> 
+                    <h3 class="mb-0">El vocabulario exacto para el daily stand-up en un equipo internacional</h3>
+                    <div class="mb-1 text-body-secondary">En un equipo remoto con inglés como idioma de trabajo, el stand-up diario es el primer punto de contacto. Las frases concretas para un stand-up efectivo: "Yesterday I worked on...", "Today I'm planning to...", "I'm blocked by... and I need help with...", "No blockers, I'll have this ready by EOD (end of day)". Practicar el stand-up de voz alta todos los días de esta semana en inglés, solo, como si estuvieras con el equipo.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=er9gntPjTJU" target="_blank">▶️ Stand-up English for developers →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Entregable: Presentación técnica de 3 minutos</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">El entregable de esta semana es una grabación de audio o video de 3 minutos en inglés explicando el proyecto del roadmap:</p>
+    <ul>
+        <li>Graba (solo audio o video) 3 minutos explicando tu arquitectura de microservicios en inglés — qué servicios tienes, cómo se comunican, y por qué tomaste esas decisiones</li>
+        <li>Escribe el README principal del proyecto en inglés — descripción, arquitectura, cómo ejecutarlo localmente, y las decisiones técnicas más importantes</li>
+        <li>Haz una lista de 10 términos técnicos nuevos en inglés que encontraste esta semana — con definición en inglés (no en español) y un ejemplo de uso en contexto</li>
+        <li>Simula un stand-up diario completo en inglés grabado el último día: yesterday, today, blockers — como si fuera real con un equipo internacional</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 Por qué la Fase 5 empieza con inglés:</strong> Todo el conocimiento técnico acumulado en las Fases 1–4 tiene un techo de impacto si solo se puede comunicar en español. Las empresas que pagan los mejores salarios del mercado (remotas internacionales, scale-ups europeas, empresas con ingeniería en inglés) requieren inglés técnico funcional. La <strong>Semana 23</strong> construye directamente sobre esto: preparación de CV y GitHub para el mercado internacional, donde el inglés es la diferencia entre ser leído o ser ignorado.
+    </div>
 </div>
