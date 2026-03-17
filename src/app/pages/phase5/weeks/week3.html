@@ -1,3 +1,477 @@
+<div class="rn-week-strip">
+    <nav class="rn-week-nav" aria-label="dias"> 
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia1">Día 1 – Backend fundamentals</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia2">Día 2 – SQL avanzado</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia3">Día 3 – System design</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia4">Día 4 – Live coding</button>
+        <button class="rn-week-btn" [routerLink]="[]" fragment="dia5">Día 5 – Simulación completa</button>
+    </nav>
+</div>
+
+<div class="intro-grid" style="margin-top:1.5rem;">
+    <div class="intro-card"><span class="icon">📅</span><div class="label">Duración</div><div class="value">5 días</div></div>
+    <div class="intro-card"><span class="icon">🎯</span><div class="label">Meta</div><div class="value">Prepárate como si la entrevista fuera mañana</div></div>
+    <div class="intro-card"><span class="icon">📚</span><div class="label">Recursos</div><div class="value">25+</div></div>
+    <div class="intro-card"><span class="icon">⚡</span><div class="label">Stack</div><div class="value">preguntas, simulaciones</div></div>
+</div>
+
+<div class="rn-ft">
+    <div class="rn-ft-header">
+        <span class="rn-ft-title">
+            <span class="rn-ft-title-slash">//</span> Flashcard Trainer
+        </span>
+        <span class="rn-ft-counter">{{ counter() }}</span>
+    </div>
+    <div class="rn-ft-cats">
+        @for (cat of categories; track cat.key) {
+            <button
+                class="rn-ft-cat"
+                [class.active]="activeCategory() === cat.key"
+                (click)="setCategory(cat.key)">
+                {{ cat.label }}
+            </button>
+        }
+    </div>
+    <div class="rn-ft-card" (click)="showAnswer()">
+        <div class="rn-ft-q-label">▸ Pregunta <span class="rn-ft-q-hint">— click para ver respuesta</span></div>
+        <div class="rn-ft-question">{{ currentCard().q }}</div>
+        @if (answerVisible()) {
+            <div class="rn-ft-divider"></div>
+            <div class="rn-ft-answer" [innerHTML]="currentCard().a"></div>
+        } @else {
+            <div class="rn-ft-answer-placeholder">
+                <span class="rn-ft-placeholder-dots">
+                    <span></span><span></span><span></span>
+                </span>
+            </div>
+        }
+    </div>
+    <div class="rn-ft-controls">
+        <button
+            class="rn-ft-btn rn-ft-btn-show"
+            [disabled]="answerVisible()"
+            (click)="showAnswer()">
+            Ver respuesta
+        </button>
+        <button
+            class="rn-ft-btn rn-ft-btn-next"
+            (click)="nextCard()">
+            Siguiente <span class="rn-ft-btn-arrow">›</span>
+        </button>
+    </div>
+</div>
+
 <div class="flow">
-    <h3>PROXIMAMENTE...</h3>
+    <h3>Las 4 categorías de una entrevista backend completa</h3>
+    <div class="principles">
+        <div class="pc"><div class="pc-title text-light">Backend Fundamentals</div><div class="pc-body">SOLID, DI, REST vs gRPC, async/await, middleware pipeline, Clean Architecture, CQRS, event-driven. Todo lo que construiste en las Fases 1–4.</div><div class="pc-body text-success">Estándar en todas</div></div>
+        <div class="pc"><div class="pc-title text-light">SQL Avanzado</div><div class="pc-body">Window functions, execution plans, índices, ACID, isolation levels, deadlocks, CTEs recursivas. La Fase 2 completa en formato pregunta-respuesta.</div><div class="pc-body text-warning">Frecuente en senior</div></div>
+        <div class="pc"><div class="pc-title text-light">SQL Avanzado</div><div class="pc-body">Diseñar sistemas a escala: URL shortener, rate limiter, notification system, order processing. El framework RADDS para responder en 45 minutos.</div><div class="pc-body text-danger">Difícil — ensayar</div></div>
+        <div class="pc"><div class="pc-title text-light">Live Coding + Simulación</div><div class="pc-body">LeetCode medium, colecciones LINQ, algorítmica básica, y una simulación de entrevista completa de 45 minutos cronometrada.</div><div class="pc-body text-danger">Alta presión</div></div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 1 -->
+<div id="dia1">
+    <div class="day-header">
+        <div class="day-number">1</div>
+        <div>
+        <div class="day-title">Preguntas de Backend — Todo lo de las Fases 1–4</div>
+        <div class="day-subtitle">SOLID con ejemplos de código real, DI y su relación con testabilidad, REST vs alternativas, CQRS en la práctica, async/await correctamente explicado, y cómo responder preguntas de arquitectura bajo presión</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>En una entrevista técnica de backend, el entrevistador no solo evalúa si conoces la respuesta — evalúa cómo razonas cuando no la sabes al 100%.</strong> La técnica correcta: empezar con la definición limpia, dar un ejemplo de código o arquitectura real, mencionar el trade-off o el cuándo NO usarlo, y conectar con algo que hayas construido. "SOLID es un conjunto de cinco principios de diseño de software orientado a objetos. En mi proyecto, el que más apliqué fue el Single Responsibility Principle al extraer la lógica de validación en clases separadas usando FluentValidation — en lugar de tener esa lógica en los controladores. El trade-off es más archivos, pero cada clase tiene una sola razón para cambiar."
+    </div>
+
+    <div class="rn-qa-list">
+        <div class="rn-qa">
+            <div class="rn-qa-q" (click)="toggleQA($event)">
+                <span class="rn-qa-q-inner">
+                    <span class="rn-qa-diff rn-diff-easy">Easy</span>
+                    Explica SOLID y da un ejemplo de S y D de tu código
+                </span>
+                <span class="rn-qa-arrow">›</span>
+            </div>
+            <div class="rn-qa-a">
+                <strong>S — Single Responsibility:</strong> cada clase tiene una sola razón para cambiar. Ejemplo: <code>OrderValidator</code> solo valida, <code>OrderRepository</code> solo persiste, <code>OrderService</code> solo orquesta. En mi proyecto separé la validación con FluentValidation en lugar de mezclarla en los controladores.<br><br>
+                <strong>D — Dependency Inversion:</strong> las capas de alto nivel no dependen de las de bajo nivel — ambas dependen de abstracciones. En la práctica: el <code>OrderService</code> depende de <code>IOrderRepository</code> (interfaz), no de <code>SqlOrderRepository</code> (implementación concreta). Esto permite testear con mocks y cambiar la implementación sin tocar el servicio.
+            </div>
+        </div>
+        <div class="rn-qa">
+            <div class="rn-qa-q" (click)="toggleQA($event)">
+                <span class="rn-qa-q-inner">
+                    <span class="rn-qa-diff rn-diff-med">Med</span>
+                    ¿Cuándo usarías CQRS y cuándo es over-engineering?
+                </span>
+                <span class="rn-qa-arrow">›</span>
+            </div>
+            <div class="rn-qa-a">
+                <strong>CQRS</strong> (Command Query Responsibility Segregation) separa las operaciones de escritura (Commands) de las de lectura (Queries). <span class="rn-qa-highlight">Cuándo usarlo:</span> cuando las lecturas y escrituras tienen requisitos muy distintos de escala o complejidad, cuando hay múltiples read models del mismo dato, o cuando usas Event Sourcing. En mi proyecto lo usé con MediatR: los Commands validan y mutan estado, las Queries son optimizadas con proyecciones directas a DTOs sin pasar por el domain model.<br><br>
+                <span class="rn-qa-highlight">Cuándo es over-engineering:</span> en CRUD simples con pocos usuarios, cuando el equipo es pequeño y la complejidad añadida no justifica el beneficio, o en early-stage donde los requisitos cambian constantemente. La regla: si tus lecturas y escrituras tienen el mismo modelo de datos y escala similar, un simple Repository es suficiente.
+            </div>
+        </div>
+        <div class="rn-qa">
+            <div class="rn-qa-q" (click)="toggleQA($event)">
+                <span class="rn-qa-q-inner">
+                    <span class="rn-qa-diff rn-diff-med">Med</span>
+                    Explica async/await en .NET — ¿qué pasa realmente en el thread pool?
+                </span>
+                <span class="rn-qa-arrow">›</span>
+            </div>
+            <div class="rn-qa-a">
+                <code>async/await</code> no crea threads nuevos — libera el thread actual mientras espera operaciones I/O para que pueda atender otras requests. Cuando escribes <code>await _db.GetAsync()</code>, el thread del request es devuelto al thread pool mientras la base de datos procesa. Cuando la BD responde, el runtime toma un thread disponible (puede ser el mismo u otro) y continúa la ejecución.<br><br>
+                <span class="rn-qa-highlight">Error común a mencionar:</span> <code>async void</code> (solo para event handlers — no se puede await, las excepciones se pierden), <code>.Result</code> o <code>.Wait()</code> que causan deadlocks en ASP.NET classic, y no usar <code>ConfigureAwait(false)</code> en librerías. En ASP.NET Core, <code>ConfigureAwait</code> es menos crítico porque no hay SynchronizationContext, pero es buena práctica en código de librería.
+            </div>
+        </div>
+        <div class="rn-qa">
+            <div class="rn-qa-q" (click)="toggleQA($event)">
+                <span class="rn-qa-q-inner">
+                    <span class="rn-qa-diff rn-diff-hard">Hard</span>
+                    ¿Cuál es la diferencia entre el Outbox Pattern y usar una cola directamente?
+                </span>
+                <span class="rn-qa-arrow">›</span>
+            </div>
+            <div class="rn-qa-a">
+                El problema: si publicas un evento a RabbitMQ/Service Bus <em>después</em> de hacer el <code>SaveChanges()</code> en la base de datos, hay una ventana donde el DB save tiene éxito pero la publicación del evento falla — el sistema queda en estado inconsistente.<br><br>
+                <strong>Outbox Pattern:</strong> en la <em>misma transacción</em> que guardas los datos, escribes el evento en una tabla <code>OutboxMessages</code> en la misma BD. Un proceso background separado (o un job) lee esa tabla y publica a la cola, marcando el mensaje como procesado. Si la publicación falla, reintenta — si tiene éxito, no hay inconsistencia posible.<br><br>
+                <span class="rn-qa-highlight">vs. Cola directa:</span> la cola directa es "at most once delivery" — puede perder mensajes. El Outbox garantiza "at least once delivery". La contrapartida: el consumer debe ser idempotente porque puede recibir el mismo mensaje más de una vez. En mi proyecto lo implementé con MassTransit que tiene soporte nativo de Outbox con EF Core.
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video — YouTube</strong> 
+                    <h3 class="mb-0">.NET Backend Interview Questions — 50 preguntas con respuestas</h3>
+                    <div class="mb-1 text-body-secondary">Video que cubre 50 preguntas comunes de entrevistas para desarrolladores C#/.NET, incluyendo conceptos clave como OOP, value types vs reference types, delegates, multithreading, LINQ, reflection y manejo de memoria.</div>
+                    <a class="link" href="https://youtu.be/VCcXcwsH9G4?si=rvtZdv3e4JzXgfRO" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📄</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📄 Referencia — Repositorio de preguntas</strong> 
+                    <h3 class="mb-0">dotnet-interview-questions en GitHub — 200+ preguntas con respuestas curadas</h3>
+                    <div class="mb-1 text-body-secondary">Repositorio comunitario con más de 200 preguntas de entrevistas .NET organizadas por categoría: C# language features, ASP.NET Core, EF Core, design patterns, microservices, Azure, security, y testing. Cada pregunta tiene respuesta concisa y, en muchos casos, código de ejemplo. Ideal para repasar rápido antes de una entrevista o identificar gaps de conocimiento.</div>
+                    <a class="link" href="https://github.com/Devinterview-io/net-core-interview-questions" target="_blank">📘 GitHub →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 2 -->
+<div id="dia2">
+    <div class="day-header">
+        <div class="day-number">2</div>
+        <div>
+        <div class="day-title">SQL Avanzado en Formato Entrevista</div>
+        <div class="day-subtitle">Window functions vs GROUP BY, execution plan y cómo optimizar una query lenta, índices covering vs composite, diferencias entre niveles de aislamiento, y cómo diagnosticar un deadlock</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Las preguntas de SQL en entrevistas senior tienen un patrón: el entrevistador muestra una query o un problema de performance y te pide diagnosticar o mejorar.</strong> El enfoque correcto no es memorizar respuestas — es tener un framework de diagnóstico. Para una query lenta: primero revisar el execution plan (¿hay table scans en tablas grandes?), luego verificar los índices (¿la WHERE clause usa una columna indexada?), luego revisar estadísticas desactualizadas, y finalmente considerar si la query puede reestructurarse. Tener este proceso en la cabeza permite responder incluso preguntas que no has visto antes.
+    </div>
+
+    <div class="rn-qa-list">
+        <div class="rn-qa">
+            <div class="rn-qa-q" (click)="toggleQA($event)">
+                <span class="rn-qa-q-inner">
+                    <span class="rn-qa-diff rn-diff-med">Med</span>
+                    ¿Cuándo usas ROW_NUMBER() vs RANK() vs DENSE_RANK()?
+                </span>
+                <span class="rn-qa-arrow">›</span>
+            </div>
+            <div class="rn-qa-a">
+                Las tres son window functions que asignan números de fila, pero manejan empates distinto:<br><br><code>ROW_NUMBER()</code>: número único siempre, sin importar empates. Si dos filas tienen el mismo valor, una recibe 1 y otra 2 — arbitrariamente. Útil para paginación y deduplicación.<br><br><code>RANK()</code>: si hay empate en posición 2, ambas filas reciben 2, y la siguiente recibe 4 (salta el 3). Útil para rankings donde el "salto" es semánticamente correcto (como clasificaciones deportivas).<br><br><code>DENSE_RANK()</code>: si hay empate en posición 2, ambas filas reciben 2, y la siguiente recibe 3 — sin saltos. Útil cuando necesitas rankings continuos sin huecos.<br><br><span class="rn-qa-highlight">Ejemplo de entrevista:</span> "Dame el segundo salario más alto por departamento" — <code>DENSE_RANK() OVER (PARTITION BY dept ORDER BY salary DESC)</code> con <code>WHERE rnk = 2</code>.
+            </div>
+        </div>
+        <div class="rn-qa">
+            <div class="rn-qa-q" (click)="toggleQA($event)">
+                <span class="rn-qa-q-inner">
+                    <span class="rn-qa-diff rn-diff-hard">Hard</span>
+                    Un query tarda 8 segundos. ¿Cómo lo diagnosticas y optimizas?
+                </span>
+                <span class="rn-qa-arrow">›</span>
+            </div>
+            <div class="rn-qa-a">
+                <strong>Paso 1 — Execution plan:</strong> <code>SET STATISTICS IO ON; SET STATISTICS TIME ON;</code> antes del query, o ver el Actual Execution Plan en SSMS. Buscar: Table Scan en tablas grandes (señal de índice faltante), Key Lookup caro (señal de índice non-covering), Sort o Hash Match en tablas grandes, flechas gruesas (muchas filas pasando entre operadores).<br><br><strong>Paso 2 — Índices:</strong> verificar que las columnas en WHERE, JOIN y ORDER BY tienen índices. Si hay Key Lookup, considerar un <em>covering index</em> que incluya las columnas del SELECT con INCLUDE().<br><br><strong>Paso 3 — Estadísticas:</strong> <code>UPDATE STATISTICS [tabla]</code> — estadísticas desactualizadas hacen que el query optimizer tome decisiones malas.<br><br><strong>Paso 4 — Query rewrite:</strong> ¿hay subqueries que pueden ser JOINs? ¿Funciones en la WHERE clause que rompen el SARGability (ej: <code>WHERE YEAR(fecha) = 2024</code> vs <code>WHERE fecha BETWEEN '2024-01-01' AND '2024-12-31'</code>)?<br><br><strong>Paso 5 — Concurrencia:</strong> si el problema es intermitente, puede ser bloqueo o deadlock — revisar <code>sys.dm_exec_requests</code>.
+            </div>
+        </div>
+        <div class="rn-qa">
+            <div class="rn-qa-q" (click)="toggleQA($event)">
+                <span class="rn-qa-q-inner">
+                    <span class="rn-qa-diff rn-diff-hard">Hard</span>
+                    Explica ACID y qué pasa en cada nivel de aislamiento
+                </span>
+                <span class="rn-qa-arrow">›</span>
+            </div>
+            <div class="rn-qa-a">
+                <strong>ACID:</strong> Atomicity (todo o nada), Consistency (las reglas de integridad se mantienen), Isolation (transacciones concurrentes no se interfieren), Durability (los commits sobreviven fallos).<br><br><span class="rn-qa-highlight">Problemas de concurrencia:</span> Dirty Read (leer datos no commiteados), Non-repeatable Read (la misma fila devuelve valores distintos en la misma tx), Phantom Read (nuevas filas aparecen en lecturas repetidas).<br><br><strong>READ UNCOMMITTED:</strong> ve dirty reads — no se usa en producción salvo para reportes aproximados. <strong>READ COMMITTED</strong> (default de SQL Server): elimina dirty reads, permite non-repeatable reads. <strong>REPEATABLE READ:</strong> elimina dirty y non-repeatable reads, permite phantom reads. <strong>SERIALIZABLE:</strong> elimina todos los problemas — mayor consistencia, menor concurrencia, riesgo de deadlocks. <strong>SNAPSHOT:</strong> el equilibrio de SQL Server — lecturas ven una copia point-in-time, writes siguen bloqueándose entre sí. Excelente para reads de alta concurrencia.
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">📋</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">📋 interview_queries.sql</strong> 
+                    <h3 class="mb-0">Las 3 queries que más aparecen en entrevistas</h3>
+                    <pre><code>{{codeExample1}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Práctica — SQL interactivo</strong> 
+                    <h3 class="mb-0">SQLZoo / LeetCode SQL — Práctica cronometrada de queries de entrevista</h3>
+                    <div class="mb-1 text-body-secondary">SQLZoo tiene ejercicios interactivos organizados por nivel incluyendo window functions, CTEs y queries complejas. LeetCode tiene una sección SQL con los problemas exactos que aparecen en entrevistas de empresas tech (Medium y Hard son los más frecuentes en entrevistas senior). El objetivo esta semana: resolver 5 problemas Medium de SQL en LeetCode, cronometrado a 15 min por problema.</div>
+                    <a class="link" href="https://sqlzoo.net/wiki/Window_functions" target="_blank">🔧 SQLZoo Windows →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 3 -->
+<div id="dia3">
+    <div class="day-header">
+        <div class="day-number">3</div>
+        <div>
+        <div class="day-title">System Design — Diseñar sistemas a escala</div>
+        <div class="day-subtitle">El framework RADDS para responder en 45 minutos, los 5 problemas más frecuentes (URL shortener, rate limiter, notification system, order processing, chat), y cómo conectar el diseño con lo que construiste</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Las entrevistas de system design no tienen una respuesta correcta única — evalúan tu proceso de razonamiento, no la solución final.</strong> El error más común: empezar a diagramar componentes inmediatamente sin clarificar los requisitos. El entrevistador quiere ver cómo navegas la ambigüedad, cómo priorizas requisitos funcionales vs no-funcionales, cómo justificas trade-offs. Un buen framework de 45 minutos: 5 min clarificando requisitos y escala, 5 min estimaciones de carga, 15 min diseño de alto nivel, 15 min deep dive en el componente más crítico, 5 min bottlenecks y mejoras. Tener este esquema memorizado elimina el pánico al inicio.
+    </div>
+
+    <div class="flow">
+        <h3>// Framework RADDS — 45 minutos de system design</h3>
+        <div class="principles">
+            <div class="pc"><div class="pc-title text-danger">1</div><div class="pc-title text-light">Requirements</div><div class="pc-body">Clarificar requisitos funcionales ("¿qué hace el sistema?") y no-funcionales ("¿cuántos usuarios? ¿latencia aceptable? ¿disponibilidad?"). No asumir — preguntar.</div><div class="pc-body text-danger">5 min</div></div>
+            <div class="pc"><div class="pc-title text-danger">2</div><div class="pc-title text-light">API Design</div><div class="pc-body">Definir los endpoints o interfaces principales. Esto clarifica el contrato del sistema antes de diseñar la implementación interna.</div><div class="pc-body text-danger">5 min</div></div>
+            <div class="pc"><div class="pc-title text-danger">3</div><div class="pc-title text-light">Data Model</div><div class="pc-body">¿Qué datos persistes? ¿SQL o NoSQL y por qué? ¿Cómo se relacionan las entidades? ¿Qué índices necesitas para las queries críticas?</div><div class="pc-body text-danger">10 min</div></div>
+            <div class="pc"><div class="pc-title text-danger">4</div><div class="pc-title text-light">Design + Scale</div><div class="pc-body">Diagrama de alto nivel con todos los componentes. Luego identificar el bottleneck y proponer solución: caché, particionamiento, async processing, CDN.</div><div class="pc-body text-danger">20 min</div></div>
+        </div>
+    </div>
+    
+    <div class="tip">
+        <strong>💡Conecta el design con tu experiencia real.</strong> "Para el rate limiting de esta API usaría Token Bucket — de hecho lo implementé en mi proyecto con el middleware nativo de .NET 8 que soporta Fixed Window, Sliding Window, y Token Bucket. El trade-off es que Token Bucket permite bursts que Fixed Window no." Esta frase en una entrevista de system design pesa 10 veces más que una descripción teórica.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon doc">📖</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-doc">📖 Libro — La referencia de system design</strong> 
+                    <h3 class="mb-0">System Design Interview — Alex Xu (Vol. 1) — El libro que prepara para FAANG</h3>
+                    <div class="mb-1 text-body-secondary">El libro más usado para preparar entrevistas de system design en empresas top. Cubre los 16 problemas más frecuentes: URL shortener, web crawler, notification system, news feed, chat system, search autocomplete, y más. Cada capítulo sigue el framework de requisitos → estimaciones → diseño → deep dive → recap. Leer los capítulos 1 (escala desde 0 a millones), 4 (Rate Limiter), y 6 (Key-Value Store) esta semana. El resto es para después.</div>
+                    <a class="link" href="https://www.amazon.com/System-Design-Interview-insiders-Second/dp/B08CMF2CQF" target="_blank">📘 Amazon →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Canal YouTube — ByteByteGo</strong> 
+                    <h3 class="mb-0">ByteByteGo — System design en video, 5–10 min por problema, con animaciones</h3>
+                    <div class="mb-1 text-body-secondary">Canal del autor de "System Design Interview" con videos de 5–10 minutos que cubren los problemas más frecuentes en formato visual. Esta semana: ver los videos de "Design a Rate Limiter", "Design a Notification System", y "Design a URL Shortener". Son exactamente los problemas que aparecen en entrevistas de empresas que contratan developers remotos de nivel senior.</div>
+                    <a class="link" href="https://www.youtube.com/@ByteByteGo" target="_blank">▶️ ByteByteGo →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 4 -->
+<div id="dia4">
+    <div class="day-header">
+        <div class="day-number">4</div>
+        <div>
+        <div class="day-title">Live Coding — Algorítmica y LINQ bajo presión</div>
+        <div class="day-subtitle">El proceso de "think aloud" durante live coding, los 10 patrones algorítmicos que aparecen el 80% del tiempo, LINQ en entrevistas .NET, y cómo manejar el bloqueo mental</div>
+        </div>
+        <span class="day-tag">⏱ ~5h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>El live coding evalúa tres cosas distintas: si llegas a la solución, cómo comunicas el proceso, y cómo respondes bajo presión.</strong> La comunicación vale tanto como la solución. Antes de escribir una sola línea: leer el problema en voz alta, preguntar por edge cases (¿puede ser null? ¿array vacío?), proponer el approach antes de implementarlo ("creo que puedo resolver esto con un sliding window — ¿te parece bien si empiezo por ahí?"). Si te bloqueas: verbalizar dónde estás bloqueado ("no recuerdo la sintaxis exacta de GroupBy con múltiples keys, pero la lógica sería..."). El entrevistador puede ayudarte si sabe dónde estás.
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon code">📋</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-code">📋 linq_interview.cs</strong> 
+                    <h3 class="mb-0">Los patrones LINQ más frecuentes en entrevistas .NET</h3>
+                    <pre><code>{{codeExample2}}</code></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Práctica — LeetCode</strong> 
+                    <h3 class="mb-0">LeetCode Medium — Los 10 patrones que cubren el 80% de entrevistas de live coding</h3>
+                    <div class="mb-1 text-body-secondary">No hay que resolver 500 problemas de LeetCode — hay que dominar 10 patrones: Two Pointers, Sliding Window, Binary Search, HashMap/Frequency Count, BFS/DFS básico, Stack para parentheses/matching, Prefix Sum, Sorting + Two Pointers, Intervals merging, y Recursión básica. Con estos 10 patrones reconocidos, el 80% de los problemas Medium de entrevistas se vuelven reconocibles. Esta semana: resolver 1–2 Medium por día usando C# o el lenguaje preferido.</div>
+                    <a class="link" href="https://neetcode.io/roadmap" target="_blank">🔧 NeetCode Roadmap →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video — YouTube</strong> 
+                    <h3 class="mb-0">How to NOT fail a coding interview — El proceso de think-aloud</h3>
+                    <div class="mb-1 text-body-secondary">Muestra el proceso correcto durante un live coding: cómo pensar en voz alta, qué preguntar antes de codear, cómo manejar el bloqueo mental, y cómo comunicar cuando no sabes la solución óptima. La parte de "cómo comunicar" es lo que más diferencia a candidatos de igual nivel técnico en entrevistas de nivel senior. ~28 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=1t1_a1BZ04o" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DÍA 5 -->
+<div id="dia5">
+    <div class="day-header">
+        <div class="day-number">5</div>
+        <div>
+        <div class="day-title">Simulación Completa — La entrevista real</div>
+        <div class="day-subtitle">Behavioral questions con el método STAR, cómo negociar el salario, simulación cronometrada de 45 min con IA o en Pramp, y la mentalidad correcta para el día de la entrevista</div>
+        </div>
+        <span class="day-tag">⏱ ~4h</span>
+    </div>
+
+    <div class="concept-box">
+        <strong>Las behavioral questions no son relleno — son tan importantes como las técnicas en empresas maduras.</strong> El método STAR (Situation, Task, Action, Result) es la estructura que los entrevistadores esperan: describe la situación con suficiente contexto, cuál era tu responsabilidad específica, qué acciones tomaste tú (no "el equipo"), y cuál fue el resultado medible. Las preguntas más frecuentes que debes preparar: "Tell me about a time you disagreed with a technical decision", "Describe a project you're most proud of", "Tell me about a time you failed", y "How do you handle working with unclear requirements". El error clásico: dar respuestas genéricas sin métricas ni especificidad.
+    </div>
+
+    <div class="flow">
+        <div class="rn-table-wrap">
+            <table class="rn-table">
+                <thead>
+                    <tr>
+                        <th>Pregunta</th>
+                        <th>Lo que evalúan</th>
+                        <th>Respuesta modelo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-light">Tell me about your most complex project</td>
+                        <td>Profundidad técnica, decisiones de arquitectura, capacidad de comunicar complejidad</td>
+                        <td>→ Proyecto del roadmap: 6 microservicios, Azure Container Apps, CI/CD, OAuth, observabilidad. Mencionar 2–3 decisiones técnicas específicas con sus trade-offs y las métricas resultantes.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Tell me about a technical decision you disagreed with</td>
+                        <td>Comunicación, madurez profesional, capacidad de defender posición con datos</td>
+                        <td>→ Estructura: S: contexto técnico → T: tu rol → A: cómo presentaste tu perspectiva con datos, cómo escuchaste la otra posición → R: la decisión tomada y qué aprendiste. No importa si "ganaste" o no.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-light">Where do you see yourself in 3 years?</td>
+                        <td>Ambición calibrada, alineación con el crecimiento de la empresa, autoreflexión</td>
+                        <td>→ Respuesta honesta: profundizar en arquitectura distribuida, liderar técnicamente un equipo pequeño, contribuir a decisiones de diseño de sistemas. Conectar con lo que esa empresa específica puede ofrecer.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon pdf">🔧</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-pdf">🔧 Simulación — El ejercicio más importante de la semana</strong> 
+                    <h3 class="mb-0">Simulación completa de 45 min con Claude como entrevistador técnico</h3>
+                    <div class="mb-1 text-body-secondary">El prompt exacto para usar hoy: <em>"Act as a senior technical interviewer for a remote .NET Backend Developer role at a scale-up. Conduct a 45-minute interview with me including: 5 min warm-up (background), 15 min technical questions on .NET and microservices, 10 min SQL (ask me to write a query live), 10 min system design (design a simple rate limiter), 5 min behavioral. Give me honest feedback on my answers, including language quality. Conduct the entire interview in English."</em> Hacer esto al menos dos veces antes del final de la semana.</div>
+                    <a class="link" target="_blank">// copiar el prompt de arriba</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative resource-card">
+                <div class="col-auto d-none d-lg-block">
+                    <div class="resource-icon vid">▶️</div>
+                </div>
+                <div class="col d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary-vid">▶️ Video — YouTube</strong> 
+                    <h3 class="mb-0">Salary negotiation for software engineers — Cómo negociar sin arruinar la oferta</h3>
+                    <div class="mb-1 text-body-secondary">Cómo negociar el salario en una oferta de trabajo de empresa tech sin arruinar la relación: cuándo traer el tema del salario, cómo responder a "¿cuál es tu expectativa salarial?", el script exacto para counter-offer, y qué factores negociar más allá del sueldo base (equity, PTO, hardware, learning budget, remote flexibility). Aplicable para empresas remotas que pagan en USD. ~20 min.</div>
+                    <a class="link" href="https://www.youtube.com/watch?v=u9BoG1n1948" target="_blank">▶️ Ver en YouTube →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ENTREGABLE -->
+<div class="deliverable">
+    <h2>🎯 Entregable — Listo para la primera entrevista real</h2>
+    <p style="font-size:0.88rem; margin-bottom: 1rem;">Al final de esta semana puedes entrar a cualquier entrevista técnica de backend .NET con confianza fundada en práctica real, no en memorización:</p>
+    <ul>
+        <li>Grabación de al menos 1 simulación de entrevista completa de 45 min en inglés — con sección técnica, SQL, system design y behavioral</li>
+        <li>Lista de 3 preguntas técnicas donde tu respuesta fue débil — con la respuesta mejorada ya preparada</li>
+        <li>5 problemas LeetCode Medium resueltos en C# con el proceso de think-aloud documentado</li>
+        <li>3 queries SQL de entrevista escritas a mano y explicadas en inglés sin ayuda de IDE</li>
+        <li>El diseño del Rate Limiter dibujado con el framework RADDS completo y las tecnologías del roadmap conectadas</li>
+        <li>Respuestas STAR preparadas en inglés para 4 behavioral questions basadas en el trabajo real del roadmap</li>
+    </ul>
+    <div style="font-size:.84rem;">
+        <strong>🔗 El cierre de 24 semanas:</strong> Esta es la semana final de un roadmap de 6 meses que cubre desde <strong>Clean Architecture y EF Core</strong> hasta <strong>microservicios en Azure, CI/CD, seguridad, observabilidad, refactoring profesional, inglés técnico, CV, y entrevistas</strong>. Lo que construiste en las Fases 1–4 no es un proyecto de aprendizaje — es un portafolio técnico de nivel senior real. La Semana 24 no es el fin de la preparación — es el inicio de la aplicación. El conocimiento técnico ya está. Ahora se trata de comunicarlo.
+    </div>
 </div>
